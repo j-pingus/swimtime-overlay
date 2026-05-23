@@ -1,0 +1,41 @@
+<div class="config-shell">
+  <header class="config-header">
+    <h1>Swimtime Overlay — Config</h1>
+  </header>
+
+  <section class="new-layout">
+    <h2>New layout</h2>
+    <form (ngSubmit)="createLayout()" class="new-layout-form">
+      <input
+        type="text"
+        placeholder="Layout name"
+        [ngModel]="newLayoutName()"
+        (ngModelChange)="newLayoutName.set($event)"
+        name="layoutName"
+        autocomplete="off"
+      />
+      <button type="submit">Create</button>
+    </form>
+    @if (nameError()) {
+      <p class="error">{{ nameError() }}</p>
+    }
+  </section>
+
+  <section class="layout-list">
+    <h2>Layouts</h2>
+    @if (store.layouts().length === 0) {
+      <p class="empty">No layouts yet. Create one above.</p>
+    } @else {
+      <ul>
+        @for (layout of store.layouts(); track layout.id) {
+          <li
+            [class.active]="layout.id === store.activeLayoutId()"
+            (click)="selectLayout(layout.id)"
+          >
+            {{ layout.name }}
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

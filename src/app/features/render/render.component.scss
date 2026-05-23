@@ -1,0 +1,22 @@
+// The render surface fills the viewport with chroma-key green.
+// Overlay content placed here will appear over the video after hardware keying.
+.render-surface {
+  position: fixed;
+  inset: 0;
+  background: #00b140; // broadcast chroma-key green
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layout-label {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.placeholder {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
