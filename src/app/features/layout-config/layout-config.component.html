@@ -5,7 +5,15 @@
       <header class="config-header">
         <a routerLink="/layouts" class="back-link">← Layouts</a>
         <h1 class="layout-name">{{ layout.name }}</h1>
-        <button class="btn-add" (click)="addFeature()">+ Add feature</button>
+        <div class="add-menu-wrapper">
+          <button class="btn-add" (click)="showAddMenu.set(!showAddMenu())">+ Add feature</button>
+          @if (showAddMenu()) {
+            <div class="add-menu">
+              <button (click)="addFeature('generic')">Generic</button>
+              <button (click)="addFeature('image')">Image</button>
+            </div>
+          }
+        </div>
       </header>
 
       <div class="zone-container">

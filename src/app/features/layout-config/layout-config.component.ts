@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { LayoutStore } from '../../core/services/layout.store';
-import { BaseFeature } from '../../core/models/layout.model';
+import { AnyFeature, FeatureType } from '../../core/models/layout.model';
 import { ZoneComponent } from './zone/zone.component';
 import { FeaturePanelComponent } from './feature-panel/feature-panel.component';
 
@@ -29,6 +29,7 @@ export class LayoutConfigComponent {
   protected readonly features = computed(() => this.layout()?.features ?? []);
 
   protected readonly selectedId = signal<string | null>(null);
+  protected readonly showAddMenu = signal(false);
 
   protected readonly selectedFeature = computed(() => {
     const id = this.selectedId();
@@ -40,29 +41,30 @@ export class LayoutConfigComponent {
     if (id) this.store.setActiveLayout(id);
   }
 
-  addFeature(): void {
+  addFeature(type: FeatureType): void {
     const layoutId = this.id();
     if (!layoutId) return;
 
-    const feature: BaseFeature = {
+    const base = {
       id: crypto.randomUUID(),
-      type: 'generic',
       label: `Feature ${this.features().length + 1}`,
-      x: 760,
-      y: 440,
-      width: 400,
-      height: 200,
+      x: 760, y: 440, width: 400, height: 200,
     };
+
+    const feature: AnyFeature = type === 'image'
+      ? { ...base, type: 'image', src: '' }
+      : { ...base, type: 'generic' };
 
     this.store.addFeature(layoutId, feature);
     this.selectedId.set(feature.id);
+    this.showAddMenu.set(false);
   }
 
   onFeatureSelect(id: string | null): void {
     this.selectedId.set(id);
   }
 
-  onFeatureUpdate(feature: BaseFeature): void {
+  onFeatureUpdate(feature: AnyFeature): void {
     const layoutId = this.id();
     if (layoutId) this.store.updateFeature(layoutId, feature);
   }

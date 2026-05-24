@@ -1,6 +1,6 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BaseFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ImageFeature } from '../../../core/models/layout.model';
 
 @Component({
   selector: 'app-feature-panel',
@@ -9,15 +9,26 @@ import { BaseFeature } from '../../../core/models/layout.model';
   styleUrl: './feature-panel.component.scss',
 })
 export class FeaturePanelComponent {
-  readonly feature = input<BaseFeature | null>(null);
+  readonly feature = input<AnyFeature | null>(null);
 
-  readonly featureChange = output<BaseFeature>();
+  readonly featureChange = output<AnyFeature>();
   readonly featureRemove = output<string>();
 
-  patch(partial: Partial<BaseFeature>): void {
+  protected readonly imageFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'image' ? f : null;
+  });
+
+  patch(partial: Partial<AnyFeature>): void {
     const f = this.feature();
     if (!f) return;
-    this.featureChange.emit({ ...f, ...partial });
+    this.featureChange.emit({ ...f, ...partial } as AnyFeature);
+  }
+
+  patchSrc(src: string): void {
+    const f = this.feature();
+    if (f?.type !== 'image') return;
+    this.featureChange.emit({ ...f, src } satisfies ImageFeature);
   }
 
   remove(): void {
@@ -27,5 +38,18 @@ export class FeaturePanelComponent {
 
   asNumber(value: string): number {
     return Math.max(0, Math.round(parseFloat(value)) || 0);
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.patchSrc(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  clearImage(): void {
+    this.patchSrc('');
   }
 }

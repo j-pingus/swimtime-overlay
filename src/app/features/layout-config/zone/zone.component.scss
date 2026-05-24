@@ -58,6 +58,30 @@ svg {
   }
 }
 
+// Transparent overlay for image features — renders selection border in config mode.
+// Sits on top of the <image> element so it reliably receives pointer events.
+.feature-overlay {
+  fill: transparent;
+  stroke: #888;
+  stroke-width: 3;
+  stroke-dasharray: 12 6;
+  cursor: pointer;
+
+  .selected & {
+    stroke: #0070f3;
+    stroke-dasharray: none;
+  }
+}
+
+// Placeholder for an image feature with no src yet — hidden in render mode.
+.feature-placeholder {
+  fill: rgba(128, 128, 128, 0.12);
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
 .anchor-move {
   fill: #fff;
   stroke: #555;

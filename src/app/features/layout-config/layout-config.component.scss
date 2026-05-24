@@ -43,8 +43,12 @@
     white-space: nowrap;
   }
 
-  .btn-add {
+  .add-menu-wrapper {
     flex-shrink: 0;
+    position: relative;
+  }
+
+  .btn-add {
     padding: 0.4rem 1rem;
     background: #0070f3;
     color: #fff;
@@ -55,6 +59,34 @@
     white-space: nowrap;
 
     &:hover { background: #005fd1; }
+  }
+
+  .add-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    z-index: 10;
+    overflow: hidden;
+    min-width: 120px;
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 0.875rem;
+      font-family: sans-serif;
+      cursor: pointer;
+      color: #333;
+
+      &:hover { background: #f0f4ff; color: #0070f3; }
+    }
   }
 }
 

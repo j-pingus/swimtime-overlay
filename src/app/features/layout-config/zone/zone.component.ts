@@ -2,7 +2,7 @@ import {
   Component, input, output, computed, signal,
   viewChild, ElementRef, HostListener,
 } from '@angular/core';
-import { BaseFeature } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, ImageFeature } from '../../../core/models/layout.model';
 
 export const CANVAS_W = 1920;
 export const CANVAS_H = 1080;
@@ -55,7 +55,11 @@ export class ZoneComponent {
     });
   });
 
-  protected readonly ANCHOR = 16; // anchor circle radius in canvas units
+  protected readonly ANCHOR = 16;
+
+  protected asImage(f: AnyFeature): ImageFeature | null {
+    return f.type === 'image' ? f : null;
+  }
 
   // --- Interaction ---
 

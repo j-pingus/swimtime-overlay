@@ -1,6 +1,6 @@
 @if (feature(); as f) {
   <div class="panel">
-    <h2>Feature</h2>
+    <h2>{{ f.type === 'image' ? 'Image feature' : 'Feature' }}</h2>
 
     <div class="field">
       <label>Label</label>
@@ -36,6 +36,28 @@
           (change)="patch({ height: asNumber($any($event.target).value) })" />
       </div>
     </div>
+
+    @if (imageFeature(); as img) {
+      <h3>Image</h3>
+
+      <div class="image-preview-wrapper">
+        @if (img.src) {
+          <img class="image-preview" [src]="img.src" alt="" />
+        } @else {
+          <div class="image-empty">No image selected</div>
+        }
+      </div>
+
+      <div class="image-actions">
+        <label class="btn-upload">
+          Choose file
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+        </label>
+        @if (img.src) {
+          <button class="btn-clear" (click)="clearImage()">Clear</button>
+        }
+      </div>
+    }
 
     <div class="actions">
       <button class="btn-remove" (click)="remove()">Delete feature</button>

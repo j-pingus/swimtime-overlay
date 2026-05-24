@@ -12,12 +12,41 @@
   @for (f of displayFeatures(); track f.id) {
     <g [class.selected]="interactive() && f.id === selectedFeatureId()">
 
-      <rect
-        [attr.x]="f.x" [attr.y]="f.y"
-        [attr.width]="f.width" [attr.height]="f.height"
-        class="feature-rect"
-        (mousedown)="interactive() && onFeatureClick($event, f)"
-      />
+      @if (asImage(f); as img) {
+        @if (img.src) {
+          <image
+            [attr.href]="img.src"
+            [attr.x]="f.x" [attr.y]="f.y"
+            [attr.width]="f.width" [attr.height]="f.height"
+            preserveAspectRatio="xMidYMid meet"
+            (mousedown)="interactive() && onFeatureClick($event, f)"
+          />
+          @if (interactive()) {
+            <!-- transparent overlay provides selection border and reliable click target -->
+            <rect
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              class="feature-overlay"
+              (mousedown)="onFeatureClick($event, f)"
+            />
+          }
+        } @else {
+          <!-- placeholder shown in config mode until an image is chosen -->
+          <rect
+            [attr.x]="f.x" [attr.y]="f.y"
+            [attr.width]="f.width" [attr.height]="f.height"
+            class="feature-rect feature-placeholder"
+            (mousedown)="interactive() && onFeatureClick($event, f)"
+          />
+        }
+      } @else {
+        <rect
+          [attr.x]="f.x" [attr.y]="f.y"
+          [attr.width]="f.width" [attr.height]="f.height"
+          class="feature-rect"
+          (mousedown)="interactive() && onFeatureClick($event, f)"
+        />
+      }
 
       <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
         {{ f.label }}
