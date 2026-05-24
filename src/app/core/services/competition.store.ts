@@ -27,6 +27,15 @@ const DUMMY_ROSTER: Omit<Lane, 'number'>[] = [
   { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: '1:03.45', time: '1:03.45', rank: '10', timestamp: null },
 ];
 
+function emptyLane(number: number): Lane {
+  return { number, swimmerName: '', club: '', nat: '', entryTime: null, officialTime: null, time: null, rank: null, timestamp: null };
+}
+
+function normalizeLanes(lanes: Lane[], laneCount: number): Lane[] {
+  const byNumber = new Map(lanes.map((l) => [l.number, l]));
+  return Array.from({ length: laneCount }, (_, i) => byNumber.get(i + 1) ?? emptyLane(i + 1));
+}
+
 function buildDummyPool(laneCount: number): Pool {
   const lanes: Lane[] = Array.from({ length: laneCount }, (_, i) => {
     const base = DUMMY_ROSTER[i] ?? {
@@ -95,7 +104,24 @@ export class CompetitionStore {
   // --- Live updates (called by the live data service with already-mapped domain objects) ---
 
   setCompetition(competition: Competition): void {
-    this.update((s) => ({ ...s, competition }));
+    this.update((s) => {
+      const sameHeat =
+        s.competition.currentEvent?.number === competition.currentEvent?.number &&
+        s.competition.currentHeat?.number === competition.currentHeat?.number;
+
+      let lanes = normalizeLanes(competition.pool.lanes, s.laneCount);
+
+      if (sameHeat) {
+        const currentByNumber = new Map(s.competition.pool.lanes.map((l) => [l.number, l]));
+        lanes = lanes.map((lane) => {
+          const existing = currentByNumber.get(lane.number);
+          if (!existing) return lane;
+          return { ...lane, time: existing.time, rank: existing.rank, timestamp: existing.timestamp };
+        });
+      }
+
+      return { ...s, competition: { ...competition, pool: { lanes } } };
+    });
   }
 
   updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {

@@ -194,7 +194,13 @@ export class LayoutStore {
   private migrate(state: LayoutStoreState): LayoutStoreState {
     return {
       ...state,
-      layouts: state.layouts.map((l) => ({ ...l, features: l.features ?? [] })),
+      layouts: state.layouts.map((l) => ({
+        ...l,
+        features: (l.features ?? []).map((f) => {
+          if (f.type !== 'lane' || 'displayDuration' in f) return f;
+          return Object.assign({}, f, { displayDuration: null }) as AnyFeature;
+        }),
+      })),
     };
   }
 }

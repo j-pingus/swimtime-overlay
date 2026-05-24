@@ -53,6 +53,8 @@ export interface LaneFeature extends FeatureBase {
   bold: boolean;
   italic: boolean;
   align: TextAlign;
+  /** Hide lane data this many seconds after its timestamp. Null = always show. */
+  displayDuration: number | null;
 }
 
 export type AnyFeature = GenericFeature | ImageFeature | TextFeature | RectFeature | LaneFeature;

@@ -5,12 +5,21 @@
 
   <section class="pool-config">
     <h2>Pool</h2>
-    <div class="lane-count">
-      <label>Lanes</label>
-      <div class="lane-count-controls">
-        <button (click)="setLaneCount((competition.laneCount() - 1).toString())" [disabled]="competition.laneCount() <= 1">−</button>
-        <span>{{ competition.laneCount() }}</span>
-        <button (click)="setLaneCount((competition.laneCount() + 1).toString())" [disabled]="competition.laneCount() >= 10">+</button>
+    <div class="pool-config-row">
+      <div class="lane-count">
+        <label>Lanes</label>
+        <div class="lane-count-controls">
+          <button (click)="setLaneCount((competition.laneCount() - 1).toString())" [disabled]="competition.laneCount() <= 1">−</button>
+          <span>{{ competition.laneCount() }}</span>
+          <button (click)="setLaneCount((competition.laneCount() + 1).toString())" [disabled]="competition.laneCount() >= 10">+</button>
+        </div>
+      </div>
+      <div class="live-toggle">
+        @if (competition.mode() === 'live') {
+          <button class="btn-live btn-live--on" (click)="disableLive()">● Live</button>
+        } @else {
+          <button class="btn-live btn-live--off" (click)="enableLive()">○ Live</button>
+        }
       </div>
     </div>
   </section>

@@ -207,6 +207,22 @@ select {
   }
 }
 
+.field--inline {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  input[type='number'] {
+    width: 60px;
+  }
+
+  label {
+    font-size: 0.85rem;
+    color: #555;
+    white-space: nowrap;
+  }
+}
+
 .field--color {
   flex: 0 0 auto;
   min-width: 60px;

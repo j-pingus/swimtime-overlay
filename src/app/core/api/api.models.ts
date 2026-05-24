@@ -64,7 +64,29 @@ export interface LaptimeDto {
   timestamp?: number;
 }
 
+export type SwimTimeMessageType =
+  | 'EVENT_LOADED'
+  | 'HEAT_LOADED'
+  | 'START_LIST'
+  | 'CLUB_LOADED'
+  | 'PODIUM'
+  | 'COMPETITION_LOADED'
+  | 'LAPTIME_LOADED'
+  | 'TIME_KEEPING'
+  | 'HEAT_OFFICIAL'
+  | 'SESSION_LOADED'
+  | 'ATHLETE_LOADED'
+  | 'ENTRY_LOADED'
+  | 'AGEGROUP_LOADED'
+  | 'CHRONO_START'
+  | 'CHRONO_STOP'
+  | 'HEAT_ARRIVED'
+  | 'SITB_STOPPED'
+  | 'MEDAL_CEREMONY'
+  | 'ALL';
+
 export interface EventAndHeatDto {
+  swimTimeMessageType?: SwimTimeMessageType;
   event?: string;
   heat?: string;
   isFinished?: boolean;
