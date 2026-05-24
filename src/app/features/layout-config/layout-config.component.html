@@ -1,0 +1,12 @@
+<div class="layout-config-shell">
+  <a routerLink="/layouts" class="back-link">← All layouts</a>
+
+  @if (layout()) {
+    <header class="page-header">
+      <h1>{{ layout()!.name }}</h1>
+    </header>
+    <p class="placeholder-notice">Layout configuration coming soon.</p>
+  } @else {
+    <p class="not-found">Layout not found.</p>
+  }
+</div>
