@@ -115,8 +115,8 @@ export class ZoneComponent {
       const dx = d.currentX - d.startX;
       const dy = d.currentY - d.startY;
       const updated: BaseFeature = d.mode === 'move'
-        ? { ...feature, x: clamp(d.origX + dx, 0, CANVAS_W - feature.width), y: clamp(d.origY + dy, 0, CANVAS_H - feature.height) }
-        : { ...feature, width: Math.max(40, d.origW + dx), height: Math.max(20, d.origH + dy) };
+        ? { ...feature, x: round(clamp(d.origX + dx, 0, CANVAS_W - feature.width)), y: round(clamp(d.origY + dy, 0, CANVAS_H - feature.height)) }
+        : { ...feature, width: round(clamp(d.origW + dx, 40, CANVAS_W - d.origX)), height: round(clamp(d.origH + dy, 20, CANVAS_H - d.origY)) };
       this.featureUpdate.emit(updated);
     }
     this.drag.set(null);
@@ -132,4 +132,8 @@ export class ZoneComponent {
 
 function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
+}
+
+function round(v: number): number {
+  return Math.round(v);
 }

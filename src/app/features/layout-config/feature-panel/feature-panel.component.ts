@@ -26,6 +26,6 @@ export class FeaturePanelComponent {
   }
 
   asNumber(value: string): number {
-    return Math.max(0, parseInt(value, 10) || 0);
+    return Math.max(0, Math.round(parseFloat(value)) || 0);
   }
 }
