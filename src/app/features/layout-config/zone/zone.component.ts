@@ -51,7 +51,7 @@ export class ZoneComponent {
       const dy = d.currentY - d.startY;
       return d.mode === 'move'
         ? { ...f, x: clamp(d.origX + dx, 0, CANVAS_W - f.width), y: clamp(d.origY + dy, 0, CANVAS_H - f.height) }
-        : { ...f, width: Math.max(40, d.origW + dx), height: Math.max(20, d.origH + dy) };
+        : { ...f, width: clamp(d.origW + dx, 40, CANVAS_W - d.origX), height: clamp(d.origH + dy, 20, CANVAS_H - d.origY) };
     });
   });
 
