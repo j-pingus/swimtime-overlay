@@ -85,6 +85,11 @@ export class LayoutListComponent {
     if (n >= 1 && n <= 10) this.competition.setLaneCount(n);
   }
 
+  setFirstLane(value: string): void {
+    const n = parseInt(value, 10);
+    if (!isNaN(n) && n >= 0) this.competition.setFirstLane(n);
+  }
+
   enableLive(): void {
     this.liveData.start();
   }

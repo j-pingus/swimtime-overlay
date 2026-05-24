@@ -6,12 +6,15 @@ export type CompetitionMode = 'live' | 'config';
 export interface CompetitionStoreState {
   mode: CompetitionMode;
   laneCount: number;
+  firstLane: number;
   competition: Competition;
 }
 
 const MODE_KEY       = 'swimtime_competition_mode';
-const LANE_COUNT_KEY = 'swimtime_lane_count';
-const DEFAULT_LANES  = 8;
+const LANE_COUNT_KEY  = 'swimtime_lane_count';
+const FIRST_LANE_KEY  = 'swimtime_first_lane';
+const DEFAULT_LANES   = 8;
+const DEFAULT_FIRST_LANE = 1;
 
 // Full roster of dummy swimmers — pool is sliced/extended to match laneCount.
 const DUMMY_ROSTER: Omit<Lane, 'number'>[] = [
@@ -31,15 +34,19 @@ function emptyLane(number: number): Lane {
   return { number, swimmerName: '', club: '', nat: '', entryTime: null, officialTime: null, time: null, rank: null, timestamp: null };
 }
 
-function normalizeLanes(lanes: Lane[], laneCount: number): Lane[] {
+function normalizeLanes(lanes: Lane[], laneCount: number, firstLane: number): Lane[] {
   const byNumber = new Map(lanes.map((l) => [l.number, l]));
-  return Array.from({ length: laneCount }, (_, i) => byNumber.get(i + 1) ?? emptyLane(i + 1));
+  return Array.from({ length: laneCount }, (_, i) => {
+    const n = firstLane + i;
+    return byNumber.get(n) ?? emptyLane(n);
+  });
 }
 
-function buildDummyPool(laneCount: number): Pool {
+function buildDummyPool(laneCount: number, firstLane: number): Pool {
   const lanes: Lane[] = Array.from({ length: laneCount }, (_, i) => {
+    const n = firstLane + i;
     const base = DUMMY_ROSTER[i] ?? {
-      swimmerName: `Swimmer ${i + 1}`,
+      swimmerName: `Swimmer ${n}`,
       club: '',
       nat: '',
       entryTime: null,
@@ -48,16 +55,16 @@ function buildDummyPool(laneCount: number): Pool {
       rank: null,
       timestamp: null,
     };
-    return { number: i + 1, ...base };
+    return { number: n, ...base };
   });
   return { lanes };
 }
 
-function buildDummyCompetition(laneCount: number): Competition {
+function buildDummyCompetition(laneCount: number, firstLane: number): Competition {
   return {
     currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', heats: [{ number: '1' }, { number: '2' }, { number: '3' }] },
     currentHeat:  { number: '2' },
-    pool: buildDummyPool(laneCount),
+    pool: buildDummyPool(laneCount, firstLane),
   };
 }
 
@@ -74,6 +81,7 @@ export class CompetitionStore {
 
   readonly mode         = computed(() => this._state().mode);
   readonly laneCount    = computed(() => this._state().laneCount);
+  readonly firstLane    = computed(() => this._state().firstLane);
   readonly competition  = computed(() => this._state().competition);
   readonly pool         = computed(() => this._state().competition.pool);
   readonly currentEvent = computed(() => this._state().competition.currentEvent);
@@ -85,18 +93,28 @@ export class CompetitionStore {
     this.update((s) => ({
       ...s,
       mode,
-      competition: mode === 'config' ? buildDummyCompetition(s.laneCount) : EMPTY_COMPETITION,
+      competition: mode === 'config' ? buildDummyCompetition(s.laneCount, s.firstLane) : EMPTY_COMPETITION,
     }));
   }
 
-  // --- Lane count (config mode only — rebuilds the dummy pool) ---
+  // --- Lane count / first lane (config mode only — rebuilds the dummy pool) ---
 
   setLaneCount(count: number): void {
     this.update((s) => ({
       ...s,
       laneCount: count,
       competition: s.mode === 'config'
-        ? { ...s.competition, pool: buildDummyPool(count) }
+        ? { ...s.competition, pool: buildDummyPool(count, s.firstLane) }
+        : s.competition,
+    }));
+  }
+
+  setFirstLane(first: number): void {
+    this.update((s) => ({
+      ...s,
+      firstLane: first,
+      competition: s.mode === 'config'
+        ? { ...s.competition, pool: buildDummyPool(s.laneCount, first) }
         : s.competition,
     }));
   }
@@ -109,7 +127,7 @@ export class CompetitionStore {
         s.competition.currentEvent?.number === competition.currentEvent?.number &&
         s.competition.currentHeat?.number === competition.currentHeat?.number;
 
-      let lanes = normalizeLanes(competition.pool.lanes, s.laneCount);
+      let lanes = normalizeLanes(competition.pool.lanes, s.laneCount, s.firstLane);
 
       if (sameHeat) {
         const currentByNumber = new Map(s.competition.pool.lanes.map((l) => [l.number, l]));
@@ -164,15 +182,20 @@ export class CompetitionStore {
       localStorage.getItem(MODE_KEY) === 'live' ? 'live' : 'config';
     const laneCount =
       parseInt(localStorage.getItem(LANE_COUNT_KEY) ?? '', 10) || DEFAULT_LANES;
+    const firstLane =
+      parseInt(localStorage.getItem(FIRST_LANE_KEY) ?? '', 10);
+    const resolvedFirstLane = isNaN(firstLane) ? DEFAULT_FIRST_LANE : firstLane;
     return {
       mode,
       laneCount,
-      competition: mode === 'config' ? buildDummyCompetition(laneCount) : EMPTY_COMPETITION,
+      firstLane: resolvedFirstLane,
+      competition: mode === 'config' ? buildDummyCompetition(laneCount, resolvedFirstLane) : EMPTY_COMPETITION,
     };
   }
 
   private persist(state: CompetitionStoreState): void {
     localStorage.setItem(MODE_KEY, state.mode);
     localStorage.setItem(LANE_COUNT_KEY, String(state.laneCount));
+    localStorage.setItem(FIRST_LANE_KEY, String(state.firstLane));
   }
 }

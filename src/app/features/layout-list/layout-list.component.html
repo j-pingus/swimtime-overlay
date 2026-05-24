@@ -7,6 +7,14 @@
     <h2>Pool</h2>
     <div class="pool-config-row">
       <div class="lane-count">
+        <label>First lane</label>
+        <div class="lane-count-controls">
+          <button (click)="setFirstLane((competition.firstLane() - 1).toString())" [disabled]="competition.firstLane() <= 0">−</button>
+          <span>{{ competition.firstLane() }}</span>
+          <button (click)="setFirstLane((competition.firstLane() + 1).toString())">+</button>
+        </div>
+      </div>
+      <div class="lane-count">
         <label>Lanes</label>
         <div class="lane-count-controls">
           <button (click)="setLaneCount((competition.laneCount() - 1).toString())" [disabled]="competition.laneCount() <= 1">−</button>
