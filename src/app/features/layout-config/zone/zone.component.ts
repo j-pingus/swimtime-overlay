@@ -2,7 +2,7 @@ import {
   Component, inject, input, output, computed, signal,
   viewChild, ElementRef, HostListener,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, ImageFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, ImageFeature, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { resolveTemplate } from '../../../core/utils/template.util';
 
@@ -67,6 +67,18 @@ export class ZoneComponent {
 
   protected asText(f: AnyFeature): TextFeature | null {
     return f.type === 'text' ? f : null;
+  }
+
+  protected asRect(f: AnyFeature): RectFeature | null {
+    return f.type === 'rect' ? f : null;
+  }
+
+  protected rectFill(f: RectFeature): string {
+    return f.bgColor;
+  }
+
+  protected rectFillOpacity(f: RectFeature): number {
+    return f.bgOpacity / 100;
   }
 
   protected resolvedText(f: TextFeature): string {

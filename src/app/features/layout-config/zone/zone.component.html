@@ -40,6 +40,31 @@
           />
         }
 
+      } @else if (asRect(f); as r) {
+        <!-- Visual rectangle -->
+        <rect
+          [attr.x]="r.x + r.padding"
+          [attr.y]="r.y + r.padding"
+          [attr.width]="r.width - 2 * r.padding"
+          [attr.height]="r.height - 2 * r.padding"
+          [attr.fill]="rectFill(r)"
+          [attr.fill-opacity]="rectFillOpacity(r)"
+          [attr.stroke]="r.border ? r.borderColor : 'none'"
+          [attr.stroke-width]="r.border ? r.borderWidth : 0"
+          [attr.rx]="r.borderRadius"
+          class="rect-visual"
+          (mousedown)="interactive() && onFeatureClick($event, f)"
+        />
+        @if (interactive()) {
+          <!-- selection + click overlay on the full bounding box so anchors always work -->
+          <rect
+            [attr.x]="f.x" [attr.y]="f.y"
+            [attr.width]="f.width" [attr.height]="f.height"
+            class="feature-overlay"
+            (mousedown)="onFeatureClick($event, f)"
+          />
+        }
+
       } @else if (asText(f); as txt) {
         <!-- Hit area + selection border (config only, hidden in render mode) -->
         <rect
@@ -69,8 +94,8 @@
         />
       }
 
-      <!-- Label shown in config mode only; suppressed for text features (template IS the label) -->
-      @if (!asText(f)) {
+      <!-- Label shown in config mode only; suppressed for text/rect (their visuals speak for themselves) -->
+      @if (!asText(f) && !asRect(f)) {
         <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
           {{ f.label }}
         </text>

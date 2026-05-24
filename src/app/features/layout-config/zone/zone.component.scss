@@ -58,6 +58,11 @@ svg {
   }
 }
 
+// Visual rectangle — purely decorative, pointer-events off so the overlay handles interaction.
+.rect-visual {
+  pointer-events: none;
+}
+
 // Bounding rect for text features — dashed outline in config, invisible in render.
 .text-bg {
   fill: transparent;

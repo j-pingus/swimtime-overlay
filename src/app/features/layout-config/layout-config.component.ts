@@ -54,6 +54,7 @@ export class LayoutConfigComponent {
     const feature: AnyFeature =
       type === 'image' ? { ...base, type: 'image', src: '' }
       : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left' }
+      : type === 'rect' ? { ...base, type: 'rect', bgColor: '#000000', bgOpacity: 50, border: false, borderColor: '#ffffff', borderWidth: 2, borderRadius: 0, padding: 0 }
       : { ...base, type: 'generic' };
 
     this.store.addFeature(layoutId, feature);

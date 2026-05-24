@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AnyFeature, ImageFeature, TextFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ImageFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
 
 @Component({
   selector: 'app-feature-panel',
@@ -28,10 +28,21 @@ export class FeaturePanelComponent {
     return f?.type === 'text' ? f : null;
   });
 
+  protected readonly rectFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'rect' ? f : null;
+  });
+
   patch(partial: Partial<AnyFeature>): void {
     const f = this.feature();
     if (!f) return;
     this.featureChange.emit({ ...f, ...partial } as AnyFeature);
+  }
+
+  patchRect(partial: Partial<RectFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'rect') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies RectFeature);
   }
 
   patchText(partial: Partial<TextFeature>): void {
@@ -75,6 +86,7 @@ export class FeaturePanelComponent {
   }
 
   typeLabel(f: AnyFeature): string {
-    return f.type === 'image' ? 'IMG' : f.type === 'text' ? 'TXT' : 'GEN';
+    const map: Record<string, string> = { image: 'IMG', text: 'TXT', rect: 'RCT', generic: 'GEN' };
+    return map[f.type] ?? 'GEN';
   }
 }

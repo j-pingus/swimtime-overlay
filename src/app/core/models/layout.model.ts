@@ -1,4 +1,4 @@
-export type FeatureType = 'generic' | 'image' | 'text';
+export type FeatureType = 'generic' | 'image' | 'text' | 'rect';
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -31,7 +31,20 @@ export interface TextFeature extends FeatureBase {
   align: TextAlign;
 }
 
-export type AnyFeature = GenericFeature | ImageFeature | TextFeature;
+export interface RectFeature extends FeatureBase {
+  type: 'rect';
+  bgColor: string;
+  /** Background opacity 0–100. */
+  bgOpacity: number;
+  border: boolean;
+  borderColor: string;
+  borderWidth: number;
+  borderRadius: number;
+  /** Insets the visual rectangle from the bounding-box edges on all sides. */
+  padding: number;
+}
+
+export type AnyFeature = GenericFeature | ImageFeature | TextFeature | RectFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;

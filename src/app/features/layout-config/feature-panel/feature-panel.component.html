@@ -1,6 +1,6 @@
 @if (feature(); as f) {
   <div class="panel">
-    <h2>{{ f.type === 'image' ? 'Image feature' : 'Feature' }}</h2>
+    <h2>{{ f.type === 'image' ? 'Image' : f.type === 'text' ? 'Text' : f.type === 'rect' ? 'Rectangle' : 'Feature' }}</h2>
 
     <div class="field">
       <label>Label</label>
@@ -36,6 +36,61 @@
           (change)="patch({ height: asNumber($any($event.target).value) })" />
       </div>
     </div>
+
+    @if (rectFeature(); as r) {
+      <h3>Background</h3>
+
+      <div class="field-row">
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="r.bgColor"
+            (input)="patchRect({ bgColor: $any($event.target).value })" />
+        </div>
+        <div class="field">
+          <label>Opacity %</label>
+          <input type="number" [value]="r.bgOpacity" min="0" max="100"
+            (change)="patchRect({ bgOpacity: asNumber($any($event.target).value) })" />
+        </div>
+      </div>
+
+      <h3>Border</h3>
+
+      <div class="field-row field-row--center">
+        <label class="toggle-label">
+          <input type="checkbox" [checked]="r.border"
+            (change)="patchRect({ border: $any($event.target).checked })" />
+          Show border
+        </label>
+      </div>
+
+      @if (r.border) {
+        <div class="field-row">
+          <div class="field field--color">
+            <label>Color</label>
+            <input type="color" [value]="r.borderColor"
+              (input)="patchRect({ borderColor: $any($event.target).value })" />
+          </div>
+          <div class="field">
+            <label>Thickness</label>
+            <input type="number" [value]="r.borderWidth" min="1"
+              (change)="patchRect({ borderWidth: asNumber($any($event.target).value) })" />
+          </div>
+        </div>
+      }
+
+      <div class="field-row">
+        <div class="field">
+          <label>Rounded corners</label>
+          <input type="number" [value]="r.borderRadius" min="0"
+            (change)="patchRect({ borderRadius: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field">
+          <label>Padding</label>
+          <input type="number" [value]="r.padding" min="0"
+            (change)="patchRect({ padding: asNumber($any($event.target).value) })" />
+        </div>
+      </div>
+    }
 
     @if (textFeature(); as txt) {
       <h3>Text</h3>
