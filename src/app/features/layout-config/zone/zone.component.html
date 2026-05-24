@@ -41,20 +41,31 @@
         }
 
       } @else if (asRect(f); as r) {
-        <!-- Visual rectangle -->
+        <!-- Fill covers the full bounding box -->
         <rect
-          [attr.x]="r.x + r.padding"
-          [attr.y]="r.y + r.padding"
-          [attr.width]="r.width - 2 * r.padding"
-          [attr.height]="r.height - 2 * r.padding"
+          [attr.x]="r.x" [attr.y]="r.y"
+          [attr.width]="r.width" [attr.height]="r.height"
           [attr.fill]="rectFill(r)"
           [attr.fill-opacity]="rectFillOpacity(r)"
-          [attr.stroke]="r.border ? r.borderColor : 'none'"
-          [attr.stroke-width]="r.border ? r.borderWidth : 0"
+          stroke="none"
           [attr.rx]="r.borderRadius"
           class="rect-visual"
           (mousedown)="interactive() && onFeatureClick($event, f)"
         />
+        <!-- Border drawn inset from the fill edges by padding -->
+        @if (r.border) {
+          <rect
+            [attr.x]="r.x + r.padding"
+            [attr.y]="r.y + r.padding"
+            [attr.width]="r.width - 2 * r.padding"
+            [attr.height]="r.height - 2 * r.padding"
+            fill="none"
+            [attr.stroke]="r.borderColor"
+            [attr.stroke-width]="r.borderWidth"
+            [attr.rx]="r.borderRadius"
+            class="rect-visual"
+          />
+        }
         @if (interactive()) {
           <!-- selection + click overlay on the full bounding box so anchors always work -->
           <rect
