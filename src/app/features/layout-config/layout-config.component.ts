@@ -1,4 +1,4 @@
-import { Component, inject, computed, effect } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -24,9 +24,7 @@ export class LayoutConfigComponent {
   });
 
   constructor() {
-    effect(() => {
-      const id = this.id();
-      if (id) this.store.setActiveLayout(id);
-    });
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) this.store.setActiveLayout(id);
   }
 }
