@@ -129,7 +129,7 @@
         </text>
       }
 
-      @if (interactive()) {
+      @if (interactive() && f.id === selectedFeatureId()) {
         <!-- Move anchor: top-left -->
         <circle
           [attr.cx]="f.x" [attr.cy]="f.y" [attr.r]="ANCHOR"
