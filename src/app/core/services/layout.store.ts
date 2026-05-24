@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Layout, BaseFeature } from '../models/layout.model';
+import { Layout, AnyFeature, BaseFeature } from '../models/layout.model';
 
 export type LayoutStoreState = {
   layouts: Layout[];
@@ -58,6 +58,15 @@ export class LayoutStore {
         l.id === layoutId
           ? { ...l, features: l.features.map((f) => (f.id === feature.id ? feature : f)) }
           : l,
+      ),
+    }));
+  }
+
+  reorderFeatures(layoutId: string, features: AnyFeature[]): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) =>
+        l.id === layoutId ? { ...l, features } : l,
       ),
     }));
   }

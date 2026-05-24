@@ -121,7 +121,28 @@
     </div>
   </div>
 } @else {
-  <div class="empty">
-    <p>Select a feature or add one to configure it.</p>
+  <div class="feature-list-panel">
+    <h2>Features</h2>
+
+    @if (features().length === 0) {
+      <p class="empty-hint">Add a feature to get started.</p>
+    } @else {
+      <p class="list-hint">Drag to reorder · bottom of list renders on top</p>
+
+      <div
+        cdkDropList
+        [cdkDropListData]="features()"
+        (cdkDropListDropped)="onDrop($event)"
+        class="feature-list"
+      >
+        @for (f of features(); track f.id) {
+          <div cdkDrag class="feature-item" (click)="featureSelect.emit(f.id)">
+            <span cdkDragHandle class="drag-handle">⠿</span>
+            <span class="type-badge type-badge--{{ f.type }}">{{ typeLabel(f) }}</span>
+            <span class="item-label">{{ f.label }}</span>
+          </div>
+        }
+      </div>
+    }
   </div>
 }

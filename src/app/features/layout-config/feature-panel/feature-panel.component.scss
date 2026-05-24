@@ -72,6 +72,104 @@ h3 {
   gap: 0.5rem;
 }
 
+// ── Feature list (empty state) ─────────────────────────────────────────────
+
+.feature-list-panel {
+  padding: 1rem;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.empty-hint {
+  font-size: 0.85rem;
+  color: #aaa;
+  font-family: sans-serif;
+  margin: 0.5rem 0 0;
+}
+
+.list-hint {
+  font-size: 0.72rem;
+  color: #bbb;
+  font-family: sans-serif;
+  margin: 0;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 0.25rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  font-family: sans-serif;
+
+  &:hover {
+    border-color: #0070f3;
+    background: #f0f4ff;
+  }
+
+  // CDK placeholder and preview
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #0070f3;
+  }
+}
+
+.drag-handle {
+  color: #bbb;
+  font-size: 1.1rem;
+  cursor: grab;
+  flex-shrink: 0;
+
+  &:active { cursor: grabbing; }
+}
+
+.type-badge {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: sans-serif;
+
+  &--generic { background: #e8e8e8; color: #666; }
+  &--image   { background: #e8f4ff; color: #0070c0; }
+  &--text    { background: #f0e8ff; color: #7000c0; }
+}
+
+.item-label {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Feature editor ─────────────────────────────────────────────────────────
+
 .template-input {
   width: 100%;
   padding: 0.4rem 0.5rem;

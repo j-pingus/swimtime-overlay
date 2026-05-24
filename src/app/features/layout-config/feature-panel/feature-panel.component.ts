@@ -1,18 +1,22 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AnyFeature, ImageFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
+import { AnyFeature, ImageFeature, TextFeature } from '../../../core/models/layout.model';
 
 @Component({
   selector: 'app-feature-panel',
-  imports: [FormsModule],
+  imports: [FormsModule, CdkDropList, CdkDrag, CdkDragHandle],
   templateUrl: './feature-panel.component.html',
   styleUrl: './feature-panel.component.scss',
 })
 export class FeaturePanelComponent {
   readonly feature = input<AnyFeature | null>(null);
+  readonly features = input<AnyFeature[]>([]);
 
   readonly featureChange = output<AnyFeature>();
   readonly featureRemove = output<string>();
+  readonly featureSelect = output<string>();
+  readonly featuresReorder = output<AnyFeature[]>();
 
   protected readonly imageFeature = computed(() => {
     const f = this.feature();
@@ -62,5 +66,15 @@ export class FeaturePanelComponent {
 
   clearImage(): void {
     this.patchSrc('');
+  }
+
+  onDrop(event: CdkDragDrop<AnyFeature[]>): void {
+    const reordered = [...this.features()];
+    moveItemInArray(reordered, event.previousIndex, event.currentIndex);
+    this.featuresReorder.emit(reordered);
+  }
+
+  typeLabel(f: AnyFeature): string {
+    return f.type === 'image' ? 'IMG' : f.type === 'text' ? 'TXT' : 'GEN';
   }
 }

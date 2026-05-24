@@ -70,6 +70,11 @@ export class LayoutConfigComponent {
     if (layoutId) this.store.updateFeature(layoutId, feature);
   }
 
+  onFeaturesReorder(features: AnyFeature[]): void {
+    const layoutId = this.id();
+    if (layoutId) this.store.reorderFeatures(layoutId, features);
+  }
+
   onFeatureRemove(featureId: string): void {
     const layoutId = this.id();
     if (layoutId) {

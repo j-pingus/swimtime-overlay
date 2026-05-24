@@ -30,8 +30,11 @@
     <div class="right-panel">
       <app-feature-panel
         [feature]="selectedFeature()"
+        [features]="features()"
         (featureChange)="onFeatureUpdate($event)"
         (featureRemove)="onFeatureRemove($event)"
+        (featureSelect)="onFeatureSelect($event)"
+        (featuresReorder)="onFeaturesReorder($event)"
       />
     </div>
 
