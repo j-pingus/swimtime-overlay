@@ -40,6 +40,13 @@ export class LayoutStore {
     this.update((s) => ({ ...s, activeLayoutId: id }));
   }
 
+  renameLayout(id: string, name: string): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) => l.id === id ? { ...l, name } : l),
+    }));
+  }
+
   // --- Feature CRUD ---
 
   addFeature(layoutId: string, feature: BaseFeature): void {

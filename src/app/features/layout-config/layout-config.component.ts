@@ -41,6 +41,11 @@ export class LayoutConfigComponent {
     if (id) this.store.setActiveLayout(id);
   }
 
+  renameLayout(name: string): void {
+    const id = this.id();
+    if (id && name.trim()) this.store.renameLayout(id, name.trim());
+  }
+
   addFeature(type: FeatureType): void {
     const layoutId = this.id();
     if (!layoutId) return;

@@ -38,9 +38,24 @@
     font-size: 1rem;
     font-weight: 600;
     margin: 0;
+    min-width: 0;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    font-family: inherit;
+    color: inherit;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &:hover { border-color: #ddd; }
+
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+      background: #fff;
+    }
   }
 
   .add-menu-wrapper {

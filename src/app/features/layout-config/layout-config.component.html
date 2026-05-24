@@ -4,7 +4,12 @@
     <div class="left-panel">
       <header class="config-header">
         <a routerLink="/layouts" class="back-link">← Layouts</a>
-        <h1 class="layout-name">{{ layout.name }}</h1>
+        <input
+          class="layout-name"
+          type="text"
+          [value]="layout.name"
+          (change)="renameLayout($any($event.target).value)"
+        />
         <div class="add-menu-wrapper">
           <button class="btn-add" (click)="showAddMenu.set(!showAddMenu())">+ Add feature</button>
           @if (showAddMenu()) {
