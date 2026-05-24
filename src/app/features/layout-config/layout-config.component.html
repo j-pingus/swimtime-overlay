@@ -9,7 +9,6 @@
           <button class="btn-add" (click)="showAddMenu.set(!showAddMenu())">+ Add feature</button>
           @if (showAddMenu()) {
             <div class="add-menu">
-              <button (click)="addFeature('generic')">Generic</button>
               <button (click)="addFeature('image')">Image</button>
               <button (click)="addFeature('text')">Text</button>
               <button (click)="addFeature('rect')">Rectangle</button>
