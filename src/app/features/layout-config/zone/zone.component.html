@@ -77,6 +77,12 @@
         }
 
       } @else if (asTextLike(f); as tl) {
+        <defs>
+          <clipPath [id]="'tc-' + f.id">
+            <rect [attr.x]="f.x" [attr.y]="f.y" [attr.width]="f.width" [attr.height]="f.height" />
+          </clipPath>
+        </defs>
+
         <!-- Hit area + selection border (config only, hidden in render mode) -->
         <rect
           [attr.x]="f.x" [attr.y]="f.y"
@@ -96,6 +102,10 @@
               [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
               [attr.font-style]="tl.italic ? 'italic' : 'normal'"
               [attr.text-anchor]="textAnchor(tl)"
+              [attr.stroke]="tl.outlineColor ?? 'none'"
+              [attr.stroke-width]="tl.outlineColor ? 3 : 0"
+              [attr.clip-path]="'url(#tc-' + f.id + ')'"
+              style="paint-order: stroke fill"
               class="text-content"
             >{{ row.text }}</text>
           }
@@ -108,6 +118,10 @@
             [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
             [attr.font-style]="tl.italic ? 'italic' : 'normal'"
             [attr.text-anchor]="textAnchor(tl)"
+            [attr.stroke]="tl.outlineColor ?? 'none'"
+            [attr.stroke-width]="tl.outlineColor ? 3 : 0"
+            [attr.clip-path]="'url(#tc-' + f.id + ')'"
+            style="paint-order: stroke fill"
             class="text-content"
             (mousedown)="interactive() && onFeatureClick($event, f)"
           >{{ resolvedDisplayText(tl) }}</text>

@@ -243,8 +243,14 @@ export class LayoutStore {
       layouts: state.layouts.map((l) => ({
         ...l,
         features: (l.features ?? []).map((f) => {
-          if (f.type !== 'lane' || 'displayDuration' in f) return f;
-          return Object.assign({}, f, { displayDuration: null }) as AnyFeature;
+          let patched = f;
+          if (f.type === 'lane' && !('displayDuration' in f)) {
+            patched = Object.assign({}, patched, { displayDuration: null }) as AnyFeature;
+          }
+          if ((f.type === 'text' || f.type === 'lane') && !('outlineColor' in f)) {
+            patched = Object.assign({}, patched, { outlineColor: null }) as AnyFeature;
+          }
+          return patched;
         }),
       })),
     };

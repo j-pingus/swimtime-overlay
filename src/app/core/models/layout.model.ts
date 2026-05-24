@@ -29,6 +29,7 @@ export interface TextFeature extends FeatureBase {
   bold: boolean;
   italic: boolean;
   align: TextAlign;
+  outlineColor: string | null;
 }
 
 export interface RectFeature extends FeatureBase {
@@ -53,6 +54,7 @@ export interface LaneFeature extends FeatureBase {
   bold: boolean;
   italic: boolean;
   align: TextAlign;
+  outlineColor: string | null;
   /** Hide lane data this many seconds after its timestamp. Null = always show. */
   displayDuration: number | null;
 }

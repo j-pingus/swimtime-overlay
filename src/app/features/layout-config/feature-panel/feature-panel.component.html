@@ -114,6 +114,17 @@
           <input type="color" [value]="ln.color"
             (input)="patchLane({ color: $any($event.target).value })" />
         </div>
+        <div class="field field--color">
+          <label class="toggle-label">
+            <input type="checkbox" [checked]="ln.outlineColor !== null"
+              (change)="patchLane({ outlineColor: $any($event.target).checked ? '#000000' : null })" />
+            Outline
+          </label>
+          @if (ln.outlineColor !== null) {
+            <input type="color" [value]="ln.outlineColor"
+              (input)="patchLane({ outlineColor: $any($event.target).value })" />
+          }
+        </div>
       </div>
 
       <div class="style-row">
@@ -185,6 +196,17 @@
           <label>Color</label>
           <input type="color" [value]="txt.color"
             (input)="patchText({ color: $any($event.target).value })" />
+        </div>
+        <div class="field field--color">
+          <label class="toggle-label">
+            <input type="checkbox" [checked]="txt.outlineColor !== null"
+              (change)="patchText({ outlineColor: $any($event.target).checked ? '#000000' : null })" />
+            Outline
+          </label>
+          @if (txt.outlineColor !== null) {
+            <input type="color" [value]="txt.outlineColor"
+              (input)="patchText({ outlineColor: $any($event.target).value })" />
+          }
         </div>
       </div>
 
