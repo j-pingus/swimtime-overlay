@@ -1,8 +1,10 @@
 import {
-  Component, input, output, computed, signal,
+  Component, inject, input, output, computed, signal,
   viewChild, ElementRef, HostListener,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, ImageFeature } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, ImageFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { CompetitionStore } from '../../../core/services/competition.store';
+import { resolveTemplate } from '../../../core/utils/template.util';
 
 export const CANVAS_W = 1920;
 export const CANVAS_H = 1080;
@@ -31,6 +33,8 @@ interface DragState {
   styleUrl: './zone.component.scss',
 })
 export class ZoneComponent {
+  private readonly competitionStore = inject(CompetitionStore);
+
   readonly features = input<BaseFeature[]>([]);
   readonly selectedFeatureId = input<string | null>(null);
   /** When false the zone is display-only: no anchors, no canvas hint, no interaction. */
@@ -59,6 +63,25 @@ export class ZoneComponent {
 
   protected asImage(f: AnyFeature): ImageFeature | null {
     return f.type === 'image' ? f : null;
+  }
+
+  protected asText(f: AnyFeature): TextFeature | null {
+    return f.type === 'text' ? f : null;
+  }
+
+  protected resolvedText(f: TextFeature): string {
+    return resolveTemplate(f.template, this.competitionStore.competition());
+  }
+
+  protected textX(f: TextFeature): number {
+    if (f.align === 'center') return f.x + f.width / 2;
+    if (f.align === 'right') return f.x + f.width;
+    return f.x;
+  }
+
+  protected textAnchor(f: TextFeature): string {
+    const map: Record<TextAlign, string> = { left: 'start', center: 'middle', right: 'end' };
+    return map[f.align];
   }
 
   // --- Interaction ---

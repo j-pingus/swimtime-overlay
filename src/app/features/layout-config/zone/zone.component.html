@@ -39,6 +39,27 @@
             (mousedown)="interactive() && onFeatureClick($event, f)"
           />
         }
+
+      } @else if (asText(f); as txt) {
+        <!-- Hit area + selection border (config only, hidden in render mode) -->
+        <rect
+          [attr.x]="f.x" [attr.y]="f.y"
+          [attr.width]="f.width" [attr.height]="f.height"
+          class="text-bg"
+          (mousedown)="interactive() && onFeatureClick($event, f)"
+        />
+        <text
+          [attr.x]="textX(txt)"
+          [attr.y]="f.y + txt.fontSize"
+          [attr.font-size]="txt.fontSize"
+          [attr.fill]="txt.color"
+          [attr.font-weight]="txt.bold ? 'bold' : 'normal'"
+          [attr.font-style]="txt.italic ? 'italic' : 'normal'"
+          [attr.text-anchor]="textAnchor(txt)"
+          class="text-content"
+          (mousedown)="interactive() && onFeatureClick($event, f)"
+        >{{ resolvedText(txt) }}</text>
+
       } @else {
         <rect
           [attr.x]="f.x" [attr.y]="f.y"
@@ -48,9 +69,12 @@
         />
       }
 
-      <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
-        {{ f.label }}
-      </text>
+      <!-- Label shown in config mode only; suppressed for text features (template IS the label) -->
+      @if (!asText(f)) {
+        <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
+          {{ f.label }}
+        </text>
+      }
 
       @if (interactive()) {
         <!-- Move anchor: top-left -->

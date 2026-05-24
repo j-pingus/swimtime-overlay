@@ -51,8 +51,9 @@ export class LayoutConfigComponent {
       x: 760, y: 440, width: 400, height: 200,
     };
 
-    const feature: AnyFeature = type === 'image'
-      ? { ...base, type: 'image', src: '' }
+    const feature: AnyFeature =
+      type === 'image' ? { ...base, type: 'image', src: '' }
+      : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left' }
       : { ...base, type: 'generic' };
 
     this.store.addFeature(layoutId, feature);

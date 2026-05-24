@@ -58,6 +58,31 @@ svg {
   }
 }
 
+// Bounding rect for text features — dashed outline in config, invisible in render.
+.text-bg {
+  fill: transparent;
+  stroke: rgba(200, 200, 200, 0.45);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+  cursor: pointer;
+
+  .selected & {
+    stroke: #0070f3;
+    stroke-width: 3;
+    stroke-dasharray: none;
+  }
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
+// Actual SVG text — pointer-events off so clicks fall through to the .text-bg hit area.
+.text-content {
+  font-family: sans-serif;
+  pointer-events: none;
+}
+
 // Transparent overlay for image features — renders selection border in config mode.
 // Sits on top of the <image> element so it reliably receives pointer events.
 .feature-overlay {

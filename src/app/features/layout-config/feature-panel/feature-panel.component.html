@@ -37,6 +37,63 @@
       </div>
     </div>
 
+    @if (textFeature(); as txt) {
+      <h3>Text</h3>
+
+      <div class="field">
+        <label>Template</label>
+        <textarea class="template-input"
+          [value]="txt.template"
+          (change)="patchText({ template: $any($event.target).value })"
+        ></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Font size</label>
+          <input type="number" [value]="txt.fontSize" min="1"
+            (change)="patchText({ fontSize: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="txt.color"
+            (input)="patchText({ color: $any($event.target).value })" />
+        </div>
+      </div>
+
+      <div class="style-row">
+        <button class="btn-style" [class.active]="txt.bold"
+          (click)="patchText({ bold: !txt.bold })"><b>B</b></button>
+        <button class="btn-style" [class.active]="txt.italic"
+          (click)="patchText({ italic: !txt.italic })"><i>I</i></button>
+      </div>
+
+      <h3>Alignment</h3>
+      <div class="align-row">
+        <button class="btn-align" [class.active]="txt.align === 'left'"
+          (click)="patchText({ align: 'left' })">Left</button>
+        <button class="btn-align" [class.active]="txt.align === 'center'"
+          (click)="patchText({ align: 'center' })">Center</button>
+        <button class="btn-align" [class.active]="txt.align === 'right'"
+          (click)="patchText({ align: 'right' })">Right</button>
+      </div>
+
+      <details class="vars-ref">
+        <summary>Available variables</summary>
+        <ul>
+          <li><code>$currentEvent.number</code></li>
+          <li><code>$currentEvent.stroke</code></li>
+          <li><code>$currentEvent.category</code></li>
+          <li><code>$currentEvent.distance</code></li>
+          <li><code>$currentHeat.number</code></li>
+          <li><code>$nextEvent.number</code></li>
+          <li><code>$nextEvent.stroke</code></li>
+          <li><code>$nextEvent.category</code></li>
+          <li><code>$nextEvent.distance</code></li>
+        </ul>
+      </details>
+    }
+
     @if (imageFeature(); as img) {
       <h3>Image</h3>
 

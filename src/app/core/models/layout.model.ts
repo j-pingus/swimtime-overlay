@@ -1,4 +1,5 @@
-export type FeatureType = 'generic' | 'image';
+export type FeatureType = 'generic' | 'image' | 'text';
+export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
   id: string;
@@ -19,7 +20,18 @@ export interface ImageFeature extends FeatureBase {
   src: string;
 }
 
-export type AnyFeature = GenericFeature | ImageFeature;
+export interface TextFeature extends FeatureBase {
+  type: 'text';
+  /** Raw template — $path.to.value patterns are resolved against Competition at render time. */
+  template: string;
+  fontSize: number;
+  color: string;
+  bold: boolean;
+  italic: boolean;
+  align: TextAlign;
+}
+
+export type AnyFeature = GenericFeature | ImageFeature | TextFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;

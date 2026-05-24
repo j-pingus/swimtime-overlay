@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AnyFeature, ImageFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ImageFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
 
 @Component({
   selector: 'app-feature-panel',
@@ -19,10 +19,21 @@ export class FeaturePanelComponent {
     return f?.type === 'image' ? f : null;
   });
 
+  protected readonly textFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'text' ? f : null;
+  });
+
   patch(partial: Partial<AnyFeature>): void {
     const f = this.feature();
     if (!f) return;
     this.featureChange.emit({ ...f, ...partial } as AnyFeature);
+  }
+
+  patchText(partial: Partial<TextFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'text') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies TextFeature);
   }
 
   patchSrc(src: string): void {
