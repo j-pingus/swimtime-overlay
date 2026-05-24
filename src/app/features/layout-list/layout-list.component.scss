@@ -18,6 +18,55 @@ h2 {
   margin-bottom: 0.75rem;
 }
 
+.pool-config {
+  margin-bottom: 2rem;
+}
+
+.lane-count {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  label {
+    font-size: 0.95rem;
+    color: #333;
+  }
+}
+
+.lane-count-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  span {
+    width: 2rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  button {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: #0070f3;
+      color: #0070f3;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+}
+
 .new-layout-form {
   display: flex;
   gap: 0.5rem;

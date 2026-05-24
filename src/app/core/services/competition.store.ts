@@ -1,32 +1,56 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Competition, Lane, Pool, SwimEvent, Heat } from '../models/domain.models';
+import { Competition, Lane, Pool } from '../models/domain.models';
 
 export type CompetitionMode = 'live' | 'config';
 
 export interface CompetitionStoreState {
   mode: CompetitionMode;
+  laneCount: number;
   competition: Competition;
 }
 
-const MODE_KEY = 'swimtime_competition_mode';
+const MODE_KEY       = 'swimtime_competition_mode';
+const LANE_COUNT_KEY = 'swimtime_lane_count';
+const DEFAULT_LANES  = 8;
 
-const DUMMY_LANES: Lane[] = [
-  { number: 1, swimmerName: 'Alice Martin',  club: 'CN Marseille',    nat: 'FRA', entryTime: '1:02.45', officialTime: null, time: '1:02.87', rank: '3' },
-  { number: 2, swimmerName: 'Emma Johnson',  club: 'Bath SC',         nat: 'GBR', entryTime: '1:01.12', officialTime: null, time: '1:01.34', rank: '1' },
-  { number: 3, swimmerName: 'Sophie Müller', club: 'SG Frankfurt',    nat: 'GER', entryTime: '1:01.89', officialTime: null, time: '1:01.56', rank: '2' },
-  { number: 4, swimmerName: 'Laura García',  club: 'CN Barcelona',    nat: 'ESP', entryTime: '1:03.21', officialTime: null, time: '1:03.45', rank: '4' },
-  { number: 5, swimmerName: 'Anna Kowalski', club: 'KS Wrocław',      nat: 'POL', entryTime: '1:03.88', officialTime: null, time: null,       rank: null },
-  { number: 6, swimmerName: 'Claire Dupont', club: 'Swimming Antwerp',nat: 'BEL', entryTime: '1:04.12', officialTime: null, time: null,       rank: null },
-  { number: 7, swimmerName: 'Mia Hansen',    club: 'Virum SK',        nat: 'DEN', entryTime: '1:04.56', officialTime: null, time: null,       rank: null },
-  { number: 8, swimmerName: 'Lena Novak',    club: 'PK Bratislava',   nat: 'SVK', entryTime: '1:05.01', officialTime: null, time: null,       rank: null },
+// Full roster of dummy swimmers — pool is sliced/extended to match laneCount.
+const DUMMY_ROSTER: Omit<Lane, 'number'>[] = [
+  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     nat: 'FRA', entryTime: '1:02.45', officialTime: null, time: '1:02.87', rank: '3' },
+  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          nat: 'GBR', entryTime: '1:01.12', officialTime: null, time: '1:01.34', rank: '1' },
+  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     nat: 'GER', entryTime: '1:01.89', officialTime: null, time: '1:01.56', rank: '2' },
+  { swimmerName: 'Laura García',   club: 'CN Barcelona',     nat: 'ESP', entryTime: '1:03.21', officialTime: null, time: '1:03.45', rank: '4' },
+  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       nat: 'POL', entryTime: '1:03.88', officialTime: null, time: null,      rank: null },
+  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', nat: 'BEL', entryTime: '1:04.12', officialTime: null, time: null,      rank: null },
+  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         nat: 'DEN', entryTime: '1:04.56', officialTime: null, time: null,      rank: null },
+  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    nat: 'SVK', entryTime: '1:05.01', officialTime: null, time: null,      rank: null },
+  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       nat: 'ITA', entryTime: '1:05.34', officialTime: null, time: null,      rank: null },
+  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: null, time: null,      rank: null },
 ];
 
-const DUMMY_COMPETITION: Competition = {
-  currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', heats: [{ number: '1' }, { number: '2' }, { number: '3' }] },
-  currentHeat:  { number: '2' },
-  nextEvent:    { number: '15', stroke: 'Backstroke', category: 'Men', distance: '200', heats: [{ number: '1' }, { number: '2' }] },
-  pool: { lanes: DUMMY_LANES },
-};
+function buildDummyPool(laneCount: number): Pool {
+  const lanes: Lane[] = Array.from({ length: laneCount }, (_, i) => {
+    const base = DUMMY_ROSTER[i] ?? {
+      swimmerName: `Swimmer ${i + 1}`,
+      club: '',
+      nat: '',
+      entryTime: null,
+      officialTime: null,
+      time: null,
+      rank: null,
+    };
+    return { number: i + 1, ...base };
+  });
+  return { lanes };
+}
+
+function buildDummyCompetition(laneCount: number): Competition {
+  return {
+    currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', heats: [{ number: '1' }, { number: '2' }, { number: '3' }] },
+    currentHeat:  { number: '2' },
+    nextEvent:    { number: '15', stroke: 'Backstroke', category: 'Men', distance: '200', heats: [{ number: '1' }, { number: '2' }] },
+    pool: buildDummyPool(laneCount),
+  };
+}
 
 const EMPTY_COMPETITION: Competition = {
   currentEvent: null,
@@ -40,9 +64,10 @@ export class CompetitionStore {
   private readonly _state = signal<CompetitionStoreState>(this.loadInitial());
   private localUpdateListeners: Array<(s: CompetitionStoreState) => void> = [];
 
-  readonly mode        = computed(() => this._state().mode);
-  readonly competition = computed(() => this._state().competition);
-  readonly pool        = computed(() => this._state().competition.pool);
+  readonly mode         = computed(() => this._state().mode);
+  readonly laneCount    = computed(() => this._state().laneCount);
+  readonly competition  = computed(() => this._state().competition);
+  readonly pool         = computed(() => this._state().competition.pool);
   readonly currentEvent = computed(() => this._state().competition.currentEvent);
   readonly currentHeat  = computed(() => this._state().competition.currentHeat);
   readonly nextEvent    = computed(() => this._state().competition.nextEvent);
@@ -50,8 +75,23 @@ export class CompetitionStore {
   // --- Mode ---
 
   setMode(mode: CompetitionMode): void {
-    const competition = mode === 'config' ? DUMMY_COMPETITION : EMPTY_COMPETITION;
-    this.update(() => ({ mode, competition }));
+    this.update((s) => ({
+      ...s,
+      mode,
+      competition: mode === 'config' ? buildDummyCompetition(s.laneCount) : EMPTY_COMPETITION,
+    }));
+  }
+
+  // --- Lane count (config mode only — rebuilds the dummy pool) ---
+
+  setLaneCount(count: number): void {
+    this.update((s) => ({
+      ...s,
+      laneCount: count,
+      competition: s.mode === 'config'
+        ? { ...s.competition, pool: buildDummyPool(count) }
+        : s.competition,
+    }));
   }
 
   // --- Live updates (called by the live data service with already-mapped domain objects) ---
@@ -91,17 +131,24 @@ export class CompetitionStore {
   private update(fn: (s: CompetitionStoreState) => CompetitionStoreState): void {
     const next = fn(this._state());
     this._state.set(next);
-    this.persistMode(next.mode);
+    this.persist(next);
     this.localUpdateListeners.forEach((l) => l(next));
   }
 
   private loadInitial(): CompetitionStoreState {
-    const saved = localStorage.getItem(MODE_KEY);
-    const mode: CompetitionMode = saved === 'live' ? 'live' : 'config';
-    return { mode, competition: mode === 'config' ? DUMMY_COMPETITION : EMPTY_COMPETITION };
+    const mode: CompetitionMode =
+      localStorage.getItem(MODE_KEY) === 'live' ? 'live' : 'config';
+    const laneCount =
+      parseInt(localStorage.getItem(LANE_COUNT_KEY) ?? '', 10) || DEFAULT_LANES;
+    return {
+      mode,
+      laneCount,
+      competition: mode === 'config' ? buildDummyCompetition(laneCount) : EMPTY_COMPETITION,
+    };
   }
 
-  private persistMode(mode: CompetitionMode): void {
-    localStorage.setItem(MODE_KEY, mode);
+  private persist(state: CompetitionStoreState): void {
+    localStorage.setItem(MODE_KEY, state.mode);
+    localStorage.setItem(LANE_COUNT_KEY, String(state.laneCount));
   }
 }
