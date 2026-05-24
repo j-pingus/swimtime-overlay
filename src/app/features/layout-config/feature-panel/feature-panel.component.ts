@@ -1,7 +1,8 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AnyFeature, ImageFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ImageFeature, LaneFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { CompetitionStore } from '../../../core/services/competition.store';
 
 @Component({
   selector: 'app-feature-panel',
@@ -10,6 +11,8 @@ import { AnyFeature, ImageFeature, RectFeature, TextFeature } from '../../../cor
   styleUrl: './feature-panel.component.scss',
 })
 export class FeaturePanelComponent {
+  private readonly competitionStore = inject(CompetitionStore);
+
   readonly feature = input<AnyFeature | null>(null);
   readonly features = input<AnyFeature[]>([]);
 
@@ -33,10 +36,25 @@ export class FeaturePanelComponent {
     return f?.type === 'rect' ? f : null;
   });
 
+  protected readonly laneFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'lane' ? f : null;
+  });
+
+  protected readonly laneOptions = computed(() =>
+    Array.from({ length: this.competitionStore.laneCount() }, (_, i) => i + 1),
+  );
+
   patch(partial: Partial<AnyFeature>): void {
     const f = this.feature();
     if (!f) return;
     this.featureChange.emit({ ...f, ...partial } as AnyFeature);
+  }
+
+  patchLane(partial: Partial<LaneFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'lane') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies LaneFeature);
   }
 
   patchRect(partial: Partial<RectFeature>): void {
@@ -86,7 +104,7 @@ export class FeaturePanelComponent {
   }
 
   typeLabel(f: AnyFeature): string {
-    const map: Record<string, string> = { image: 'IMG', text: 'TXT', rect: 'RCT', generic: 'GEN' };
+    const map: Record<string, string> = { image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN' };
     return map[f.type] ?? 'GEN';
   }
 }

@@ -1,6 +1,6 @@
 @if (feature(); as f) {
   <div class="panel">
-    <h2>{{ f.type === 'image' ? 'Image' : f.type === 'text' ? 'Text' : f.type === 'rect' ? 'Rectangle' : 'Feature' }}</h2>
+    <h2>{{ f.type === 'image' ? 'Image' : f.type === 'text' ? 'Text' : f.type === 'rect' ? 'Rectangle' : f.type === 'lane' ? 'Lane text' : 'Feature' }}</h2>
 
     <div class="field">
       <label>Label</label>
@@ -90,6 +90,74 @@
             (change)="patchRect({ padding: asNumber($any($event.target).value) })" />
         </div>
       </div>
+    }
+
+    @if (laneFeature(); as ln) {
+      <h3>Lane</h3>
+
+      <div class="field">
+        <label>Lane number</label>
+        <select [value]="ln.laneNumber"
+          (change)="patchLane({ laneNumber: asNumber($any($event.target).value) })">
+          @for (n of laneOptions(); track n) {
+            <option [value]="n">Lane {{ n }}</option>
+          }
+        </select>
+      </div>
+
+      <h3>Text</h3>
+
+      <div class="field">
+        <label>Template</label>
+        <textarea class="template-input"
+          [value]="ln.template"
+          (change)="patchLane({ template: $any($event.target).value })"
+        ></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Font size</label>
+          <input type="number" [value]="ln.fontSize" min="1"
+            (change)="patchLane({ fontSize: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="ln.color"
+            (input)="patchLane({ color: $any($event.target).value })" />
+        </div>
+      </div>
+
+      <div class="style-row">
+        <button class="btn-style" [class.active]="ln.bold"
+          (click)="patchLane({ bold: !ln.bold })"><b>B</b></button>
+        <button class="btn-style" [class.active]="ln.italic"
+          (click)="patchLane({ italic: !ln.italic })"><i>I</i></button>
+      </div>
+
+      <h3>Alignment</h3>
+      <div class="align-row">
+        <button class="btn-align" [class.active]="ln.align === 'left'"
+          (click)="patchLane({ align: 'left' })">Left</button>
+        <button class="btn-align" [class.active]="ln.align === 'center'"
+          (click)="patchLane({ align: 'center' })">Center</button>
+        <button class="btn-align" [class.active]="ln.align === 'right'"
+          (click)="patchLane({ align: 'right' })">Right</button>
+      </div>
+
+      <details class="vars-ref">
+        <summary>Available variables</summary>
+        <ul>
+          <li><code>$swimmerName</code></li>
+          <li><code>$club</code></li>
+          <li><code>$nat</code></li>
+          <li><code>$entryTime</code></li>
+          <li><code>$time</code></li>
+          <li><code>$officialTime</code></li>
+          <li><code>$rank</code></li>
+          <li><code>$number</code></li>
+        </ul>
+      </details>
     }
 
     @if (textFeature(); as txt) {

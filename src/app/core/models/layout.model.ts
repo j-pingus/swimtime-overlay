@@ -1,4 +1,4 @@
-export type FeatureType = 'generic' | 'image' | 'text' | 'rect';
+export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane';
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -44,7 +44,19 @@ export interface RectFeature extends FeatureBase {
   padding: number;
 }
 
-export type AnyFeature = GenericFeature | ImageFeature | TextFeature | RectFeature;
+export interface LaneFeature extends FeatureBase {
+  type: 'lane';
+  /** 1-based lane number; patterns resolve against the matching Lane in the pool. */
+  laneNumber: number;
+  template: string;
+  fontSize: number;
+  color: string;
+  bold: boolean;
+  italic: boolean;
+  align: TextAlign;
+}
+
+export type AnyFeature = GenericFeature | ImageFeature | TextFeature | RectFeature | LaneFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;

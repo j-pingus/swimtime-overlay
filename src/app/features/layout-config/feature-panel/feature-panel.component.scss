@@ -158,6 +158,7 @@ h3 {
   &--image   { background: #e8f4ff; color: #0070c0; }
   &--text    { background: #f0e8ff; color: #7000c0; }
   &--rect    { background: #e8fff0; color: #007040; }
+  &--lane    { background: #fff8e0; color: #a06000; }
 }
 
 .item-label {
@@ -170,6 +171,23 @@ h3 {
 }
 
 // ── Feature editor ─────────────────────────────────────────────────────────
+
+select {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  font-family: sans-serif;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #0070f3;
+  }
+}
 
 .template-input {
   width: 100%;

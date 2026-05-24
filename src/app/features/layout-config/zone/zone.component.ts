@@ -2,7 +2,7 @@ import {
   Component, inject, input, output, computed, signal,
   viewChild, ElementRef, HostListener,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, ImageFeature, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, ImageFeature, LaneFeature, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { resolveTemplate } from '../../../core/utils/template.util';
 
@@ -65,8 +65,8 @@ export class ZoneComponent {
     return f.type === 'image' ? f : null;
   }
 
-  protected asText(f: AnyFeature): TextFeature | null {
-    return f.type === 'text' ? f : null;
+  protected asTextLike(f: AnyFeature): TextFeature | LaneFeature | null {
+    return (f.type === 'text' || f.type === 'lane') ? f : null;
   }
 
   protected asRect(f: AnyFeature): RectFeature | null {
@@ -81,17 +81,22 @@ export class ZoneComponent {
     return f.bgOpacity / 100;
   }
 
-  protected resolvedText(f: TextFeature): string {
-    return resolveTemplate(f.template, this.competitionStore.competition());
+  protected resolvedDisplayText(f: TextFeature | LaneFeature): string {
+    const competition = this.competitionStore.competition();
+    if (f.type === 'lane') {
+      const lane = competition.pool.lanes.find((l) => l.number === f.laneNumber);
+      return resolveTemplate(f.template, lane ?? {});
+    }
+    return resolveTemplate(f.template, competition);
   }
 
-  protected textX(f: TextFeature): number {
+  protected textX(f: TextFeature | LaneFeature): number {
     if (f.align === 'center') return f.x + f.width / 2;
     if (f.align === 'right') return f.x + f.width;
     return f.x;
   }
 
-  protected textAnchor(f: TextFeature): string {
+  protected textAnchor(f: TextFeature | LaneFeature): string {
     const map: Record<TextAlign, string> = { left: 'start', center: 'middle', right: 'end' };
     return map[f.align];
   }
