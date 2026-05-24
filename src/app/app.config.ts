@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, inject, APP_INIT
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
+import { LayoutStore } from './core/services/layout.store';
 import { LayoutSyncService } from './core/services/layout-sync.service';
 import { CompetitionSyncService } from './core/services/competition-sync.service';
 
@@ -14,9 +15,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: () => {
+        const layoutStore = inject(LayoutStore);
         inject(LayoutSyncService);
         inject(CompetitionSyncService);
-        return () => {};
+        return () => layoutStore.init();
       },
       multi: true,
     },
