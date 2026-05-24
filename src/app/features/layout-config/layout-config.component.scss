@@ -62,10 +62,7 @@
   flex: 1;
   min-height: 0;
   background: #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
+  overflow: hidden;
 }
 
 // ── Right panel (30%) ─────────────────────────────────────────────────────────

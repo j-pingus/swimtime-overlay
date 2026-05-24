@@ -1,9 +1,7 @@
 :host {
   display: block;
-  aspect-ratio: 16 / 9;
-  max-width: 100%;
-  max-height: 100%;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 svg {
@@ -11,6 +9,8 @@ svg {
   height: 100%;
   display: block;
   user-select: none;
+  // preserveAspectRatio="xMidYMid meet" on the element letterboxes
+  // the 1920×1080 canvas to fill the available space without distortion.
 }
 
 .canvas-bg {
