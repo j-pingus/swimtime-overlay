@@ -69,6 +69,10 @@ export class ZoneComponent {
     return (f.type === 'text' || f.type === 'lane') ? f : null;
   }
 
+  protected asLane(f: AnyFeature): LaneFeature | null {
+    return f.type === 'lane' ? f : null;
+  }
+
   protected asRect(f: AnyFeature): RectFeature | null {
     return f.type === 'rect' ? f : null;
   }
@@ -82,12 +86,16 @@ export class ZoneComponent {
   }
 
   protected resolvedDisplayText(f: TextFeature | LaneFeature): string {
-    const competition = this.competitionStore.competition();
-    if (f.type === 'lane') {
-      const lane = competition.pool.lanes.find((l) => l.number === f.laneNumber);
-      return resolveTemplate(f.template, lane ?? {});
-    }
-    return resolveTemplate(f.template, competition);
+    return resolveTemplate(f.template, this.competitionStore.competition());
+  }
+
+  protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
+    const lanes = this.competitionStore.competition().pool.lanes;
+    const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
+    return lanes.map((lane, i) => ({
+      y: f.y + i * rowH + f.fontSize,
+      text: resolveTemplate(f.template, lane),
+    }));
   }
 
   protected textX(f: TextFeature | LaneFeature): number {

@@ -73,17 +73,34 @@
           class="text-bg"
           (mousedown)="interactive() && onFeatureClick($event, f)"
         />
-        <text
-          [attr.x]="textX(tl)"
-          [attr.y]="f.y + tl.fontSize"
-          [attr.font-size]="tl.fontSize"
-          [attr.fill]="tl.color"
-          [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
-          [attr.font-style]="tl.italic ? 'italic' : 'normal'"
-          [attr.text-anchor]="textAnchor(tl)"
-          class="text-content"
-          (mousedown)="interactive() && onFeatureClick($event, f)"
-        >{{ resolvedDisplayText(tl) }}</text>
+
+        @if (asLane(tl); as lane) {
+          <!-- One text element per lane, evenly spaced within the feature height -->
+          @for (row of laneRows(lane); track $index) {
+            <text
+              [attr.x]="textX(tl)"
+              [attr.y]="row.y"
+              [attr.font-size]="tl.fontSize"
+              [attr.fill]="tl.color"
+              [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
+              [attr.font-style]="tl.italic ? 'italic' : 'normal'"
+              [attr.text-anchor]="textAnchor(tl)"
+              class="text-content"
+            >{{ row.text }}</text>
+          }
+        } @else {
+          <text
+            [attr.x]="textX(tl)"
+            [attr.y]="f.y + tl.fontSize"
+            [attr.font-size]="tl.fontSize"
+            [attr.fill]="tl.color"
+            [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
+            [attr.font-style]="tl.italic ? 'italic' : 'normal'"
+            [attr.text-anchor]="textAnchor(tl)"
+            class="text-content"
+            (mousedown)="interactive() && onFeatureClick($event, f)"
+          >{{ resolvedDisplayText(tl) }}</text>
+        }
 
       } @else {
         <rect

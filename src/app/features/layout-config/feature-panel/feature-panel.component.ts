@@ -1,8 +1,7 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AnyFeature, ImageFeature, LaneFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
-import { CompetitionStore } from '../../../core/services/competition.store';
 
 @Component({
   selector: 'app-feature-panel',
@@ -11,8 +10,6 @@ import { CompetitionStore } from '../../../core/services/competition.store';
   styleUrl: './feature-panel.component.scss',
 })
 export class FeaturePanelComponent {
-  private readonly competitionStore = inject(CompetitionStore);
-
   readonly feature = input<AnyFeature | null>(null);
   readonly features = input<AnyFeature[]>([]);
 
@@ -40,10 +37,6 @@ export class FeaturePanelComponent {
     const f = this.feature();
     return f?.type === 'lane' ? f : null;
   });
-
-  protected readonly laneOptions = computed(() =>
-    Array.from({ length: this.competitionStore.laneCount() }, (_, i) => i + 1),
-  );
 
   patch(partial: Partial<AnyFeature>): void {
     const f = this.feature();

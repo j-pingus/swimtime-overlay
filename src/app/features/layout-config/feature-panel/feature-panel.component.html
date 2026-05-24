@@ -93,18 +93,6 @@
     }
 
     @if (laneFeature(); as ln) {
-      <h3>Lane</h3>
-
-      <div class="field">
-        <label>Lane number</label>
-        <select [value]="ln.laneNumber"
-          (change)="patchLane({ laneNumber: asNumber($any($event.target).value) })">
-          @for (n of laneOptions(); track n) {
-            <option [value]="n">Lane {{ n }}</option>
-          }
-        </select>
-      </div>
-
       <h3>Text</h3>
 
       <div class="field">

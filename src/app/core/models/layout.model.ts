@@ -46,8 +46,7 @@ export interface RectFeature extends FeatureBase {
 
 export interface LaneFeature extends FeatureBase {
   type: 'lane';
-  /** 1-based lane number; patterns resolve against the matching Lane in the pool. */
-  laneNumber: number;
+  /** Template evaluated once per lane; $-patterns resolve against each Lane object. */
   template: string;
   fontSize: number;
   color: string;

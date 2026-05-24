@@ -55,7 +55,7 @@ export class LayoutConfigComponent {
       type === 'image' ? { ...base, type: 'image', src: '' }
       : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left' }
       : type === 'rect' ? { ...base, type: 'rect', bgColor: '#000000', bgOpacity: 50, border: false, borderColor: '#ffffff', borderWidth: 2, borderRadius: 0, padding: 0 }
-      : type === 'lane' ? { ...base, type: 'lane', laneNumber: 1, template: '$swimmerName', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left' }
+      : type === 'lane' ? { ...base, type: 'lane', template: '$swimmerName', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left' }
       : { ...base, type: 'generic' };
 
     this.store.addFeature(layoutId, feature);
