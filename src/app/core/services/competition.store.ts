@@ -47,7 +47,6 @@ function buildDummyCompetition(laneCount: number): Competition {
   return {
     currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', heats: [{ number: '1' }, { number: '2' }, { number: '3' }] },
     currentHeat:  { number: '2' },
-    nextEvent:    { number: '15', stroke: 'Backstroke', category: 'Men', distance: '200', heats: [{ number: '1' }, { number: '2' }] },
     pool: buildDummyPool(laneCount),
   };
 }
@@ -55,7 +54,6 @@ function buildDummyCompetition(laneCount: number): Competition {
 const EMPTY_COMPETITION: Competition = {
   currentEvent: null,
   currentHeat:  null,
-  nextEvent:    null,
   pool:         { lanes: [] },
 };
 
@@ -70,7 +68,6 @@ export class CompetitionStore {
   readonly pool         = computed(() => this._state().competition.pool);
   readonly currentEvent = computed(() => this._state().competition.currentEvent);
   readonly currentHeat  = computed(() => this._state().competition.currentHeat);
-  readonly nextEvent    = computed(() => this._state().competition.nextEvent);
 
   // --- Mode ---
 

@@ -30,6 +30,5 @@ export interface SwimEvent {
 export interface Competition {
   currentEvent: SwimEvent | null;
   currentHeat: Heat | null;
-  nextEvent: SwimEvent | null;
   pool: Pool;
 }
