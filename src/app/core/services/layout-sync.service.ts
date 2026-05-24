@@ -1,4 +1,4 @@
-import { Injectable, inject, OnDestroy, effect } from '@angular/core';
+import { Injectable, inject, OnDestroy } from '@angular/core';
 import { LayoutStore, LayoutStoreState } from './layout.store';
 
 const CHANNEL_NAME = 'swimtime_layout_sync';
@@ -7,25 +7,22 @@ const CHANNEL_NAME = 'swimtime_layout_sync';
 export class LayoutSyncService implements OnDestroy {
   private readonly store = inject(LayoutStore);
   private readonly channel = new BroadcastChannel(CHANNEL_NAME);
-  private broadcasting = false;
+  private readonly unsubscribeLocal: () => void;
 
   constructor() {
+    // Receive state pushed by other windows and apply it locally (no re-broadcast).
     this.channel.onmessage = (event: MessageEvent<LayoutStoreState>) => {
-      this.broadcasting = true;
       this.store.applyRemoteState(event.data);
-      this.broadcasting = false;
     };
 
-    // Broadcast every state change to other windows
-    effect(() => {
-      const state = this.store.getState();
-      if (!this.broadcasting) {
-        this.channel.postMessage(state);
-      }
+    // Broadcast every LOCAL mutation synchronously — applyRemoteState never calls this.
+    this.unsubscribeLocal = this.store.onLocalUpdate((state) => {
+      this.channel.postMessage(state);
     });
   }
 
   ngOnDestroy(): void {
     this.channel.close();
+    this.unsubscribeLocal();
   }
 }

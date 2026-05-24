@@ -11,6 +11,7 @@ const STORAGE_KEY = 'swimtime_layouts';
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
   private readonly _state = signal<LayoutStoreState>(this.load());
+  private localUpdateListeners: Array<(s: LayoutStoreState) => void> = [];
 
   readonly layouts = computed(() => this._state().layouts);
   readonly activeLayoutId = computed(() => this._state().activeLayoutId);
@@ -36,19 +37,24 @@ export class LayoutStore {
     this.update((s) => ({ ...s, activeLayoutId: id }));
   }
 
-  /** Apply a state patch arriving from another window via BroadcastChannel. */
+  /** Apply a state patch arriving from another window — never triggers local broadcast. */
   applyRemoteState(state: LayoutStoreState): void {
     this._state.set(state);
   }
 
-  getState(): LayoutStoreState {
-    return this._state();
+  /** Register a callback invoked synchronously on every local state mutation. */
+  onLocalUpdate(fn: (s: LayoutStoreState) => void): () => void {
+    this.localUpdateListeners.push(fn);
+    return () => {
+      this.localUpdateListeners = this.localUpdateListeners.filter((l) => l !== fn);
+    };
   }
 
   private update(fn: (s: LayoutStoreState) => LayoutStoreState): void {
     const next = fn(this._state());
     this._state.set(next);
     this.persist(next);
+    this.localUpdateListeners.forEach((l) => l(next));
   }
 
   private load(): LayoutStoreState {
