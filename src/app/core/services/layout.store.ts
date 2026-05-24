@@ -1,9 +1,10 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Layout, AnyFeature, BaseFeature } from '../models/layout.model';
+import { Layout, AnyFeature, BaseFeature, MessageTypeRule, MessageTypeRules } from '../models/layout.model';
 
 export type LayoutStoreState = {
   layouts: Layout[];
   activeLayoutId: string | null;
+  messageTypeRules: MessageTypeRules;
 };
 
 // ── IndexedDB helpers ──────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ const LS_KEY = 'swimtime_layouts';
 
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
-  private readonly _state = signal<LayoutStoreState>({ layouts: [], activeLayoutId: null });
+  private readonly _state = signal<LayoutStoreState>({ layouts: [], activeLayoutId: null, messageTypeRules: {} });
   private readonly db = openIDB();
   private localUpdateListeners: Array<(s: LayoutStoreState) => void> = [];
 
@@ -55,6 +56,7 @@ export class LayoutStore {
     const id = this._state().activeLayoutId;
     return this._state().layouts.find((l) => l.id === id) ?? null;
   });
+  readonly messageTypeRules = computed(() => this._state().messageTypeRules);
 
   /** Called by APP_INITIALIZER — loads persisted state before the app renders. */
   async init(): Promise<void> {
@@ -90,14 +92,46 @@ export class LayoutStore {
       features: [],
     };
     this.update((s) => ({
+      ...s,
       layouts: [...s.layouts, layout],
       activeLayoutId: layout.id,
     }));
     return layout;
   }
 
-  setActiveLayout(id: string): void {
+  setActiveLayout(id: string | null): void {
     this.update((s) => ({ ...s, activeLayoutId: id }));
+  }
+
+  // --- Message type rules ---
+
+  setMessageTypeRule(messageType: string, rule: MessageTypeRule): void {
+    this.update((s) => ({
+      ...s,
+      messageTypeRules: { ...s.messageTypeRules, [messageType]: rule },
+    }));
+  }
+
+  clearMessageTypeRule(messageType: string): void {
+    this.update((s) => {
+      const { [messageType]: _, ...rest } = s.messageTypeRules;
+      return { ...s, messageTypeRules: rest };
+    });
+  }
+
+  cloneLayout(id: string): void {
+    this.update((s) => {
+      const source = s.layouts.find((l) => l.id === id);
+      if (!source) return s;
+      const clone: Layout = {
+        ...source,
+        id: crypto.randomUUID(),
+        name: `${source.name} (copy)`,
+        createdAt: Date.now(),
+        features: source.features.map((f) => ({ ...f, id: crypto.randomUUID() })),
+      };
+      return { ...s, layouts: [...s.layouts, clone] };
+    });
   }
 
   renameLayout(id: string, name: string): void {
@@ -109,6 +143,7 @@ export class LayoutStore {
 
   deleteLayout(id: string): void {
     this.update((s) => ({
+      ...s,
       layouts: s.layouts.filter((l) => l.id !== id),
       activeLayoutId: s.activeLayoutId === id ? null : s.activeLayoutId,
     }));
@@ -194,6 +229,7 @@ export class LayoutStore {
   private migrate(state: LayoutStoreState): LayoutStoreState {
     return {
       ...state,
+      messageTypeRules: state.messageTypeRules ?? {},
       layouts: state.layouts.map((l) => ({
         ...l,
         features: (l.features ?? []).map((f) => {

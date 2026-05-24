@@ -62,6 +62,15 @@ export type AnyFeature = GenericFeature | ImageFeature | TextFeature | RectFeatu
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;
 
+export interface MessageTypeRule {
+  layoutId: string;
+  /** Automatically clear the active layout after this many seconds. Null = stay until next rule fires. */
+  duration: number | null;
+}
+
+/** Keyed by SwimTimeMessageType string — loose-typed to avoid importing API models here. */
+export type MessageTypeRules = Record<string, MessageTypeRule>;
+
 export interface Layout {
   id: string;
   name: string;
