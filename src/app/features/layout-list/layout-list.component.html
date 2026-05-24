@@ -85,7 +85,13 @@
   </section>
 
   <section class="layouts">
-    <h2>Layouts</h2>
+    <div class="layouts-header">
+      <h2>Layouts</h2>
+      <label class="btn-import" title="Import layout from file">
+        Import
+        <input type="file" accept=".json,application/json" (change)="onImportFile($event)" />
+      </label>
+    </div>
     @if (store.layouts().length === 0) {
       <p class="empty">No layouts yet. Create one above.</p>
     } @else {
@@ -101,6 +107,7 @@
               }
               <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
               <button class="btn-clone" (click)="cloneLayout(layout.id)" title="Clone layout">⎘</button>
+              <button class="btn-export" (click)="exportLayout(layout)" title="Export layout">↓</button>
               <button class="btn-delete" (click)="deleteLayout(layout.id)" title="Delete layout">×</button>
             </span>
           </li>

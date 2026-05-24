@@ -119,6 +119,16 @@ export class LayoutStore {
     });
   }
 
+  importLayout(layout: Layout): void {
+    const imported: Layout = {
+      ...layout,
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      features: layout.features.map((f) => ({ ...f, id: crypto.randomUUID() })),
+    };
+    this.update((s) => ({ ...s, layouts: [...s.layouts, imported] }));
+  }
+
   cloneLayout(id: string): void {
     this.update((s) => {
       const source = s.layouts.find((l) => l.id === id);
