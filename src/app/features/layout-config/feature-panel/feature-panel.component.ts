@@ -14,6 +14,7 @@ export class FeaturePanelComponent {
   readonly features = input<AnyFeature[]>([]);
 
   readonly featureChange = output<AnyFeature>();
+  readonly featureClone = output<AnyFeature>();
   readonly featureRemove = output<string>();
   readonly featureSelect = output<string>();
   readonly featuresReorder = output<AnyFeature[]>();
@@ -66,6 +67,11 @@ export class FeaturePanelComponent {
     const f = this.feature();
     if (f?.type !== 'image') return;
     this.featureChange.emit({ ...f, src } satisfies ImageFeature);
+  }
+
+  clone(): void {
+    const f = this.feature();
+    if (f) this.featureClone.emit({ ...f, id: crypto.randomUUID() });
   }
 
   remove(): void {

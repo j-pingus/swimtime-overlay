@@ -34,6 +34,7 @@
         [feature]="selectedFeature()"
         [features]="features()"
         (featureChange)="onFeatureUpdate($event)"
+        (featureClone)="onFeatureClone($event)"
         (featureRemove)="onFeatureRemove($event)"
         (featureSelect)="onFeatureSelect($event)"
         (featuresReorder)="onFeaturesReorder($event)"

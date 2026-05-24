@@ -15,16 +15,16 @@ const DEFAULT_LANES  = 8;
 
 // Full roster of dummy swimmers — pool is sliced/extended to match laneCount.
 const DUMMY_ROSTER: Omit<Lane, 'number'>[] = [
-  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     nat: 'FRA', entryTime: '1:02.45', officialTime: null, time: '1:02.87', rank: '3' },
-  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          nat: 'GBR', entryTime: '1:01.12', officialTime: null, time: '1:01.34', rank: '1' },
-  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     nat: 'GER', entryTime: '1:01.89', officialTime: null, time: '1:01.56', rank: '2' },
-  { swimmerName: 'Laura García',   club: 'CN Barcelona',     nat: 'ESP', entryTime: '1:03.21', officialTime: null, time: '1:03.45', rank: '4' },
-  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       nat: 'POL', entryTime: '1:03.88', officialTime: null, time: null,      rank: null },
-  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', nat: 'BEL', entryTime: '1:04.12', officialTime: null, time: null,      rank: null },
-  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         nat: 'DEN', entryTime: '1:04.56', officialTime: null, time: null,      rank: null },
-  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    nat: 'SVK', entryTime: '1:05.01', officialTime: null, time: null,      rank: null },
-  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       nat: 'ITA', entryTime: '1:05.34', officialTime: null, time: null,      rank: null },
-  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: null, time: null,      rank: null },
+  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     nat: 'FRA', entryTime: '1:02.45', officialTime: '1:02.87', time: '1:02.87', rank: '3' },
+  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          nat: 'GBR', entryTime: '1:01.12', officialTime: '1:01.34', time: '1:01.34', rank: '1' },
+  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     nat: 'GER', entryTime: '1:01.89', officialTime: '1:01.56', time: '1:01.56', rank: '2' },
+  { swimmerName: 'Laura García',   club: 'CN Barcelona',     nat: 'ESP', entryTime: '1:03.21', officialTime: '1:03.45', time: '1:03.45', rank: '4' },
+  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       nat: 'POL', entryTime: '1:03.88', officialTime: '1:02.87', time: '1:02.87', rank: '5' },
+  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', nat: 'BEL', entryTime: '1:04.12', officialTime: '1:01.34', time: '1:01.34', rank: '6' },
+  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         nat: 'DEN', entryTime: '1:04.56', officialTime: '1:02.87', time: '1:02.87', rank: '7' },
+  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    nat: 'SVK', entryTime: '1:05.01', officialTime: '1:01.34', time: '1:01.34', rank: '9' },
+  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       nat: 'ITA', entryTime: '1:05.34', officialTime: '1:01.56', time: '1:01.56', rank: '8' },
+  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: '1:03.45', time: '1:03.45', rank: '10' },
 ];
 
 function buildDummyPool(laneCount: number): Pool {
