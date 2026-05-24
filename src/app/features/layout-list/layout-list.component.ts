@@ -20,6 +20,10 @@ export class LayoutListComponent {
     this.store.setActiveLayout(id);
   }
 
+  deleteLayout(id: string): void {
+    this.store.deleteLayout(id);
+  }
+
   setLaneCount(value: string): void {
     const n = parseInt(value, 10);
     if (n >= 1 && n <= 10) this.competition.setLaneCount(n);

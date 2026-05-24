@@ -47,6 +47,13 @@ export class LayoutStore {
     }));
   }
 
+  deleteLayout(id: string): void {
+    this.update((s) => ({
+      layouts: s.layouts.filter((l) => l.id !== id),
+      activeLayoutId: s.activeLayoutId === id ? null : s.activeLayoutId,
+    }));
+  }
+
   // --- Feature CRUD ---
 
   addFeature(layoutId: string, feature: BaseFeature): void {
