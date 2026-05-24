@@ -33,6 +33,8 @@ interface DragState {
 export class ZoneComponent {
   readonly features = input<BaseFeature[]>([]);
   readonly selectedFeatureId = input<string | null>(null);
+  /** When false the zone is display-only: no anchors, no canvas hint, no interaction. */
+  readonly interactive = input<boolean>(true);
 
   readonly featureSelect = output<string | null>();
   readonly featureUpdate = output<BaseFeature>();

@@ -1,12 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { LayoutStore } from '../../core/services/layout.store';
+import { ZoneComponent } from '../layout-config/zone/zone.component';
 
 @Component({
   selector: 'app-render',
-  imports: [],
+  imports: [ZoneComponent],
   templateUrl: './render.component.html',
   styleUrl: './render.component.scss',
 })
 export class RenderComponent {
-  protected readonly store = inject(LayoutStore);
+  private readonly store = inject(LayoutStore);
+
+  protected readonly features = computed(
+    () => this.store.activeLayout()?.features ?? [],
+  );
 }

@@ -1,7 +1,3 @@
 <div class="render-surface">
-  @if (store.activeLayout()) {
-    <span class="layout-label">{{ store.activeLayout()!.name }}</span>
-  } @else {
-    <span class="placeholder">No layout selected</span>
-  }
+  <app-zone [features]="features()" [interactive]="false" />
 </div>

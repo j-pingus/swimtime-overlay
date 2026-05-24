@@ -33,6 +33,14 @@ svg {
     stroke-width: 3;
     stroke-dasharray: none;
   }
+
+  // Render mode: solid placeholder, no interaction cursor
+  svg:not(.is-interactive) & {
+    fill: rgba(255, 255, 255, 0.9);
+    stroke: none;
+    stroke-dasharray: none;
+    cursor: default;
+  }
 }
 
 .feature-label {
@@ -43,6 +51,10 @@ svg {
 
   .selected & {
     fill: #0070f3;
+  }
+
+  svg:not(.is-interactive) & {
+    display: none;
   }
 }
 
