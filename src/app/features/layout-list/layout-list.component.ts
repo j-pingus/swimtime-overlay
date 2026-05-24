@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LayoutStore } from '../../core/services/layout.store';
+import { CompetitionStore } from '../../core/services/competition.store';
 
 @Component({
   selector: 'app-layout-list',
@@ -11,11 +12,17 @@ import { LayoutStore } from '../../core/services/layout.store';
 })
 export class LayoutListComponent {
   protected readonly store = inject(LayoutStore);
+  protected readonly competition = inject(CompetitionStore);
   protected newLayoutName = signal('');
   protected nameError = signal('');
 
   activate(id: string): void {
     this.store.setActiveLayout(id);
+  }
+
+  setLaneCount(value: string): void {
+    const n = parseInt(value, 10);
+    if (n >= 1 && n <= 10) this.competition.setLaneCount(n);
   }
 
   createLayout(): void {

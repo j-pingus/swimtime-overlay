@@ -12,7 +12,7 @@ import { LayoutStore } from '../../core/services/layout.store';
 })
 export class LayoutConfigComponent {
   private readonly route = inject(ActivatedRoute);
-  protected readonly store = inject(LayoutStore);
+  private readonly store = inject(LayoutStore);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map((p) => p.get('id'))),
@@ -22,4 +22,9 @@ export class LayoutConfigComponent {
     const id = this.id();
     return id ? this.store.layouts().find((l) => l.id === id) ?? null : null;
   });
+
+  constructor() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) this.store.setActiveLayout(id);
+  }
 }

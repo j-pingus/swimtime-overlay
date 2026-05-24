@@ -3,6 +3,18 @@
     <h1>Swimtime Overlay</h1>
   </header>
 
+  <section class="pool-config">
+    <h2>Pool</h2>
+    <div class="lane-count">
+      <label>Lanes</label>
+      <div class="lane-count-controls">
+        <button (click)="setLaneCount((competition.laneCount() - 1).toString())" [disabled]="competition.laneCount() <= 1">−</button>
+        <span>{{ competition.laneCount() }}</span>
+        <button (click)="setLaneCount((competition.laneCount() + 1).toString())" [disabled]="competition.laneCount() >= 10">+</button>
+      </div>
+    </div>
+  </section>
+
   <section class="new-layout">
     <h2>New layout</h2>
     <form (ngSubmit)="createLayout()" class="new-layout-form">
