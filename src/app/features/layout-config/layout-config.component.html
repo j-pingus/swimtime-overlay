@@ -1,12 +1,35 @@
-<div class="layout-config-shell">
-  <a routerLink="/layouts" class="back-link">← All layouts</a>
+@if (layout(); as layout) {
+  <div class="layout-config-shell">
 
-  @if (layout()) {
-    <header class="page-header">
-      <h1>{{ layout()!.name }}</h1>
-    </header>
-    <p class="placeholder-notice">Layout configuration coming soon.</p>
-  } @else {
-    <p class="not-found">Layout not found.</p>
-  }
-</div>
+    <div class="left-panel">
+      <header class="config-header">
+        <a routerLink="/layouts" class="back-link">← Layouts</a>
+        <h1 class="layout-name">{{ layout.name }}</h1>
+        <button class="btn-add" (click)="addFeature()">+ Add feature</button>
+      </header>
+
+      <div class="zone-container">
+        <app-zone
+          [features]="features()"
+          [selectedFeatureId]="selectedId()"
+          (featureSelect)="onFeatureSelect($event)"
+          (featureUpdate)="onFeatureUpdate($event)"
+        />
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <app-feature-panel
+        [feature]="selectedFeature()"
+        (featureChange)="onFeatureUpdate($event)"
+        (featureRemove)="onFeatureRemove($event)"
+      />
+    </div>
+
+  </div>
+} @else {
+  <div class="not-found">
+    <a routerLink="/layouts">← Back to layouts</a>
+    <p>Layout not found.</p>
+  </div>
+}

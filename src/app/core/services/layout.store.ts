@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Layout } from '../models/layout.model';
+import { Layout, BaseFeature } from '../models/layout.model';
 
 export type LayoutStoreState = {
   layouts: Layout[];
@@ -20,11 +20,14 @@ export class LayoutStore {
     return this._state().layouts.find((l) => l.id === id) ?? null;
   });
 
+  // --- Layout CRUD ---
+
   createLayout(name: string): Layout {
     const layout: Layout = {
       id: crypto.randomUUID(),
       name: name.trim(),
       createdAt: Date.now(),
+      features: [],
     };
     this.update((s) => ({
       layouts: [...s.layouts, layout],
@@ -37,17 +40,54 @@ export class LayoutStore {
     this.update((s) => ({ ...s, activeLayoutId: id }));
   }
 
-  /** Apply a state patch arriving from another window — never triggers local broadcast. */
+  // --- Feature CRUD ---
+
+  addFeature(layoutId: string, feature: BaseFeature): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) =>
+        l.id === layoutId ? { ...l, features: [...l.features, feature] } : l,
+      ),
+    }));
+  }
+
+  updateFeature(layoutId: string, feature: BaseFeature): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) =>
+        l.id === layoutId
+          ? { ...l, features: l.features.map((f) => (f.id === feature.id ? feature : f)) }
+          : l,
+      ),
+    }));
+  }
+
+  removeFeature(layoutId: string, featureId: string): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) =>
+        l.id === layoutId
+          ? { ...l, features: l.features.filter((f) => f.id !== featureId) }
+          : l,
+      ),
+    }));
+  }
+
+  // --- Sync ---
+
   applyRemoteState(state: LayoutStoreState): void {
     this._state.set(state);
   }
 
-  /** Register a callback invoked synchronously on every local state mutation. */
   onLocalUpdate(fn: (s: LayoutStoreState) => void): () => void {
     this.localUpdateListeners.push(fn);
     return () => {
       this.localUpdateListeners = this.localUpdateListeners.filter((l) => l !== fn);
     };
+  }
+
+  getState(): LayoutStoreState {
+    return this._state();
   }
 
   private update(fn: (s: LayoutStoreState) => LayoutStoreState): void {
@@ -60,7 +100,12 @@ export class LayoutStore {
   private load(): LayoutStoreState {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw) as LayoutStoreState;
+      if (raw) {
+        const state = JSON.parse(raw) as LayoutStoreState;
+        // Migrate layouts that predate the features field
+        state.layouts = state.layouts.map((l) => ({ ...l, features: l.features ?? [] }));
+        return state;
+      }
     } catch {}
     return { layouts: [], activeLayoutId: null };
   }

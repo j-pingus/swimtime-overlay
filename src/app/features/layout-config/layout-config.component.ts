@@ -1,12 +1,15 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { LayoutStore } from '../../core/services/layout.store';
+import { BaseFeature } from '../../core/models/layout.model';
+import { ZoneComponent } from './zone/zone.component';
+import { FeaturePanelComponent } from './feature-panel/feature-panel.component';
 
 @Component({
   selector: 'app-layout-config',
-  imports: [RouterLink],
+  imports: [RouterLink, ZoneComponent, FeaturePanelComponent],
   templateUrl: './layout-config.component.html',
   styleUrl: './layout-config.component.scss',
 })
@@ -23,8 +26,52 @@ export class LayoutConfigComponent {
     return id ? this.store.layouts().find((l) => l.id === id) ?? null : null;
   });
 
+  protected readonly features = computed(() => this.layout()?.features ?? []);
+
+  protected readonly selectedId = signal<string | null>(null);
+
+  protected readonly selectedFeature = computed(() => {
+    const id = this.selectedId();
+    return id ? this.features().find((f) => f.id === id) ?? null : null;
+  });
+
   constructor() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) this.store.setActiveLayout(id);
+  }
+
+  addFeature(): void {
+    const layoutId = this.id();
+    if (!layoutId) return;
+
+    const feature: BaseFeature = {
+      id: crypto.randomUUID(),
+      type: 'generic',
+      label: `Feature ${this.features().length + 1}`,
+      x: 760,
+      y: 440,
+      width: 400,
+      height: 200,
+    };
+
+    this.store.addFeature(layoutId, feature);
+    this.selectedId.set(feature.id);
+  }
+
+  onFeatureSelect(id: string | null): void {
+    this.selectedId.set(id);
+  }
+
+  onFeatureUpdate(feature: BaseFeature): void {
+    const layoutId = this.id();
+    if (layoutId) this.store.updateFeature(layoutId, feature);
+  }
+
+  onFeatureRemove(featureId: string): void {
+    const layoutId = this.id();
+    if (layoutId) {
+      this.store.removeFeature(layoutId, featureId);
+      this.selectedId.set(null);
+    }
   }
 }

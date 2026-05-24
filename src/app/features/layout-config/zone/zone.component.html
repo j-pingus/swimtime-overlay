@@ -1,0 +1,42 @@
+<svg
+  #svgEl
+  [attr.viewBox]="'0 0 ' + 1920 + ' ' + 1080"
+  preserveAspectRatio="xMidYMid meet"
+  (mousedown)="onBackgroundClick()"
+>
+  <!-- Canvas hint — faint green matching the render screen -->
+  <rect width="1920" height="1080" class="canvas-bg" />
+
+  @for (f of displayFeatures(); track f.id) {
+    <g [class.selected]="f.id === selectedFeatureId()">
+
+      <!-- Feature body -->
+      <rect
+        [attr.x]="f.x" [attr.y]="f.y"
+        [attr.width]="f.width" [attr.height]="f.height"
+        class="feature-rect"
+        (mousedown)="onFeatureClick($event, f)"
+      />
+
+      <!-- Label -->
+      <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
+        {{ f.label }}
+      </text>
+
+      <!-- Move anchor: top-left -->
+      <circle
+        [attr.cx]="f.x" [attr.cy]="f.y" [attr.r]="ANCHOR"
+        class="anchor-move"
+        (mousedown)="onMoveStart($event, f)"
+      />
+
+      <!-- Resize anchor: bottom-right -->
+      <circle
+        [attr.cx]="f.x + f.width" [attr.cy]="f.y + f.height" [attr.r]="ANCHOR"
+        class="anchor-resize"
+        (mousedown)="onResizeStart($event, f)"
+      />
+
+    </g>
+  }
+</svg>

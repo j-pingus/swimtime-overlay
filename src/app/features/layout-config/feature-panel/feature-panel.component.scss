@@ -1,0 +1,94 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.panel {
+  padding: 1rem;
+}
+
+.empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+
+  p {
+    color: #aaa;
+    text-align: center;
+    font-size: 0.9rem;
+    font-family: sans-serif;
+  }
+}
+
+h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #888;
+  margin: 0 0 1rem;
+  font-family: sans-serif;
+}
+
+h3 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #aaa;
+  margin: 1.25rem 0 0.5rem;
+  font-family: sans-serif;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+
+  label {
+    font-size: 0.75rem;
+    color: #666;
+    font-family: sans-serif;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+    }
+  }
+}
+
+.field-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions {
+  margin-top: 2rem;
+}
+
+.btn-remove {
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid #e00;
+  border-radius: 4px;
+  color: #e00;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-family: sans-serif;
+
+  &:hover {
+    background: #e00;
+    color: #fff;
+  }
+}

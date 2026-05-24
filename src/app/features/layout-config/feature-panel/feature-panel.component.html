@@ -1,0 +1,48 @@
+@if (feature(); as f) {
+  <div class="panel">
+    <h2>Feature</h2>
+
+    <div class="field">
+      <label>Label</label>
+      <input type="text" [value]="f.label" (change)="patch({ label: $any($event.target).value })" />
+    </div>
+
+    <h3>Position</h3>
+
+    <div class="field-row">
+      <div class="field">
+        <label>X</label>
+        <input type="number" [value]="f.x" min="0"
+          (change)="patch({ x: asNumber($any($event.target).value) })" />
+      </div>
+      <div class="field">
+        <label>Y</label>
+        <input type="number" [value]="f.y" min="0"
+          (change)="patch({ y: asNumber($any($event.target).value) })" />
+      </div>
+    </div>
+
+    <h3>Size</h3>
+
+    <div class="field-row">
+      <div class="field">
+        <label>W</label>
+        <input type="number" [value]="f.width" min="1"
+          (change)="patch({ width: asNumber($any($event.target).value) })" />
+      </div>
+      <div class="field">
+        <label>H</label>
+        <input type="number" [value]="f.height" min="1"
+          (change)="patch({ height: asNumber($any($event.target).value) })" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-remove" (click)="remove()">Delete feature</button>
+    </div>
+  </div>
+} @else {
+  <div class="empty">
+    <p>Select a feature or add one to configure it.</p>
+  </div>
+}
