@@ -12,12 +12,17 @@ type DragMode = 'move' | 'resize';
 interface DragState {
   featureId: string;
   mode: DragMode;
+  /** SVG coords where the drag started — never mutated. */
   startX: number;
   startY: number;
+  /** Feature geometry when the drag started — never mutated. */
   origX: number;
   origY: number;
   origW: number;
   origH: number;
+  /** Current SVG mouse position — updated every mousemove. */
+  currentX: number;
+  currentY: number;
 }
 
 @Component({
@@ -35,14 +40,16 @@ export class ZoneComponent {
   private readonly svgEl = viewChild.required<ElementRef<SVGSVGElement>>('svgEl');
   private readonly drag = signal<DragState | null>(null);
 
-  /** Merges drag-preview position into the feature list for live feedback. */
+  /** Merges drag-preview geometry into the feature list for live feedback. */
   protected readonly displayFeatures = computed(() => {
-    const dragging = this.drag();
+    const d = this.drag();
     return this.features().map((f) => {
-      if (!dragging || f.id !== dragging.featureId) return f;
-      return dragging.mode === 'move'
-        ? { ...f, x: dragging.origX, y: dragging.origY }
-        : { ...f, width: dragging.origW, height: dragging.origH };
+      if (!d || f.id !== d.featureId) return f;
+      const dx = d.currentX - d.startX;
+      const dy = d.currentY - d.startY;
+      return d.mode === 'move'
+        ? { ...f, x: clamp(d.origX + dx, 0, CANVAS_W - f.width), y: clamp(d.origY + dy, 0, CANVAS_H - f.height) }
+        : { ...f, width: Math.max(40, d.origW + dx), height: Math.max(20, d.origH + dy) };
     });
   });
 
@@ -64,11 +71,11 @@ export class ZoneComponent {
     event.preventDefault();
     const { x, y } = this.toSVG(event);
     this.drag.set({
-      featureId: feature.id,
-      mode: 'move',
+      featureId: feature.id, mode: 'move',
       startX: x, startY: y,
       origX: feature.x, origY: feature.y,
       origW: feature.width, origH: feature.height,
+      currentX: x, currentY: y,
     });
     this.featureSelect.emit(feature.id);
   }
@@ -78,52 +85,36 @@ export class ZoneComponent {
     event.preventDefault();
     const { x, y } = this.toSVG(event);
     this.drag.set({
-      featureId: feature.id,
-      mode: 'resize',
+      featureId: feature.id, mode: 'resize',
       startX: x, startY: y,
       origX: feature.x, origY: feature.y,
       origW: feature.width, origH: feature.height,
+      currentX: x, currentY: y,
     });
     this.featureSelect.emit(feature.id);
   }
 
   @HostListener('window:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    const state = this.drag();
-    if (!state) return;
-
+    if (!this.drag()) return;
     const { x, y } = this.toSVG(event);
-    const dx = x - state.startX;
-    const dy = y - state.startY;
-    const feature = this.features().find((f) => f.id === state.featureId);
-    if (!feature) return;
-
-    if (state.mode === 'move') {
-      this.drag.update((s) => s && ({
-        ...s,
-        origX: clamp(state.origX + dx, 0, CANVAS_W - feature.width),
-        origY: clamp(state.origY + dy, 0, CANVAS_H - feature.height),
-      }));
-    } else {
-      this.drag.update((s) => s && ({
-        ...s,
-        origW: Math.max(40, state.origW + dx),
-        origH: Math.max(20, state.origH + dy),
-      }));
-    }
+    // Only update current mouse position — orig* and start* stay frozen.
+    this.drag.update((s) => s && ({ ...s, currentX: x, currentY: y }));
   }
 
   @HostListener('window:mouseup')
   onMouseUp(): void {
-    const state = this.drag();
-    if (!state) return;
+    const d = this.drag();
+    if (!d) return;
 
-    const feature = this.features().find((f) => f.id === state.featureId);
+    const feature = this.features().find((f) => f.id === d.featureId);
     if (feature) {
-      const updated: BaseFeature =
-        state.mode === 'move'
-          ? { ...feature, x: state.origX, y: state.origY }
-          : { ...feature, width: state.origW, height: state.origH };
+      // Commit the same geometry that displayFeatures showed as preview.
+      const dx = d.currentX - d.startX;
+      const dy = d.currentY - d.startY;
+      const updated: BaseFeature = d.mode === 'move'
+        ? { ...feature, x: clamp(d.origX + dx, 0, CANVAS_W - feature.width), y: clamp(d.origY + dy, 0, CANVAS_H - feature.height) }
+        : { ...feature, width: Math.max(40, d.origW + dx), height: Math.max(20, d.origH + dy) };
       this.featureUpdate.emit(updated);
     }
     this.drag.set(null);
