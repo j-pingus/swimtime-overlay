@@ -49,6 +49,7 @@
                 <button class="btn-activate" (click)="activate(layout.id)">Use</button>
               }
               <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
+              <button class="btn-delete" (click)="deleteLayout(layout.id)" title="Delete layout">×</button>
             </span>
           </li>
         }

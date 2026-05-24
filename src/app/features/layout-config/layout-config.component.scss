@@ -1,31 +1,141 @@
 .layout-config-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
   font-family: sans-serif;
-  max-width: 560px;
-  margin: 2rem auto;
-  padding: 0 1rem;
 }
 
-.back-link {
-  font-size: 0.875rem;
-  color: #0070f3;
-  text-decoration: none;
+// ── Left panel (70%) ─────────────────────────────────────────────────────────
 
-  &:hover {
-    text-decoration: underline;
+.left-panel {
+  flex: 0 0 70%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid #e0e0e0;
+}
+
+.config-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+
+  .back-link {
+    font-size: 0.875rem;
+    color: #0070f3;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  .layout-name {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    min-width: 0;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    font-family: inherit;
+    color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover { border-color: #ddd; }
+
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+      background: #fff;
+    }
+  }
+
+  .add-menu-wrapper {
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .btn-add {
+    padding: 0.4rem 1rem;
+    background: #0070f3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover { background: #005fd1; }
+  }
+
+  .add-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    z-index: 10;
+    overflow: hidden;
+    min-width: 120px;
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 0.875rem;
+      font-family: sans-serif;
+      cursor: pointer;
+      color: #333;
+
+      &:hover { background: #f0f4ff; color: #0070f3; }
+    }
   }
 }
 
-.page-header h1 {
-  font-size: 1.4rem;
-  margin: 1rem 0;
+.zone-container {
+  flex: 1;
+  min-height: 0;
+  background: #1a1a1a;
+  overflow: hidden;
 }
 
-.placeholder-notice {
-  color: #888;
-  font-size: 0.95rem;
+// ── Right panel (30%) ─────────────────────────────────────────────────────────
+
+.right-panel {
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #fafafa;
 }
+
+// ── Not found fallback ────────────────────────────────────────────────────────
 
 .not-found {
-  margin-top: 1.5rem;
-  color: #c00;
+  padding: 2rem;
+  font-family: sans-serif;
+
+  a {
+    color: #0070f3;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+
+  p {
+    color: #c00;
+    margin-top: 1rem;
+  }
 }

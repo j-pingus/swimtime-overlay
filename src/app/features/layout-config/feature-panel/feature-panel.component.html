@@ -1,0 +1,256 @@
+@if (feature(); as f) {
+  <div class="panel">
+    <h2>{{ f.type === 'image' ? 'Image' : f.type === 'text' ? 'Text' : f.type === 'rect' ? 'Rectangle' : f.type === 'lane' ? 'Lane text' : 'Feature' }}</h2>
+
+    <div class="field">
+      <label>Label</label>
+      <input type="text" [value]="f.label" (change)="patch({ label: $any($event.target).value })" />
+    </div>
+
+    <h3>Position</h3>
+
+    <div class="field-row">
+      <div class="field">
+        <label>X</label>
+        <input type="number" [value]="f.x" min="0"
+          (change)="patch({ x: asNumber($any($event.target).value) })" />
+      </div>
+      <div class="field">
+        <label>Y</label>
+        <input type="number" [value]="f.y" min="0"
+          (change)="patch({ y: asNumber($any($event.target).value) })" />
+      </div>
+    </div>
+
+    <h3>Size</h3>
+
+    <div class="field-row">
+      <div class="field">
+        <label>W</label>
+        <input type="number" [value]="f.width" min="1"
+          (change)="patch({ width: asNumber($any($event.target).value) })" />
+      </div>
+      <div class="field">
+        <label>H</label>
+        <input type="number" [value]="f.height" min="1"
+          (change)="patch({ height: asNumber($any($event.target).value) })" />
+      </div>
+    </div>
+
+    @if (rectFeature(); as r) {
+      <h3>Background</h3>
+
+      <div class="field-row">
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="r.bgColor"
+            (input)="patchRect({ bgColor: $any($event.target).value })" />
+        </div>
+        <div class="field">
+          <label>Opacity %</label>
+          <input type="number" [value]="r.bgOpacity" min="0" max="100"
+            (change)="patchRect({ bgOpacity: asNumber($any($event.target).value) })" />
+        </div>
+      </div>
+
+      <h3>Border</h3>
+
+      <div class="field-row field-row--center">
+        <label class="toggle-label">
+          <input type="checkbox" [checked]="r.border"
+            (change)="patchRect({ border: $any($event.target).checked })" />
+          Show border
+        </label>
+      </div>
+
+      @if (r.border) {
+        <div class="field-row">
+          <div class="field field--color">
+            <label>Color</label>
+            <input type="color" [value]="r.borderColor"
+              (input)="patchRect({ borderColor: $any($event.target).value })" />
+          </div>
+          <div class="field">
+            <label>Thickness</label>
+            <input type="number" [value]="r.borderWidth" min="1"
+              (change)="patchRect({ borderWidth: asNumber($any($event.target).value) })" />
+          </div>
+        </div>
+      }
+
+      <div class="field-row">
+        <div class="field">
+          <label>Rounded corners</label>
+          <input type="number" [value]="r.borderRadius" min="0"
+            (change)="patchRect({ borderRadius: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field">
+          <label>Border inset</label>
+          <input type="number" [value]="r.padding" min="0"
+            (change)="patchRect({ padding: asNumber($any($event.target).value) })" />
+        </div>
+      </div>
+    }
+
+    @if (laneFeature(); as ln) {
+      <h3>Text</h3>
+
+      <div class="field">
+        <label>Template</label>
+        <textarea class="template-input"
+          [value]="ln.template"
+          (change)="patchLane({ template: $any($event.target).value })"
+        ></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Font size</label>
+          <input type="number" [value]="ln.fontSize" min="1"
+            (change)="patchLane({ fontSize: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="ln.color"
+            (input)="patchLane({ color: $any($event.target).value })" />
+        </div>
+      </div>
+
+      <div class="style-row">
+        <button class="btn-style" [class.active]="ln.bold"
+          (click)="patchLane({ bold: !ln.bold })"><b>B</b></button>
+        <button class="btn-style" [class.active]="ln.italic"
+          (click)="patchLane({ italic: !ln.italic })"><i>I</i></button>
+      </div>
+
+      <h3>Alignment</h3>
+      <div class="align-row">
+        <button class="btn-align" [class.active]="ln.align === 'left'"
+          (click)="patchLane({ align: 'left' })">Left</button>
+        <button class="btn-align" [class.active]="ln.align === 'center'"
+          (click)="patchLane({ align: 'center' })">Center</button>
+        <button class="btn-align" [class.active]="ln.align === 'right'"
+          (click)="patchLane({ align: 'right' })">Right</button>
+      </div>
+
+      <details class="vars-ref">
+        <summary>Available variables</summary>
+        <ul>
+          <li><code>${{ '{' }}swimmerName{{ '}' }}</code></li>
+          <li><code>${{ '{' }}club{{ '}' }}</code></li>
+          <li><code>${{ '{' }}nat{{ '}' }}</code></li>
+          <li><code>${{ '{' }}entryTime{{ '}' }}</code></li>
+          <li><code>${{ '{' }}time{{ '}' }}</code></li>
+          <li><code>${{ '{' }}officialTime{{ '}' }}</code></li>
+          <li><code>${{ '{' }}rank{{ '}' }}</code></li>
+          <li><code>${{ '{' }}number{{ '}' }}</code></li>
+        </ul>
+      </details>
+    }
+
+    @if (textFeature(); as txt) {
+      <h3>Text</h3>
+
+      <div class="field">
+        <label>Template</label>
+        <textarea class="template-input"
+          [value]="txt.template"
+          (change)="patchText({ template: $any($event.target).value })"
+        ></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Font size</label>
+          <input type="number" [value]="txt.fontSize" min="1"
+            (change)="patchText({ fontSize: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="txt.color"
+            (input)="patchText({ color: $any($event.target).value })" />
+        </div>
+      </div>
+
+      <div class="style-row">
+        <button class="btn-style" [class.active]="txt.bold"
+          (click)="patchText({ bold: !txt.bold })"><b>B</b></button>
+        <button class="btn-style" [class.active]="txt.italic"
+          (click)="patchText({ italic: !txt.italic })"><i>I</i></button>
+      </div>
+
+      <h3>Alignment</h3>
+      <div class="align-row">
+        <button class="btn-align" [class.active]="txt.align === 'left'"
+          (click)="patchText({ align: 'left' })">Left</button>
+        <button class="btn-align" [class.active]="txt.align === 'center'"
+          (click)="patchText({ align: 'center' })">Center</button>
+        <button class="btn-align" [class.active]="txt.align === 'right'"
+          (click)="patchText({ align: 'right' })">Right</button>
+      </div>
+
+      <details class="vars-ref">
+        <summary>Available variables</summary>
+        <ul>
+          <li><code>${{ '{' }}currentEvent.number{{ '}' }}</code></li>
+          <li><code>${{ '{' }}currentEvent.stroke{{ '}' }}</code></li>
+          <li><code>${{ '{' }}currentEvent.category{{ '}' }}</code></li>
+          <li><code>${{ '{' }}currentEvent.distance{{ '}' }}</code></li>
+          <li><code>${{ '{' }}currentHeat.number{{ '}' }}</code></li>
+        </ul>
+      </details>
+    }
+
+    @if (imageFeature(); as img) {
+      <h3>Image</h3>
+
+      <div class="image-preview-wrapper">
+        @if (img.src) {
+          <img class="image-preview" [src]="img.src" alt="" />
+        } @else {
+          <div class="image-empty">No image selected</div>
+        }
+      </div>
+
+      <div class="image-actions">
+        <label class="btn-upload">
+          Choose file
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+        </label>
+        @if (img.src) {
+          <button class="btn-clear" (click)="clearImage()">Clear</button>
+        }
+      </div>
+    }
+
+    <div class="actions">
+      <button class="btn-clone" (click)="clone()">Clone</button>
+      <button class="btn-remove" (click)="remove()">Delete</button>
+    </div>
+  </div>
+} @else {
+  <div class="feature-list-panel">
+    <h2>Features</h2>
+
+    @if (features().length === 0) {
+      <p class="empty-hint">Add a feature to get started.</p>
+    } @else {
+      <p class="list-hint">Drag to reorder · bottom of list renders on top</p>
+
+      <div
+        cdkDropList
+        [cdkDropListData]="features()"
+        (cdkDropListDropped)="onDrop($event)"
+        class="feature-list"
+      >
+        @for (f of features(); track f.id) {
+          <div cdkDrag class="feature-item" (click)="featureSelect.emit(f.id)">
+            <span cdkDragHandle class="drag-handle">⠿</span>
+            <span class="type-badge type-badge--{{ f.type }}">{{ typeLabel(f) }}</span>
+            <span class="item-label">{{ f.label }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

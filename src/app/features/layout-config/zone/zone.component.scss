@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  // preserveAspectRatio="xMidYMid meet" on the element letterboxes
+  // the 1920×1080 canvas to fill the available space without distortion.
+}
+
+.canvas-bg {
+  fill: #00b140;
+  opacity: 0.12;
+  stroke: #00b140;
+  stroke-width: 3;
+}
+
+.feature-rect {
+  fill: rgba(255, 255, 255, 0.08);
+  stroke: #888;
+  stroke-width: 3;
+  stroke-dasharray: 12 6;
+  cursor: pointer;
+
+  .selected & {
+    fill: rgba(0, 112, 243, 0.1);
+    stroke: #0070f3;
+    stroke-width: 3;
+    stroke-dasharray: none;
+  }
+
+  // Render mode: solid placeholder, no interaction cursor
+  svg:not(.is-interactive) & {
+    fill: rgba(255, 255, 255, 0.9);
+    stroke: none;
+    stroke-dasharray: none;
+    cursor: default;
+  }
+}
+
+.feature-label {
+  fill: #ccc;
+  font-size: 28px;
+  font-family: sans-serif;
+  pointer-events: none;
+
+  .selected & {
+    fill: #0070f3;
+  }
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
+// Visual rectangle — purely decorative, pointer-events off so the overlay handles interaction.
+.rect-visual {
+  pointer-events: none;
+}
+
+// Bounding rect for text features — dashed outline in config, invisible in render.
+.text-bg {
+  fill: transparent;
+  stroke: rgba(200, 200, 200, 0.45);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+  cursor: pointer;
+
+  .selected & {
+    stroke: #0070f3;
+    stroke-width: 3;
+    stroke-dasharray: none;
+  }
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
+// Actual SVG text — pointer-events off so clicks fall through to the .text-bg hit area.
+.text-content {
+  font-family: sans-serif;
+  pointer-events: none;
+}
+
+// Transparent overlay for image features — renders selection border in config mode.
+// Sits on top of the <image> element so it reliably receives pointer events.
+.feature-overlay {
+  fill: transparent;
+  stroke: #888;
+  stroke-width: 3;
+  stroke-dasharray: 12 6;
+  cursor: pointer;
+
+  .selected & {
+    stroke: #0070f3;
+    stroke-dasharray: none;
+  }
+}
+
+// Placeholder for an image feature with no src yet — hidden in render mode.
+.feature-placeholder {
+  fill: rgba(128, 128, 128, 0.12);
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
+.anchor-move {
+  fill: #fff;
+  stroke: #555;
+  stroke-width: 3;
+  cursor: move;
+
+  .selected & {
+    stroke: #0070f3;
+  }
+}
+
+.anchor-resize {
+  fill: #555;
+  stroke: #333;
+  stroke-width: 3;
+  cursor: se-resize;
+
+  .selected & {
+    fill: #0070f3;
+    stroke: #005fd1;
+  }
+}

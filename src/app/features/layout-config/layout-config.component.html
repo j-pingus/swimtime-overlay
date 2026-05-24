@@ -1,12 +1,54 @@
-<div class="layout-config-shell">
-  <a routerLink="/layouts" class="back-link">← All layouts</a>
+@if (layout(); as layout) {
+  <div class="layout-config-shell">
 
-  @if (layout()) {
-    <header class="page-header">
-      <h1>{{ layout()!.name }}</h1>
-    </header>
-    <p class="placeholder-notice">Layout configuration coming soon.</p>
-  } @else {
-    <p class="not-found">Layout not found.</p>
-  }
-</div>
+    <div class="left-panel">
+      <header class="config-header">
+        <a routerLink="/layouts" class="back-link">← Layouts</a>
+        <input
+          class="layout-name"
+          type="text"
+          [value]="layout.name"
+          (change)="renameLayout($any($event.target).value)"
+        />
+        <div class="add-menu-wrapper">
+          <button class="btn-add" (click)="showAddMenu.set(!showAddMenu())">+ Add feature</button>
+          @if (showAddMenu()) {
+            <div class="add-menu">
+              <button (click)="addFeature('image')">Image</button>
+              <button (click)="addFeature('text')">Text</button>
+              <button (click)="addFeature('rect')">Rectangle</button>
+              <button (click)="addFeature('lane')">Lane text</button>
+            </div>
+          }
+        </div>
+      </header>
+
+      <div class="zone-container">
+        <app-zone
+          [features]="features()"
+          [selectedFeatureId]="selectedId()"
+          (featureSelect)="onFeatureSelect($event)"
+          (featureUpdate)="onFeatureUpdate($event)"
+        />
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <app-feature-panel
+        [feature]="selectedFeature()"
+        [features]="features()"
+        (featureChange)="onFeatureUpdate($event)"
+        (featureClone)="onFeatureClone($event)"
+        (featureRemove)="onFeatureRemove($event)"
+        (featureSelect)="onFeatureSelect($event)"
+        (featuresReorder)="onFeaturesReorder($event)"
+      />
+    </div>
+
+  </div>
+} @else {
+  <div class="not-found">
+    <a routerLink="/layouts">← Back to layouts</a>
+    <p>Layout not found.</p>
+  </div>
+}

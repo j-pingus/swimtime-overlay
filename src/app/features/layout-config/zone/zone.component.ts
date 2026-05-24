@@ -1,0 +1,191 @@
+import {
+  Component, inject, input, output, computed, signal,
+  viewChild, ElementRef, HostListener,
+} from '@angular/core';
+import { AnyFeature, BaseFeature, ImageFeature, LaneFeature, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { CompetitionStore } from '../../../core/services/competition.store';
+import { resolveTemplate } from '../../../core/utils/template.util';
+
+export const CANVAS_W = 1920;
+export const CANVAS_H = 1080;
+
+type DragMode = 'move' | 'resize';
+
+interface DragState {
+  featureId: string;
+  mode: DragMode;
+  /** SVG coords where the drag started — never mutated. */
+  startX: number;
+  startY: number;
+  /** Feature geometry when the drag started — never mutated. */
+  origX: number;
+  origY: number;
+  origW: number;
+  origH: number;
+  /** Current SVG mouse position — updated every mousemove. */
+  currentX: number;
+  currentY: number;
+}
+
+@Component({
+  selector: 'app-zone',
+  templateUrl: './zone.component.html',
+  styleUrl: './zone.component.scss',
+})
+export class ZoneComponent {
+  private readonly competitionStore = inject(CompetitionStore);
+
+  readonly features = input<BaseFeature[]>([]);
+  readonly selectedFeatureId = input<string | null>(null);
+  /** When false the zone is display-only: no anchors, no canvas hint, no interaction. */
+  readonly interactive = input<boolean>(true);
+
+  readonly featureSelect = output<string | null>();
+  readonly featureUpdate = output<BaseFeature>();
+
+  private readonly svgEl = viewChild.required<ElementRef<SVGSVGElement>>('svgEl');
+  private readonly drag = signal<DragState | null>(null);
+
+  /** Merges drag-preview geometry into the feature list for live feedback. */
+  protected readonly displayFeatures = computed(() => {
+    const d = this.drag();
+    return this.features().map((f) => {
+      if (!d || f.id !== d.featureId) return f;
+      const dx = d.currentX - d.startX;
+      const dy = d.currentY - d.startY;
+      return d.mode === 'move'
+        ? { ...f, x: clamp(d.origX + dx, 0, CANVAS_W - f.width), y: clamp(d.origY + dy, 0, CANVAS_H - f.height) }
+        : { ...f, width: clamp(d.origW + dx, 40, CANVAS_W - d.origX), height: clamp(d.origH + dy, 20, CANVAS_H - d.origY) };
+    });
+  });
+
+  protected readonly ANCHOR = 16;
+
+  protected asImage(f: AnyFeature): ImageFeature | null {
+    return f.type === 'image' ? f : null;
+  }
+
+  protected asTextLike(f: AnyFeature): TextFeature | LaneFeature | null {
+    return (f.type === 'text' || f.type === 'lane') ? f : null;
+  }
+
+  protected asLane(f: AnyFeature): LaneFeature | null {
+    return f.type === 'lane' ? f : null;
+  }
+
+  protected asRect(f: AnyFeature): RectFeature | null {
+    return f.type === 'rect' ? f : null;
+  }
+
+  protected rectFill(f: RectFeature): string {
+    return f.bgColor;
+  }
+
+  protected rectFillOpacity(f: RectFeature): number {
+    return f.bgOpacity / 100;
+  }
+
+  protected resolvedDisplayText(f: TextFeature | LaneFeature): string {
+    return resolveTemplate(f.template, this.competitionStore.competition());
+  }
+
+  protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
+    const lanes = this.competitionStore.competition().pool.lanes;
+    const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
+    return lanes.map((lane, i) => ({
+      y: f.y + i * rowH + f.fontSize,
+      text: resolveTemplate(f.template, lane),
+    }));
+  }
+
+  protected textX(f: TextFeature | LaneFeature): number {
+    if (f.align === 'center') return f.x + f.width / 2;
+    if (f.align === 'right') return f.x + f.width;
+    return f.x;
+  }
+
+  protected textAnchor(f: TextFeature | LaneFeature): string {
+    const map: Record<TextAlign, string> = { left: 'start', center: 'middle', right: 'end' };
+    return map[f.align];
+  }
+
+  // --- Interaction ---
+
+  protected onBackgroundClick(): void {
+    this.featureSelect.emit(null);
+  }
+
+  protected onFeatureClick(event: MouseEvent, feature: BaseFeature): void {
+    event.stopPropagation();
+    this.featureSelect.emit(feature.id);
+  }
+
+  protected onMoveStart(event: MouseEvent, feature: BaseFeature): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const { x, y } = this.toSVG(event);
+    this.drag.set({
+      featureId: feature.id, mode: 'move',
+      startX: x, startY: y,
+      origX: feature.x, origY: feature.y,
+      origW: feature.width, origH: feature.height,
+      currentX: x, currentY: y,
+    });
+    this.featureSelect.emit(feature.id);
+  }
+
+  protected onResizeStart(event: MouseEvent, feature: BaseFeature): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const { x, y } = this.toSVG(event);
+    this.drag.set({
+      featureId: feature.id, mode: 'resize',
+      startX: x, startY: y,
+      origX: feature.x, origY: feature.y,
+      origW: feature.width, origH: feature.height,
+      currentX: x, currentY: y,
+    });
+    this.featureSelect.emit(feature.id);
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    if (!this.drag()) return;
+    const { x, y } = this.toSVG(event);
+    // Only update current mouse position — orig* and start* stay frozen.
+    this.drag.update((s) => s && ({ ...s, currentX: x, currentY: y }));
+  }
+
+  @HostListener('window:mouseup')
+  onMouseUp(): void {
+    const d = this.drag();
+    if (!d) return;
+
+    const feature = this.features().find((f) => f.id === d.featureId);
+    if (feature) {
+      // Commit the same geometry that displayFeatures showed as preview.
+      const dx = d.currentX - d.startX;
+      const dy = d.currentY - d.startY;
+      const updated: BaseFeature = d.mode === 'move'
+        ? { ...feature, x: round(clamp(d.origX + dx, 0, CANVAS_W - feature.width)), y: round(clamp(d.origY + dy, 0, CANVAS_H - feature.height)) }
+        : { ...feature, width: round(clamp(d.origW + dx, 40, CANVAS_W - d.origX)), height: round(clamp(d.origH + dy, 20, CANVAS_H - d.origY)) };
+      this.featureUpdate.emit(updated);
+    }
+    this.drag.set(null);
+  }
+
+  private toSVG(event: MouseEvent): { x: number; y: number } {
+    const svg = this.svgEl().nativeElement;
+    const pt = new DOMPoint(event.clientX, event.clientY);
+    const p = pt.matrixTransform(svg.getScreenCTM()!.inverse());
+    return { x: p.x, y: p.y };
+  }
+}
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, v));
+}
+
+function round(v: number): number {
+  return Math.round(v);
+}
