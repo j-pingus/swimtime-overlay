@@ -146,6 +146,22 @@
           <li><code>${{ '{' }}number{{ '}' }}</code></li>
         </ul>
       </details>
+
+      <h3>Display duration</h3>
+      <div class="field-row field-row--center">
+        <label class="toggle-label">
+          <input type="checkbox" [checked]="ln.displayDuration !== null"
+            (change)="patchLane({ displayDuration: $any($event.target).checked ? 10 : null })" />
+          Expire after
+        </label>
+        @if (ln.displayDuration !== null) {
+          <div class="field field--inline">
+            <input type="number" [value]="ln.displayDuration" min="1"
+              (change)="patchLane({ displayDuration: asNumber($any($event.target).value) })" />
+            <label>s</label>
+          </div>
+        }
+      </div>
     }
 
     @if (textFeature(); as txt) {

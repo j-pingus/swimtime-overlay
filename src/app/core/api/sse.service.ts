@@ -10,12 +10,12 @@ export class SseService implements OnDestroy {
 
   /** Real-time lap time updates pushed by the timing system. */
   lapTime$(): Observable<LaptimeDto> {
-    return this.stream<LaptimeDto>(`${this.base}/api/sse/laptime`);
+    return this.stream<LaptimeDto>(`${this.base}/sse/laptime`);
   }
 
   /** Real-time event+heat updates (lane list, stroke, category, etc). */
   eventAndHeat$(): Observable<EventAndHeatDto> {
-    return this.stream<EventAndHeatDto>(`${this.base}/api/sse/eventAndHeat`);
+    return this.stream<EventAndHeatDto>(`${this.base}/sse/eventAndHeat`);
   }
 
   private stream<T>(url: string): Observable<T> {

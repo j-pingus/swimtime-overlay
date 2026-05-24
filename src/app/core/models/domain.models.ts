@@ -9,6 +9,8 @@ export interface Lane {
   /** Live time updated by SSE lap-time events during the race. */
   time: string | null;
   rank: string | null;
+  /** Unix ms timestamp of the last data update for this lane; null until first update. */
+  timestamp: number | null;
 }
 
 export interface Pool {

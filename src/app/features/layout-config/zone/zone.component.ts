@@ -1,6 +1,6 @@
 import {
   Component, inject, input, output, computed, signal,
-  viewChild, ElementRef, HostListener,
+  viewChild, ElementRef, HostListener, DestroyRef,
 } from '@angular/core';
 import { AnyFeature, BaseFeature, ImageFeature, LaneFeature, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
 import { CompetitionStore } from '../../../core/services/competition.store';
@@ -34,6 +34,12 @@ interface DragState {
 })
 export class ZoneComponent {
   private readonly competitionStore = inject(CompetitionStore);
+  private readonly now = signal(Date.now());
+
+  constructor() {
+    const id = setInterval(() => this.now.set(Date.now()), 1000);
+    inject(DestroyRef).onDestroy(() => clearInterval(id));
+  }
 
   readonly features = input<BaseFeature[]>([]);
   readonly selectedFeatureId = input<string | null>(null);
@@ -91,11 +97,18 @@ export class ZoneComponent {
 
   protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
     const lanes = this.competitionStore.competition().pool.lanes;
+    const now = this.now();
     const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
-    return lanes.map((lane, i) => ({
-      y: f.y + i * rowH + f.fontSize,
-      text: resolveTemplate(f.template, lane),
-    }));
+    return lanes.map((lane, i) => {
+      const expired =
+        f.displayDuration != null &&
+        lane.timestamp != null &&
+        now - lane.timestamp > f.displayDuration * 1000;
+      return {
+        y: f.y + i * rowH + f.fontSize,
+        text: expired ? '' : resolveTemplate(f.template, lane),
+      };
+    });
   }
 
   protected textX(f: TextFeature | LaneFeature): number {

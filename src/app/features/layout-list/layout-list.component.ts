@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LayoutStore } from '../../core/services/layout.store';
 import { CompetitionStore } from '../../core/services/competition.store';
+import { LiveDataService } from '../../core/services/live-data.service';
 
 @Component({
   selector: 'app-layout-list',
@@ -13,6 +14,7 @@ import { CompetitionStore } from '../../core/services/competition.store';
 export class LayoutListComponent {
   protected readonly store = inject(LayoutStore);
   protected readonly competition = inject(CompetitionStore);
+  private readonly liveData = inject(LiveDataService);
   protected newLayoutName = signal('');
   protected nameError = signal('');
 
@@ -27,6 +29,14 @@ export class LayoutListComponent {
   setLaneCount(value: string): void {
     const n = parseInt(value, 10);
     if (n >= 1 && n <= 10) this.competition.setLaneCount(n);
+  }
+
+  enableLive(): void {
+    this.liveData.start();
+  }
+
+  disableLive(): void {
+    this.liveData.stop();
   }
 
   createLayout(): void {
