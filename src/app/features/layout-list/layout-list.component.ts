@@ -5,6 +5,7 @@ import { LayoutStore } from '../../core/services/layout.store';
 import { CompetitionStore } from '../../core/services/competition.store';
 import { LiveDataService } from '../../core/services/live-data.service';
 import { ALL_MESSAGE_TYPES } from '../../core/api/api.models';
+import { Layout } from '../../core/models/layout.model';
 
 @Component({
   selector: 'app-layout-list',
@@ -48,6 +49,35 @@ export class LayoutListComponent {
 
   deleteLayout(id: string): void {
     this.store.deleteLayout(id);
+  }
+
+  exportLayout(layout: Layout): void {
+    const json = JSON.stringify(layout, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${layout.name.replace(/[^\w\-]/g, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  onImportFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const layout = JSON.parse(reader.result as string) as Layout;
+        if (!layout.name || !Array.isArray(layout.features)) return;
+        this.store.importLayout(layout);
+      } catch {
+        // invalid JSON — silently ignore
+      }
+      input.value = '';
+    };
+    reader.readAsText(file);
   }
 
   setLaneCount(value: string): void {
