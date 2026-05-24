@@ -1,11 +1,20 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'config', pathMatch: 'full' },
+  { path: '', redirectTo: 'layouts', pathMatch: 'full' },
   {
-    path: 'config',
+    path: 'layouts',
     loadComponent: () =>
-      import('./features/config/config.component').then((m) => m.ConfigComponent),
+      import('./features/layout-list/layout-list.component').then(
+        (m) => m.LayoutListComponent,
+      ),
+  },
+  {
+    path: 'config/:id',
+    loadComponent: () =>
+      import('./features/layout-config/layout-config.component').then(
+        (m) => m.LayoutConfigComponent,
+      ),
   },
   {
     path: 'render',

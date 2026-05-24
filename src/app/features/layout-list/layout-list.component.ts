@@ -1,14 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LayoutStore } from '../../core/services/layout.store';
 
 @Component({
-  selector: 'app-config',
-  imports: [FormsModule],
-  templateUrl: './config.component.html',
-  styleUrl: './config.component.scss',
+  selector: 'app-layout-list',
+  imports: [FormsModule, RouterLink],
+  templateUrl: './layout-list.component.html',
+  styleUrl: './layout-list.component.scss',
 })
-export class ConfigComponent {
+export class LayoutListComponent {
   protected readonly store = inject(LayoutStore);
   protected newLayoutName = signal('');
   protected nameError = signal('');
@@ -26,9 +27,5 @@ export class ConfigComponent {
     this.store.createLayout(name);
     this.newLayoutName.set('');
     this.nameError.set('');
-  }
-
-  selectLayout(id: string): void {
-    this.store.setActiveLayout(id);
   }
 }

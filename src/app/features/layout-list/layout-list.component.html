@@ -1,6 +1,6 @@
-<div class="config-shell">
-  <header class="config-header">
-    <h1>Swimtime Overlay — Config</h1>
+<div class="layout-list-shell">
+  <header class="page-header">
+    <h1>Swimtime Overlay</h1>
   </header>
 
   <section class="new-layout">
@@ -21,18 +21,16 @@
     }
   </section>
 
-  <section class="layout-list">
+  <section class="layouts">
     <h2>Layouts</h2>
     @if (store.layouts().length === 0) {
       <p class="empty">No layouts yet. Create one above.</p>
     } @else {
       <ul>
         @for (layout of store.layouts(); track layout.id) {
-          <li
-            [class.active]="layout.id === store.activeLayoutId()"
-            (click)="selectLayout(layout.id)"
-          >
-            {{ layout.name }}
+          <li>
+            <span class="layout-name">{{ layout.name }}</span>
+            <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
           </li>
         }
       </ul>
