@@ -14,6 +14,10 @@ export class LayoutListComponent {
   protected newLayoutName = signal('');
   protected nameError = signal('');
 
+  activate(id: string): void {
+    this.store.setActiveLayout(id);
+  }
+
   createLayout(): void {
     const name = this.newLayoutName().trim();
     if (!name) {

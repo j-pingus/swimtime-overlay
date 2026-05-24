@@ -28,9 +28,16 @@
     } @else {
       <ul>
         @for (layout of store.layouts(); track layout.id) {
-          <li>
+          <li [class.active]="layout.id === store.activeLayoutId()">
             <span class="layout-name">{{ layout.name }}</span>
-            <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
+            <span class="actions">
+              @if (layout.id === store.activeLayoutId()) {
+                <span class="badge-active">● Active</span>
+              } @else {
+                <button class="btn-activate" (click)="activate(layout.id)">Use</button>
+              }
+              <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
+            </span>
           </li>
         }
       </ul>
