@@ -106,6 +106,129 @@ h2 {
   }
 }
 
+.associations {
+  margin-bottom: 2rem;
+}
+
+.rule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  font-size: 0.85rem;
+
+  .rule-type {
+    flex: 1;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #333;
+  }
+
+  .rule-layout {
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  .rule-duration {
+    width: 2.5rem;
+    text-align: right;
+    color: #888;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+
+    &--none {
+      color: #bbb;
+    }
+  }
+
+  .btn-remove-rule {
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: #bbb;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 1rem;
+    line-height: 1;
+
+    &:hover {
+      border-color: #e00;
+      color: #e00;
+    }
+  }
+}
+
+.rule-add {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  select {
+    flex: 1;
+    min-width: 0;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+    }
+  }
+
+  input[type='number'] {
+    width: 100px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+    }
+  }
+
+  button {
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    background: #0070f3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background: #005fd1;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+
 .new-layout-form {
   display: flex;
   gap: 0.5rem;
@@ -198,6 +321,25 @@ h2 {
       &:hover {
         border-color: #555;
         color: #000;
+      }
+    }
+
+    .btn-clone {
+      font-size: 1rem;
+      line-height: 1;
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: #bbb;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      &:hover {
+        border-color: #0070f3;
+        color: #0070f3;
       }
     }
 

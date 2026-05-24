@@ -24,6 +24,48 @@
     </div>
   </section>
 
+  <section class="associations">
+    <h2>Message type associations</h2>
+
+    @if (ruleEntries().length > 0) {
+      <ul class="rule-list">
+        @for (rule of ruleEntries(); track rule.type) {
+          <li class="rule-item">
+            <span class="rule-type">{{ rule.type }}</span>
+            <span class="rule-layout">{{ rule.layoutName }}</span>
+            @if (rule.duration !== null) {
+              <span class="rule-duration">{{ rule.duration }}s</span>
+            } @else {
+              <span class="rule-duration rule-duration--none">∞</span>
+            }
+            <button class="btn-remove-rule" (click)="removeRule(rule.type)" title="Remove">×</button>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (availableMessageTypes().length > 0 && store.layouts().length > 0) {
+      <div class="rule-add">
+        <select [ngModel]="newRuleType()" (ngModelChange)="newRuleType.set($event)" name="ruleType">
+          <option value="">Message type…</option>
+          @for (t of availableMessageTypes(); track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+        <select [ngModel]="newRuleLayoutId()" (ngModelChange)="newRuleLayoutId.set($event)" name="ruleLayout">
+          <option value="">Layout…</option>
+          @for (l of store.layouts(); track l.id) {
+            <option [value]="l.id">{{ l.name }}</option>
+          }
+        </select>
+        <input type="number" min="1" placeholder="Duration (s)"
+          [ngModel]="newRuleDuration()" (ngModelChange)="newRuleDuration.set($event)"
+          name="ruleDuration" />
+        <button (click)="addRule()" [disabled]="!newRuleType() || !newRuleLayoutId()">Add</button>
+      </div>
+    }
+  </section>
+
   <section class="new-layout">
     <h2>New layout</h2>
     <form (ngSubmit)="createLayout()" class="new-layout-form">
@@ -58,6 +100,7 @@
                 <button class="btn-activate" (click)="activate(layout.id)">Use</button>
               }
               <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
+              <button class="btn-clone" (click)="cloneLayout(layout.id)" title="Clone layout">⎘</button>
               <button class="btn-delete" (click)="deleteLayout(layout.id)" title="Delete layout">×</button>
             </span>
           </li>
