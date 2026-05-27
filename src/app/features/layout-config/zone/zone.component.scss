@@ -112,6 +112,35 @@ svg {
   }
 }
 
+// Group bounding box — dashed outline in config mode, never shown in render.
+.group-bounds {
+  fill: transparent;
+  stroke: rgba(255, 200, 0, 0.5);
+  stroke-width: 2;
+  stroke-dasharray: 14 6;
+  cursor: pointer;
+
+  &.selected {
+    stroke: #ffc800;
+    stroke-width: 3;
+  }
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
+.group-label {
+  fill: rgba(255, 200, 0, 0.7);
+  font-size: 22px;
+  font-family: sans-serif;
+  pointer-events: none;
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
 .anchor-move {
   fill: #fff;
   stroke: #555;
