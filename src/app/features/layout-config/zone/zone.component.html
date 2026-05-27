@@ -10,19 +10,97 @@
   }
 
   @for (f of displayFeatures(); track f.id) {
-    <g [class.selected]="interactive() && f.id === selectedFeatureId()">
 
-      @if (asImage(f); as img) {
-        @if (img.src) {
-          <image
-            [attr.href]="img.src"
-            [attr.x]="f.x" [attr.y]="f.y"
-            [attr.width]="f.width" [attr.height]="f.height"
-            preserveAspectRatio="xMidYMid meet"
+    @if (asGroup(f); as g) {
+      @if (interactive()) {
+        @let bounds = groupBoundsMap().get(g.id);
+        @if (bounds) {
+          <rect
+            [attr.x]="bounds.x - GROUP_PAD"
+            [attr.y]="bounds.y - GROUP_PAD"
+            [attr.width]="bounds.width + GROUP_PAD * 2"
+            [attr.height]="bounds.height + GROUP_PAD * 2"
+            [class.group-bounds]="true"
+            [class.selected]="g.id === selectedFeatureId()"
+            (mousedown)="onFeatureClick($event, g)"
+          />
+          <text
+            [attr.x]="bounds.x - GROUP_PAD + 4"
+            [attr.y]="bounds.y - GROUP_PAD - 6"
+            class="group-label"
+          >{{ g.label }}</text>
+          @if (g.id === selectedFeatureId()) {
+            <circle
+              [attr.cx]="bounds.x - GROUP_PAD"
+              [attr.cy]="bounds.y - GROUP_PAD"
+              [attr.r]="ANCHOR"
+              class="anchor-move"
+              (mousedown)="onMoveStart($event, g)"
+            />
+          }
+        }
+      }
+
+    } @else {
+
+      <g [class.selected]="interactive() && (f.id === selectedFeatureId() || (!!f.groupId && f.groupId === selectedFeatureId()))">
+
+        @if (asImage(f); as img) {
+          @if (img.src) {
+            <image
+              [attr.href]="img.src"
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              preserveAspectRatio="xMidYMid meet"
+              (mousedown)="interactive() && onFeatureClick($event, f)"
+            />
+            @if (interactive()) {
+              <!-- transparent overlay provides selection border and reliable click target -->
+              <rect
+                [attr.x]="f.x" [attr.y]="f.y"
+                [attr.width]="f.width" [attr.height]="f.height"
+                class="feature-overlay"
+                (mousedown)="onFeatureClick($event, f)"
+              />
+            }
+          } @else {
+            <!-- placeholder shown in config mode until an image is chosen -->
+            <rect
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              class="feature-rect feature-placeholder"
+              (mousedown)="interactive() && onFeatureClick($event, f)"
+            />
+          }
+
+        } @else if (asRect(f); as r) {
+          <!-- Fill covers the full bounding box -->
+          <rect
+            [attr.x]="r.x" [attr.y]="r.y"
+            [attr.width]="r.width" [attr.height]="r.height"
+            [attr.fill]="rectFill(r)"
+            [attr.fill-opacity]="rectFillOpacity(r)"
+            stroke="none"
+            [attr.rx]="r.borderRadius"
+            class="rect-visual"
             (mousedown)="interactive() && onFeatureClick($event, f)"
           />
+          <!-- Border drawn inset from the fill edges by padding -->
+          @if (r.border) {
+            <rect
+              [attr.x]="r.x + r.padding"
+              [attr.y]="r.y + r.padding"
+              [attr.width]="r.width - 2 * r.padding"
+              [attr.height]="r.height - 2 * r.padding"
+              fill="none"
+              [attr.stroke]="r.borderColor"
+              [attr.stroke-width]="r.borderWidth"
+              [attr.rx]="r.borderRadius"
+              class="rect-visual"
+            />
+          }
           @if (interactive()) {
-            <!-- transparent overlay provides selection border and reliable click target -->
+            <!-- selection + click overlay on the full bounding box so anchors always work -->
             <rect
               [attr.x]="f.x" [attr.y]="f.y"
               [attr.width]="f.width" [attr.height]="f.height"
@@ -30,73 +108,44 @@
               (mousedown)="onFeatureClick($event, f)"
             />
           }
-        } @else {
-          <!-- placeholder shown in config mode until an image is chosen -->
+
+        } @else if (asTextLike(f); as tl) {
+          <defs>
+            <clipPath [id]="'tc-' + f.id">
+              <rect [attr.x]="f.x" [attr.y]="f.y" [attr.width]="f.width" [attr.height]="f.height" />
+            </clipPath>
+          </defs>
+
+          <!-- Hit area + selection border (config only, hidden in render mode) -->
           <rect
             [attr.x]="f.x" [attr.y]="f.y"
             [attr.width]="f.width" [attr.height]="f.height"
-            class="feature-rect feature-placeholder"
+            class="text-bg"
             (mousedown)="interactive() && onFeatureClick($event, f)"
           />
-        }
 
-      } @else if (asRect(f); as r) {
-        <!-- Fill covers the full bounding box -->
-        <rect
-          [attr.x]="r.x" [attr.y]="r.y"
-          [attr.width]="r.width" [attr.height]="r.height"
-          [attr.fill]="rectFill(r)"
-          [attr.fill-opacity]="rectFillOpacity(r)"
-          stroke="none"
-          [attr.rx]="r.borderRadius"
-          class="rect-visual"
-          (mousedown)="interactive() && onFeatureClick($event, f)"
-        />
-        <!-- Border drawn inset from the fill edges by padding -->
-        @if (r.border) {
-          <rect
-            [attr.x]="r.x + r.padding"
-            [attr.y]="r.y + r.padding"
-            [attr.width]="r.width - 2 * r.padding"
-            [attr.height]="r.height - 2 * r.padding"
-            fill="none"
-            [attr.stroke]="r.borderColor"
-            [attr.stroke-width]="r.borderWidth"
-            [attr.rx]="r.borderRadius"
-            class="rect-visual"
-          />
-        }
-        @if (interactive()) {
-          <!-- selection + click overlay on the full bounding box so anchors always work -->
-          <rect
-            [attr.x]="f.x" [attr.y]="f.y"
-            [attr.width]="f.width" [attr.height]="f.height"
-            class="feature-overlay"
-            (mousedown)="onFeatureClick($event, f)"
-          />
-        }
-
-      } @else if (asTextLike(f); as tl) {
-        <defs>
-          <clipPath [id]="'tc-' + f.id">
-            <rect [attr.x]="f.x" [attr.y]="f.y" [attr.width]="f.width" [attr.height]="f.height" />
-          </clipPath>
-        </defs>
-
-        <!-- Hit area + selection border (config only, hidden in render mode) -->
-        <rect
-          [attr.x]="f.x" [attr.y]="f.y"
-          [attr.width]="f.width" [attr.height]="f.height"
-          class="text-bg"
-          (mousedown)="interactive() && onFeatureClick($event, f)"
-        />
-
-        @if (asLane(tl); as lane) {
-          <!-- One text element per lane, evenly spaced within the feature height -->
-          @for (row of laneRows(lane); track $index) {
+          @if (asLane(tl); as lane) {
+            <!-- One text element per lane, evenly spaced within the feature height -->
+            @for (row of laneRows(lane); track $index) {
+              <text
+                [attr.x]="textX(tl)"
+                [attr.y]="row.y"
+                [attr.font-size]="tl.fontSize"
+                [attr.fill]="tl.color"
+                [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
+                [attr.font-style]="tl.italic ? 'italic' : 'normal'"
+                [attr.text-anchor]="textAnchor(tl)"
+                [attr.stroke]="tl.outlineColor ?? 'none'"
+                [attr.stroke-width]="tl.outlineColor ? 3 : 0"
+                [attr.clip-path]="'url(#tc-' + f.id + ')'"
+                style="paint-order: stroke fill"
+                class="text-content"
+              >{{ row.text }}</text>
+            }
+          } @else {
             <text
               [attr.x]="textX(tl)"
-              [attr.y]="row.y"
+              [attr.y]="f.y + tl.fontSize"
               [attr.font-size]="tl.fontSize"
               [attr.fill]="tl.color"
               [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
@@ -107,58 +156,44 @@
               [attr.clip-path]="'url(#tc-' + f.id + ')'"
               style="paint-order: stroke fill"
               class="text-content"
-            >{{ row.text }}</text>
+              (mousedown)="interactive() && onFeatureClick($event, f)"
+            >{{ resolvedDisplayText(tl) }}</text>
           }
+
         } @else {
-          <text
-            [attr.x]="textX(tl)"
-            [attr.y]="f.y + tl.fontSize"
-            [attr.font-size]="tl.fontSize"
-            [attr.fill]="tl.color"
-            [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
-            [attr.font-style]="tl.italic ? 'italic' : 'normal'"
-            [attr.text-anchor]="textAnchor(tl)"
-            [attr.stroke]="tl.outlineColor ?? 'none'"
-            [attr.stroke-width]="tl.outlineColor ? 3 : 0"
-            [attr.clip-path]="'url(#tc-' + f.id + ')'"
-            style="paint-order: stroke fill"
-            class="text-content"
+          <rect
+            [attr.x]="f.x" [attr.y]="f.y"
+            [attr.width]="f.width" [attr.height]="f.height"
+            class="feature-rect"
             (mousedown)="interactive() && onFeatureClick($event, f)"
-          >{{ resolvedDisplayText(tl) }}</text>
+          />
         }
 
-      } @else {
-        <rect
-          [attr.x]="f.x" [attr.y]="f.y"
-          [attr.width]="f.width" [attr.height]="f.height"
-          class="feature-rect"
-          (mousedown)="interactive() && onFeatureClick($event, f)"
-        />
-      }
+        <!-- Label shown in config mode only; suppressed for text-like/rect (their visuals speak for themselves) -->
+        @if (!asTextLike(f) && !asRect(f)) {
+          <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
+            {{ f.label }}
+          </text>
+        }
 
-      <!-- Label shown in config mode only; suppressed for text-like/rect (their visuals speak for themselves) -->
-      @if (!asTextLike(f) && !asRect(f)) {
-        <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
-          {{ f.label }}
-        </text>
-      }
+        <!-- Anchors only for individually-selected, non-grouped features -->
+        @if (interactive() && f.id === selectedFeatureId() && !f.groupId) {
+          <!-- Move anchor: top-left -->
+          <circle
+            [attr.cx]="f.x" [attr.cy]="f.y" [attr.r]="ANCHOR"
+            class="anchor-move"
+            (mousedown)="onMoveStart($event, f)"
+          />
 
-      @if (interactive() && f.id === selectedFeatureId()) {
-        <!-- Move anchor: top-left -->
-        <circle
-          [attr.cx]="f.x" [attr.cy]="f.y" [attr.r]="ANCHOR"
-          class="anchor-move"
-          (mousedown)="onMoveStart($event, f)"
-        />
+          <!-- Resize anchor: bottom-right -->
+          <circle
+            [attr.cx]="f.x + f.width" [attr.cy]="f.y + f.height" [attr.r]="ANCHOR"
+            class="anchor-resize"
+            (mousedown)="onResizeStart($event, f)"
+          />
+        }
 
-        <!-- Resize anchor: bottom-right -->
-        <circle
-          [attr.cx]="f.x + f.width" [attr.cy]="f.y + f.height" [attr.r]="ANCHOR"
-          class="anchor-resize"
-          (mousedown)="onResizeStart($event, f)"
-        />
-      }
-
-    </g>
+      </g>
+    }
   }
 </svg>

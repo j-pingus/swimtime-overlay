@@ -1,41 +1,71 @@
 @if (feature(); as f) {
   <div class="panel">
-    <h2>{{ f.type === 'image' ? 'Image' : f.type === 'text' ? 'Text' : f.type === 'rect' ? 'Rectangle' : f.type === 'lane' ? 'Lane text' : 'Feature' }}</h2>
+    <h2>{{
+      f.type === 'group'   ? 'Group'
+      : f.type === 'image' ? 'Image'
+      : f.type === 'text'  ? 'Text'
+      : f.type === 'rect'  ? 'Rectangle'
+      : f.type === 'lane'  ? 'Lane text'
+      : 'Feature'
+    }}</h2>
 
     <div class="field">
       <label>Label</label>
       <input type="text" [value]="f.label" (change)="patch({ label: $any($event.target).value })" />
     </div>
 
-    <h3>Position</h3>
+    @if (f.type !== 'group') {
+      <h3>Position</h3>
 
-    <div class="field-row">
-      <div class="field">
-        <label>X</label>
-        <input type="number" [value]="f.x" min="0"
-          (change)="patch({ x: asNumber($any($event.target).value) })" />
+      <div class="field-row">
+        <div class="field">
+          <label>X</label>
+          <input type="number" [value]="f.x" min="0"
+            (change)="patch({ x: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field">
+          <label>Y</label>
+          <input type="number" [value]="f.y" min="0"
+            (change)="patch({ y: asNumber($any($event.target).value) })" />
+        </div>
       </div>
-      <div class="field">
-        <label>Y</label>
-        <input type="number" [value]="f.y" min="0"
-          (change)="patch({ y: asNumber($any($event.target).value) })" />
-      </div>
-    </div>
 
-    <h3>Size</h3>
+      <h3>Size</h3>
 
-    <div class="field-row">
-      <div class="field">
-        <label>W</label>
-        <input type="number" [value]="f.width" min="1"
-          (change)="patch({ width: asNumber($any($event.target).value) })" />
+      <div class="field-row">
+        <div class="field">
+          <label>W</label>
+          <input type="number" [value]="f.width" min="1"
+            (change)="patch({ width: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field">
+          <label>H</label>
+          <input type="number" [value]="f.height" min="1"
+            (change)="patch({ height: asNumber($any($event.target).value) })" />
+        </div>
       </div>
-      <div class="field">
-        <label>H</label>
-        <input type="number" [value]="f.height" min="1"
-          (change)="patch({ height: asNumber($any($event.target).value) })" />
+    }
+
+    @if (groupFeature(); as g) {
+      <div class="group-members-label">
+        <h3>Members</h3>
+        <ul class="group-members-list">
+          @for (entry of displayList(); track entry.feature.id) {
+            @if (entry.feature.groupId === g.id) {
+              <li>
+                <span class="type-badge type-badge--{{ entry.feature.type }}">{{ typeLabel(entry.feature) }}</span>
+                {{ entry.feature.label }}
+              </li>
+            }
+          }
+        </ul>
       </div>
-    </div>
+
+      <div class="actions">
+        <button class="btn-ungroup" (click)="ungroup(g.id)">Ungroup</button>
+        <button class="btn-remove" (click)="remove()">Delete group</button>
+      </div>
+    }
 
     @if (rectFeature(); as r) {
       <h3>Background</h3>
@@ -261,14 +291,21 @@
       </div>
     }
 
-    <div class="actions">
-      <button class="btn-clone" (click)="clone()">Clone</button>
-      <button class="btn-remove" (click)="remove()">Delete</button>
-    </div>
+    @if (f.type !== 'group') {
+      <div class="actions">
+        <button class="btn-clone" (click)="clone()">Clone</button>
+        <button class="btn-remove" (click)="remove()">Delete</button>
+      </div>
+    }
   </div>
 } @else {
   <div class="feature-list-panel">
-    <h2>Features</h2>
+    <div class="list-header">
+      <h2>Features</h2>
+      @if (canGroup()) {
+        <button class="btn-group" (click)="createGroup()">Group selected</button>
+      }
+    </div>
 
     @if (features().length === 0) {
       <p class="empty-hint">Add a feature to get started.</p>
@@ -277,16 +314,54 @@
 
       <div
         cdkDropList
-        [cdkDropListData]="features()"
+        [cdkDropListData]="displayList()"
         (cdkDropListDropped)="onDrop($event)"
         class="feature-list"
       >
-        @for (f of features(); track f.id) {
-          <div cdkDrag class="feature-item" (click)="featureSelect.emit(f.id)">
-            <span cdkDragHandle class="drag-handle">⠿</span>
-            <span class="type-badge type-badge--{{ f.type }}">{{ typeLabel(f) }}</span>
-            <span class="item-label">{{ f.label }}</span>
-          </div>
+        @for (entry of displayList(); track entry.feature.id) {
+
+          @if (entry.isGroupHeader) {
+            <!-- Group header row -->
+            <div cdkDrag class="feature-item feature-item--group"
+              [class.is-selected]="isSelected(entry.feature)"
+              (click)="featureSelect.emit(entry.feature.id)">
+              <span cdkDragHandle class="drag-handle">⠿</span>
+              <span class="type-badge type-badge--group">GRP</span>
+              <span class="item-label">{{ entry.feature.label }}</span>
+              <button class="btn-ungroup-inline"
+                (click)="$event.stopPropagation(); ungroup(entry.feature.id)">
+                Ungroup
+              </button>
+            </div>
+
+          } @else if (entry.isGroupChild) {
+            <!-- Group child row — indented, not individually draggable -->
+            <div cdkDrag [cdkDragDisabled]="true"
+              class="feature-item feature-item--child"
+              [class.is-selected]="isSelected(entry.feature)"
+              (click)="featureSelect.emit(entry.feature.id)">
+              <span class="child-indent"></span>
+              <span class="type-badge type-badge--{{ entry.feature.type }}">{{ typeLabel(entry.feature) }}</span>
+              <span class="item-label">{{ entry.feature.label }}</span>
+            </div>
+
+          } @else {
+            <!-- Standalone feature row -->
+            <div cdkDrag class="feature-item"
+              [class.is-selected]="isSelected(entry.feature)"
+              (click)="featureSelect.emit(entry.feature.id)">
+              <span cdkDragHandle class="drag-handle">⠿</span>
+              <span class="type-badge type-badge--{{ entry.feature.type }}">{{ typeLabel(entry.feature) }}</span>
+              <span class="item-label">{{ entry.feature.label }}</span>
+              <input
+                type="checkbox"
+                class="check-group"
+                [checked]="isChecked(entry.feature.id)"
+                (click)="toggleCheck(entry.feature.id, $event)"
+              />
+            </div>
+          }
+
         }
       </div>
     }

@@ -1,4 +1,4 @@
-export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane';
+export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group';
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -8,10 +8,18 @@ interface FeatureBase {
   y: number;
   width: number;
   height: number;
+  /** Id of the GroupFeature this feature belongs to, if any. */
+  groupId?: string;
 }
 
 export interface GenericFeature extends FeatureBase {
   type: 'generic';
+}
+
+/** A group container — rendered as a dashed bounding box in the zone.
+ *  Its x/y/width/height are ignored; the zone computes them from its children. */
+export interface GroupFeature extends FeatureBase {
+  type: 'group';
 }
 
 export interface ImageFeature extends FeatureBase {
@@ -59,7 +67,7 @@ export interface LaneFeature extends FeatureBase {
   displayDuration: number | null;
 }
 
-export type AnyFeature = GenericFeature | ImageFeature | TextFeature | RectFeature | LaneFeature;
+export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;
