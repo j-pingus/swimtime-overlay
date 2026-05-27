@@ -36,6 +36,9 @@ export class LayoutConfigComponent {
     return id ? this.features().find((f) => f.id === id) ?? null : null;
   });
 
+  /** Running counter for auto-generated group labels. */
+  private groupCount = 0;
+
   constructor() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) this.store.setActiveLayout(id);
@@ -77,6 +80,11 @@ export class LayoutConfigComponent {
     if (layoutId) this.store.updateFeature(layoutId, feature);
   }
 
+  onFeaturesUpdate(features: AnyFeature[]): void {
+    const layoutId = this.id();
+    if (layoutId) this.store.batchUpdateFeatures(layoutId, features);
+  }
+
   onFeatureClone(feature: AnyFeature): void {
     const layoutId = this.id();
     if (!layoutId) return;
@@ -93,6 +101,22 @@ export class LayoutConfigComponent {
     const layoutId = this.id();
     if (layoutId) {
       this.store.removeFeature(layoutId, featureId);
+      this.selectedId.set(null);
+    }
+  }
+
+  onGroupCreate(featureIds: string[]): void {
+    const layoutId = this.id();
+    if (!layoutId || featureIds.length < 2) return;
+    this.groupCount++;
+    const groupId = this.store.groupFeatures(layoutId, featureIds, `Group ${this.groupCount}`);
+    this.selectedId.set(groupId);
+  }
+
+  onUngroupFeature(groupId: string): void {
+    const layoutId = this.id();
+    if (layoutId) {
+      this.store.ungroupFeatures(layoutId, groupId);
       this.selectedId.set(null);
     }
   }

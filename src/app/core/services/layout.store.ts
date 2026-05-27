@@ -208,15 +208,16 @@ export class LayoutStore {
 
   /** Groups featureIds under a new GroupFeature.
    *  The group header + children are consolidated adjacent in the array so that
-   *  CDK drag-drop indices stay coherent with the visual list order. */
-  groupFeatures(layoutId: string, featureIds: string[], label: string): void {
+   *  CDK drag-drop indices stay coherent with the visual list order.
+   *  Returns the new group's id. */
+  groupFeatures(layoutId: string, featureIds: string[], label: string): string {
+    const groupId = crypto.randomUUID();
+    const group: GroupFeature = { type: 'group', id: groupId, label, x: 0, y: 0, width: 0, height: 0 };
+    const idSet = new Set(featureIds);
     this.update((s) => ({
       ...s,
       layouts: s.layouts.map((l) => {
         if (l.id !== layoutId) return l;
-        const groupId = crypto.randomUUID();
-        const group: GroupFeature = { type: 'group', id: groupId, label, x: 0, y: 0, width: 0, height: 0 };
-        const idSet = new Set(featureIds);
         // Insertion point: position of the first member in the original array.
         const firstMemberIdx = l.features.findIndex((f) => idSet.has(f.id));
         // Collect children (in original order) and assign groupId.
@@ -231,6 +232,7 @@ export class LayoutStore {
         return { ...l, features: rest };
       }),
     }));
+    return groupId;
   }
 
   /** Removes a group — clears groupId from children and removes the GroupFeature. */

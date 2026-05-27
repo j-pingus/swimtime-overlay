@@ -29,6 +29,7 @@
           [selectedFeatureId]="selectedId()"
           (featureSelect)="onFeatureSelect($event)"
           (featureUpdate)="onFeatureUpdate($event)"
+          (featuresUpdate)="onFeaturesUpdate($event)"
         />
       </div>
     </div>
@@ -37,11 +38,14 @@
       <app-feature-panel
         [feature]="selectedFeature()"
         [features]="features()"
+        [selectedFeatureId]="selectedId()"
         (featureChange)="onFeatureUpdate($event)"
         (featureClone)="onFeatureClone($event)"
         (featureRemove)="onFeatureRemove($event)"
         (featureSelect)="onFeatureSelect($event)"
         (featuresReorder)="onFeaturesReorder($event)"
+        (groupCreate)="onGroupCreate($event)"
+        (ungroupFeature)="onUngroupFeature($event)"
       />
     </div>
 
