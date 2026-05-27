@@ -206,7 +206,9 @@ export class LayoutStore {
     }));
   }
 
-  /** Groups featureIds under a new GroupFeature inserted before the first member. */
+  /** Groups featureIds under a new GroupFeature.
+   *  The group header + children are consolidated adjacent in the array so that
+   *  CDK drag-drop indices stay coherent with the visual list order. */
   groupFeatures(layoutId: string, featureIds: string[], label: string): void {
     this.update((s) => ({
       ...s,
@@ -215,11 +217,18 @@ export class LayoutStore {
         const groupId = crypto.randomUUID();
         const group: GroupFeature = { type: 'group', id: groupId, label, x: 0, y: 0, width: 0, height: 0 };
         const idSet = new Set(featureIds);
-        const firstIdx = l.features.findIndex((f) => idSet.has(f.id));
-        const features = l.features.map((f) => idSet.has(f.id) ? { ...f, groupId } : f);
-        // Insert group header before the first member
-        features.splice(firstIdx, 0, group);
-        return { ...l, features };
+        // Insertion point: position of the first member in the original array.
+        const firstMemberIdx = l.features.findIndex((f) => idSet.has(f.id));
+        // Collect children (in original order) and assign groupId.
+        const children = l.features.filter((f) => idSet.has(f.id)).map((f) => ({ ...f, groupId }));
+        // Remove children, then insert [group, ...children] at the first-member slot.
+        const rest = l.features.filter((f) => !idSet.has(f.id));
+        let insertAt = 0;
+        for (let i = 0; i < firstMemberIdx; i++) {
+          if (!idSet.has(l.features[i].id)) insertAt++;
+        }
+        rest.splice(insertAt, 0, group, ...children);
+        return { ...l, features: rest };
       }),
     }));
   }
