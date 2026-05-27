@@ -39,10 +39,7 @@ export class LayoutConfigComponent {
   /** Running counter for auto-generated group labels. */
   private groupCount = 0;
 
-  constructor() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) this.store.setActiveLayout(id);
-  }
+  constructor() {}
 
   renameLayout(name: string): void {
     const id = this.id();
