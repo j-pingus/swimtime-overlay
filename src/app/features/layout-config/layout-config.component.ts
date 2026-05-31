@@ -58,7 +58,7 @@ export class LayoutConfigComponent {
 
     const feature: AnyFeature =
       type === 'image' ? { ...base, type: 'image', src: '' }
-      : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null }
+      : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, rotation: 0 }
       : type === 'rect' ? { ...base, type: 'rect', bgColor: '#000000', bgOpacity: 50, border: false, borderColor: '#ffffff', borderWidth: 2, borderRadius: 0, padding: 0 }
       : type === 'lane' ? { ...base, type: 'lane', template: '${swimmerName}', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, displayDuration: null }
       : { ...base, type: 'generic' };

@@ -245,6 +245,12 @@
           (click)="patchText({ bold: !txt.bold })"><b>B</b></button>
         <button class="btn-style" [class.active]="txt.italic"
           (click)="patchText({ italic: !txt.italic })"><i>I</i></button>
+        <div class="field field--rotation">
+          <label>Rotation</label>
+          <input type="number" [value]="txt.rotation ?? 0" min="-360" max="360"
+            (change)="patchText({ rotation: asNumber($any($event.target).value) })" />
+          <span class="unit">°</span>
+        </div>
       </div>
 
       <h3>Alignment</h3>

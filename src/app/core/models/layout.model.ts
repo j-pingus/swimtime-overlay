@@ -38,6 +38,8 @@ export interface TextFeature extends FeatureBase {
   italic: boolean;
   align: TextAlign;
   outlineColor: string | null;
+  /** Clockwise rotation in degrees around the feature centre. Defaults to 0. */
+  rotation?: number;
 }
 
 export interface RectFeature extends FeatureBase {
