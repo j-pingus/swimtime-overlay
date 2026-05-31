@@ -38,6 +38,7 @@ export interface TextFeature extends FeatureBase {
   italic: boolean;
   align: TextAlign;
   outlineColor: string | null;
+  outlineWidth: number;
   /** Clockwise rotation in degrees around the feature centre. Defaults to 0. */
   rotation?: number;
 }
@@ -65,6 +66,7 @@ export interface LaneFeature extends FeatureBase {
   italic: boolean;
   align: TextAlign;
   outlineColor: string | null;
+  outlineWidth: number;
   /** Hide lane data this many seconds after its timestamp. Null = always show. */
   displayDuration: number | null;
 }
