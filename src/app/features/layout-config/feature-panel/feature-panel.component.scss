@@ -458,6 +458,12 @@ select {
 
   li { margin: 0.2rem 0; }
 
+  p.vars-hint {
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.75rem;
+    color: #888;
+  }
+
   code {
     font-size: 0.75rem;
     background: #f0f0f0;
