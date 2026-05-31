@@ -144,15 +144,19 @@
           <input type="color" [value]="ln.color"
             (input)="patchLane({ color: $any($event.target).value })" />
         </div>
-        <div class="field field--color">
+        <div class="field field--outline">
           <label class="toggle-label">
             <input type="checkbox" [checked]="ln.outlineColor !== null"
               (change)="patchLane({ outlineColor: $any($event.target).checked ? '#000000' : null })" />
             Outline
           </label>
           @if (ln.outlineColor !== null) {
-            <input type="color" [value]="ln.outlineColor"
-              (input)="patchLane({ outlineColor: $any($event.target).value })" />
+            <div class="outline-controls">
+              <input type="color" [value]="ln.outlineColor"
+                (input)="patchLane({ outlineColor: $any($event.target).value })" />
+              <input type="number" [value]="ln.outlineWidth" min="1" max="20"
+                (change)="patchLane({ outlineWidth: asNumber($any($event.target).value) })" />
+            </div>
           }
         </div>
       </div>
@@ -227,15 +231,19 @@
           <input type="color" [value]="txt.color"
             (input)="patchText({ color: $any($event.target).value })" />
         </div>
-        <div class="field field--color">
+        <div class="field field--outline">
           <label class="toggle-label">
             <input type="checkbox" [checked]="txt.outlineColor !== null"
               (change)="patchText({ outlineColor: $any($event.target).checked ? '#000000' : null })" />
             Outline
           </label>
           @if (txt.outlineColor !== null) {
-            <input type="color" [value]="txt.outlineColor"
-              (input)="patchText({ outlineColor: $any($event.target).value })" />
+            <div class="outline-controls">
+              <input type="color" [value]="txt.outlineColor"
+                (input)="patchText({ outlineColor: $any($event.target).value })" />
+              <input type="number" [value]="txt.outlineWidth" min="1" max="20"
+                (change)="patchText({ outlineWidth: asNumber($any($event.target).value) })" />
+            </div>
           }
         </div>
       </div>
