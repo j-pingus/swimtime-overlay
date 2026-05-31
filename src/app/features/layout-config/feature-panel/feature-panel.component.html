@@ -293,6 +293,29 @@
       </details>
     }
 
+    @if (polygonFeature(); as poly) {
+      <h3>Polygon</h3>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Points</label>
+          <input type="number" [value]="poly.points.length" min="3" max="20"
+            (change)="changePointCount(asNumber($any($event.target).value))" />
+        </div>
+        <div class="field field--color">
+          <label>Fill</label>
+          <input type="color" [value]="poly.bgColor"
+            (input)="patchPolygon({ bgColor: $any($event.target).value })" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Opacity — {{ poly.bgOpacity }}%</label>
+        <input type="range" [value]="poly.bgOpacity" min="0" max="100"
+          (input)="patchPolygon({ bgOpacity: asNumber($any($event.target).value) })" />
+      </div>
+    }
+
     @if (imageFeature(); as img) {
       <h3>Image</h3>
 

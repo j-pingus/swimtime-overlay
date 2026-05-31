@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AnyFeature, GroupFeature, ImageFeature, LaneFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { AnyFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
 
 interface ListEntry {
   feature: AnyFeature;
@@ -90,6 +90,11 @@ export class FeaturePanelComponent {
     return f?.type === 'lane' ? f : null;
   });
 
+  protected readonly polygonFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'polygon' ? f : null;
+  });
+
   protected readonly canGroup = computed(() => {
     const ids = this.checkedIds();
     return ids.size >= 2;
@@ -134,6 +139,30 @@ export class FeaturePanelComponent {
     const f = this.feature();
     if (f?.type !== 'rect') return;
     this.featureChange.emit({ ...f, ...partial } satisfies RectFeature);
+  }
+
+  patchPolygon(partial: Partial<PolygonFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'polygon') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies PolygonFeature);
+  }
+
+  changePointCount(count: number): void {
+    const f = this.polygonFeature();
+    if (!f) return;
+    count = Math.max(3, Math.min(20, count));
+    const current = f.points.length;
+    if (count === current) return;
+
+    let points = f.points.map(p => ({ ...p }));
+    if (count > current) {
+      const cx = Math.round(points.reduce((s, p) => s + p.x, 0) / points.length);
+      const cy = Math.round(points.reduce((s, p) => s + p.y, 0) / points.length);
+      for (let i = current; i < count; i++) points.push({ x: cx, y: cy });
+    } else {
+      points = points.slice(0, count);
+    }
+    this.featureChange.emit({ ...f, points });
   }
 
   patchText(partial: Partial<TextFeature>): void {
@@ -220,7 +249,7 @@ export class FeaturePanelComponent {
 
   typeLabel(f: AnyFeature): string {
     const map: Record<string, string> = {
-      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP',
+      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP', polygon: 'PLY',
     };
     return map[f.type] ?? 'GEN';
   }

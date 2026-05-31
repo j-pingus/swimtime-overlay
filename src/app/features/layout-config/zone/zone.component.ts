@@ -2,14 +2,14 @@ import {
   Component, inject, input, output, computed, signal,
   viewChild, ElementRef, HostListener, DestroyRef,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, GroupFeature, ImageFeature, LaneFeature, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, PolygonPoint, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { resolveTemplate } from '../../../core/utils/template.util';
 
 export const CANVAS_W = 1920;
 export const CANVAS_H = 1080;
 
-type DragMode = 'move' | 'resize';
+type DragMode = 'move' | 'resize' | 'point';
 
 interface GroupChild {
   id: string;
@@ -35,6 +35,9 @@ interface DragState {
   currentY: number;
   /** Set when dragging a group — original positions of all children. */
   groupChildren?: GroupChild[];
+  /** Set when dragging a polygon point. */
+  pointIndex?: number;
+  origPoints?: PolygonPoint[];
 }
 
 export interface GroupBounds {
@@ -93,13 +96,29 @@ export class ZoneComponent {
       });
     }
 
+    if (d.mode === 'point' && d.origPoints !== undefined && d.pointIndex !== undefined) {
+      return this.features().map((f) => {
+        if (f.id !== d.featureId || f.type !== 'polygon') return f;
+        const newPoints = d.origPoints!.map((pt, i) =>
+          i === d.pointIndex ? { x: pt.x + rawDx, y: pt.y + rawDy } : pt
+        );
+        return { ...(f as PolygonFeature), points: newPoints };
+      });
+    }
+
     return this.features().map((f) => {
-      if (!d || f.id !== d.featureId) return f;
-      const dx = rawDx;
-      const dy = rawDy;
-      return d.mode === 'move'
-        ? { ...f, x: clamp(d.origX + dx, 0, CANVAS_W - f.width), y: clamp(d.origY + dy, 0, CANVAS_H - f.height) }
-        : { ...f, width: clamp(d.origW + dx, 40, CANVAS_W - d.origX), height: clamp(d.origH + dy, 20, CANVAS_H - d.origY) };
+      if (f.id !== d.featureId) return f;
+      if (d.mode === 'move') {
+        const newX = clamp(d.origX + rawDx, 0, CANVAS_W - f.width);
+        const newY = clamp(d.origY + rawDy, 0, CANVAS_H - f.height);
+        if (f.type === 'polygon') {
+          const shiftX = newX - d.origX;
+          const shiftY = newY - d.origY;
+          return { ...(f as PolygonFeature), x: newX, y: newY, points: (f as PolygonFeature).points.map(pt => ({ x: pt.x + shiftX, y: pt.y + shiftY })) };
+        }
+        return { ...f, x: newX, y: newY };
+      }
+      return { ...f, width: clamp(d.origW + rawDx, 40, CANVAS_W - d.origX), height: clamp(d.origH + rawDy, 20, CANVAS_H - d.origY) };
     });
   });
 
@@ -143,6 +162,32 @@ export class ZoneComponent {
 
   protected asRect(f: AnyFeature): RectFeature | null {
     return f.type === 'rect' ? f : null;
+  }
+
+  protected asPolygon(f: AnyFeature): PolygonFeature | null {
+    return f.type === 'polygon' ? f : null;
+  }
+
+  protected polygonPointsAttr(f: PolygonFeature): string {
+    return f.points.map(pt => `${pt.x},${pt.y}`).join(' ');
+  }
+
+  protected onPointDragStart(event: MouseEvent, feature: PolygonFeature, pointIndex: number): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const { x, y } = this.toSVG(event);
+    this.drag.set({
+      featureId: feature.id,
+      mode: 'point',
+      startX: x, startY: y,
+      origX: feature.points[pointIndex].x,
+      origY: feature.points[pointIndex].y,
+      origW: 0, origH: 0,
+      currentX: x, currentY: y,
+      pointIndex,
+      origPoints: feature.points.map(p => ({ ...p })),
+    });
+    this.featureSelect.emit(feature.id);
   }
 
   protected rectFill(f: RectFeature): string {
@@ -274,15 +319,36 @@ export class ZoneComponent {
           return { ...f, x: orig.origX + dx, y: orig.origY + dy };
         });
       this.featuresUpdate.emit(updated as AnyFeature[]);
+    } else if (d.mode === 'point' && d.origPoints !== undefined && d.pointIndex !== undefined) {
+      const feature = this.features().find((f) => f.id === d.featureId);
+      if (feature?.type === 'polygon') {
+        const poly = feature as PolygonFeature;
+        const dx = round(d.currentX - d.startX);
+        const dy = round(d.currentY - d.startY);
+        const newPoints = d.origPoints.map((pt, i) =>
+          i === d.pointIndex ? { x: pt.x + dx, y: pt.y + dy } : pt
+        );
+        this.featureUpdate.emit({ ...poly, points: newPoints, ...polygonBBox(newPoints) });
+      }
     } else {
       const feature = this.features().find((f) => f.id === d.featureId);
       if (feature) {
         const dx = d.currentX - d.startX;
         const dy = d.currentY - d.startY;
-        const updated: BaseFeature = d.mode === 'move'
-          ? { ...feature, x: round(clamp(d.origX + dx, 0, CANVAS_W - feature.width)), y: round(clamp(d.origY + dy, 0, CANVAS_H - feature.height)) }
-          : { ...feature, width: round(clamp(d.origW + dx, 40, CANVAS_W - d.origX)), height: round(clamp(d.origH + dy, 20, CANVAS_H - d.origY)) };
-        this.featureUpdate.emit(updated);
+        if (d.mode === 'move' && feature.type === 'polygon') {
+          const poly = feature as PolygonFeature;
+          const newX = round(clamp(d.origX + dx, 0, CANVAS_W - feature.width));
+          const newY = round(clamp(d.origY + dy, 0, CANVAS_H - feature.height));
+          const shiftX = newX - feature.x;
+          const shiftY = newY - feature.y;
+          const newPoints = poly.points.map(pt => ({ x: pt.x + shiftX, y: pt.y + shiftY }));
+          this.featureUpdate.emit({ ...poly, x: newX, y: newY, points: newPoints });
+        } else {
+          const updated: BaseFeature = d.mode === 'move'
+            ? { ...feature, x: round(clamp(d.origX + dx, 0, CANVAS_W - feature.width)), y: round(clamp(d.origY + dy, 0, CANVAS_H - feature.height)) }
+            : { ...feature, width: round(clamp(d.origW + dx, 40, CANVAS_W - d.origX)), height: round(clamp(d.origH + dy, 20, CANVAS_H - d.origY)) };
+          this.featureUpdate.emit(updated);
+        }
       }
     }
     this.drag.set(null);
@@ -302,4 +368,12 @@ function clamp(v: number, min: number, max: number): number {
 
 function round(v: number): number {
   return Math.round(v);
+}
+
+function polygonBBox(points: PolygonPoint[]): { x: number; y: number; width: number; height: number } {
+  const xs = points.map(p => p.x);
+  const ys = points.map(p => p.y);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
 }
