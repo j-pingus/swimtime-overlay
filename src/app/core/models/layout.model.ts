@@ -1,4 +1,4 @@
-export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group';
+export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group' | 'polygon';
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -43,6 +43,19 @@ export interface TextFeature extends FeatureBase {
   rotation?: number;
 }
 
+export interface PolygonPoint {
+  x: number;
+  y: number;
+}
+
+export interface PolygonFeature extends FeatureBase {
+  type: 'polygon';
+  points: PolygonPoint[];
+  bgColor: string;
+  /** Fill opacity 0–100. */
+  bgOpacity: number;
+}
+
 export interface RectFeature extends FeatureBase {
   type: 'rect';
   bgColor: string;
@@ -71,7 +84,7 @@ export interface LaneFeature extends FeatureBase {
   displayDuration: number | null;
 }
 
-export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature;
+export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;

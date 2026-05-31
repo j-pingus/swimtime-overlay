@@ -162,6 +162,24 @@
             }
           </g>
 
+        } @else if (asPolygon(f); as poly) {
+          <polygon
+            [attr.points]="polygonPointsAttr(poly)"
+            [attr.fill]="poly.bgColor"
+            [attr.fill-opacity]="poly.bgOpacity / 100"
+            class="polygon-visual"
+            (mousedown)="interactive() && onFeatureClick($event, f)"
+          />
+          @if (interactive() && f.id === selectedFeatureId()) {
+            @for (pt of poly.points; track $index) {
+              <circle
+                [attr.cx]="pt.x" [attr.cy]="pt.y" [attr.r]="ANCHOR"
+                class="anchor-point"
+                (mousedown)="onPointDragStart($event, poly, $index)"
+              />
+            }
+          }
+
         } @else {
           <rect
             [attr.x]="f.x" [attr.y]="f.y"
@@ -171,8 +189,8 @@
           />
         }
 
-        <!-- Label shown in config mode only; suppressed for text-like/rect (their visuals speak for themselves) -->
-        @if (!asTextLike(f) && !asRect(f)) {
+        <!-- Label shown in config mode only; suppressed for text-like/rect/polygon (their visuals speak for themselves) -->
+        @if (!asTextLike(f) && !asRect(f) && !asPolygon(f)) {
           <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
             {{ f.label }}
           </text>
@@ -180,19 +198,21 @@
 
         <!-- Anchors only for individually-selected, non-grouped features -->
         @if (interactive() && f.id === selectedFeatureId() && !f.groupId) {
-          <!-- Move anchor: top-left -->
+          <!-- Move anchor: top-left of bounding box -->
           <circle
             [attr.cx]="f.x" [attr.cy]="f.y" [attr.r]="ANCHOR"
             class="anchor-move"
             (mousedown)="onMoveStart($event, f)"
           />
 
-          <!-- Resize anchor: bottom-right -->
-          <circle
-            [attr.cx]="f.x + f.width" [attr.cy]="f.y + f.height" [attr.r]="ANCHOR"
-            class="anchor-resize"
-            (mousedown)="onResizeStart($event, f)"
-          />
+          <!-- Resize anchor: hidden for polygons (points are resized individually) -->
+          @if (!asPolygon(f)) {
+            <circle
+              [attr.cx]="f.x + f.width" [attr.cy]="f.y + f.height" [attr.r]="ANCHOR"
+              class="anchor-resize"
+              (mousedown)="onResizeStart($event, f)"
+            />
+          }
         }
 
       </g>

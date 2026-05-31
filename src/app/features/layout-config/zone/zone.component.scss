@@ -163,3 +163,28 @@ svg {
     stroke: #005fd1;
   }
 }
+
+.anchor-point {
+  fill: #fff;
+  stroke: #0070f3;
+  stroke-width: 2;
+  cursor: crosshair;
+
+  svg:not(.is-interactive) & {
+    display: none;
+  }
+}
+
+.polygon-visual {
+  cursor: pointer;
+  stroke: none;
+
+  .selected & {
+    stroke: #0070f3;
+    stroke-width: 2;
+  }
+
+  svg:not(.is-interactive) & {
+    cursor: default;
+  }
+}
