@@ -349,6 +349,28 @@ select {
   }
 }
 
+.field--rotation {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+
+  label {
+    font-size: 0.8rem;
+    color: #555;
+    white-space: nowrap;
+  }
+
+  input[type='number'] {
+    width: 58px;
+  }
+
+  .unit {
+    font-size: 0.85rem;
+    color: #888;
+  }
+}
+
 .field--color {
   flex: 0 0 auto;
   min-width: 60px;
@@ -366,6 +388,7 @@ select {
 
 .style-row {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
@@ -457,6 +480,12 @@ select {
   }
 
   li { margin: 0.2rem 0; }
+
+  p.vars-hint {
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.75rem;
+    color: #888;
+  }
 
   code {
     font-size: 0.75rem;

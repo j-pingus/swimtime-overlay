@@ -184,6 +184,14 @@ export class ZoneComponent {
     return map[f.align];
   }
 
+  protected textTransform(f: TextFeature | LaneFeature): string | null {
+    const rotation = f.type === 'text' ? (f.rotation ?? 0) : 0;
+    if (!rotation) return null;
+    const cx = f.x + f.width / 2;
+    const cy = f.y + f.height / 2;
+    return `rotate(${rotation}, ${cx}, ${cy})`;
+  }
+
   // --- Interaction ---
 
   protected onBackgroundClick(): void {

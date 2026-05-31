@@ -245,6 +245,12 @@
           (click)="patchText({ bold: !txt.bold })"><b>B</b></button>
         <button class="btn-style" [class.active]="txt.italic"
           (click)="patchText({ italic: !txt.italic })"><i>I</i></button>
+        <div class="field field--rotation">
+          <label>Rotation</label>
+          <input type="number" [value]="txt.rotation ?? 0" min="-360" max="360"
+            (change)="patchText({ rotation: asNumber($any($event.target).value) })" />
+          <span class="unit">°</span>
+        </div>
       </div>
 
       <h3>Alignment</h3>
@@ -265,6 +271,16 @@
           <li><code>${{ '{' }}currentEvent.category{{ '}' }}</code></li>
           <li><code>${{ '{' }}currentEvent.distance{{ '}' }}</code></li>
           <li><code>${{ '{' }}currentHeat.number{{ '}' }}</code></li>
+        </ul>
+        <p class="vars-hint">Lane fields (0-based index):</p>
+        <ul>
+          <li><code>${{ '{' }}pool.lanes.0.swimmerName{{ '}' }}</code></li>
+          <li><code>${{ '{' }}pool.lanes.0.club{{ '}' }}</code></li>
+          <li><code>${{ '{' }}pool.lanes.0.nat{{ '}' }}</code></li>
+          <li><code>${{ '{' }}pool.lanes.0.entryTime{{ '}' }}</code></li>
+          <li><code>${{ '{' }}pool.lanes.0.time{{ '}' }}</code></li>
+          <li><code>${{ '{' }}pool.lanes.0.officialTime{{ '}' }}</code></li>
+          <li><code>${{ '{' }}pool.lanes.0.rank{{ '}' }}</code></li>
         </ul>
       </details>
     }

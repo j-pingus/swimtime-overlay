@@ -110,26 +110,43 @@
           }
 
         } @else if (asTextLike(f); as tl) {
-          <defs>
-            <clipPath [id]="'tc-' + f.id">
-              <rect [attr.x]="f.x" [attr.y]="f.y" [attr.width]="f.width" [attr.height]="f.height" />
-            </clipPath>
-          </defs>
+          <g [attr.transform]="textTransform(tl)">
+            <defs>
+              <clipPath [id]="'tc-' + f.id">
+                <rect [attr.x]="f.x" [attr.y]="f.y" [attr.width]="f.width" [attr.height]="f.height" />
+              </clipPath>
+            </defs>
 
-          <!-- Hit area + selection border (config only, hidden in render mode) -->
-          <rect
-            [attr.x]="f.x" [attr.y]="f.y"
-            [attr.width]="f.width" [attr.height]="f.height"
-            class="text-bg"
-            (mousedown)="interactive() && onFeatureClick($event, f)"
-          />
+            <!-- Hit area + selection border (config only, hidden in render mode) -->
+            <rect
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              class="text-bg"
+              (mousedown)="interactive() && onFeatureClick($event, f)"
+            />
 
-          @if (asLane(tl); as lane) {
-            <!-- One text element per lane, evenly spaced within the feature height -->
-            @for (row of laneRows(lane); track $index) {
+            @if (asLane(tl); as lane) {
+              <!-- One text element per lane, evenly spaced within the feature height -->
+              @for (row of laneRows(lane); track $index) {
+                <text
+                  [attr.x]="textX(tl)"
+                  [attr.y]="row.y"
+                  [attr.font-size]="tl.fontSize"
+                  [attr.fill]="tl.color"
+                  [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
+                  [attr.font-style]="tl.italic ? 'italic' : 'normal'"
+                  [attr.text-anchor]="textAnchor(tl)"
+                  [attr.stroke]="tl.outlineColor ?? 'none'"
+                  [attr.stroke-width]="tl.outlineColor ? 3 : 0"
+                  [attr.clip-path]="'url(#tc-' + f.id + ')'"
+                  style="paint-order: stroke fill"
+                  class="text-content"
+                >{{ row.text }}</text>
+              }
+            } @else {
               <text
                 [attr.x]="textX(tl)"
-                [attr.y]="row.y"
+                [attr.y]="f.y + tl.fontSize"
                 [attr.font-size]="tl.fontSize"
                 [attr.fill]="tl.color"
                 [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
@@ -140,25 +157,10 @@
                 [attr.clip-path]="'url(#tc-' + f.id + ')'"
                 style="paint-order: stroke fill"
                 class="text-content"
-              >{{ row.text }}</text>
+                (mousedown)="interactive() && onFeatureClick($event, f)"
+              >{{ resolvedDisplayText(tl) }}</text>
             }
-          } @else {
-            <text
-              [attr.x]="textX(tl)"
-              [attr.y]="f.y + tl.fontSize"
-              [attr.font-size]="tl.fontSize"
-              [attr.fill]="tl.color"
-              [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
-              [attr.font-style]="tl.italic ? 'italic' : 'normal'"
-              [attr.text-anchor]="textAnchor(tl)"
-              [attr.stroke]="tl.outlineColor ?? 'none'"
-              [attr.stroke-width]="tl.outlineColor ? 3 : 0"
-              [attr.clip-path]="'url(#tc-' + f.id + ')'"
-              style="paint-order: stroke fill"
-              class="text-content"
-              (mousedown)="interactive() && onFeatureClick($event, f)"
-            >{{ resolvedDisplayText(tl) }}</text>
-          }
+          </g>
 
         } @else {
           <rect
