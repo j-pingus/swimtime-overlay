@@ -123,6 +123,18 @@
     }
 
     @if (laneFeature(); as ln) {
+      <h3>Heat</h3>
+
+      <div class="field">
+        <label>Source</label>
+        <select [value]="ln.heatSource" (change)="patchLane({ heatSource: $any($any($event.target).value) })">
+          <option value="current">Current heat</option>
+          <option value="next0">Next heat 1</option>
+          <option value="next1">Next heat 2</option>
+          <option value="next2">Next heat 3</option>
+        </select>
+      </div>
+
       <h3>Text</h3>
 
       <div class="field">

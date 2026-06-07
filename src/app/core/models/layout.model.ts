@@ -69,6 +69,8 @@ export interface RectFeature extends FeatureBase {
   padding: number;
 }
 
+export type HeatSource = 'current' | 'next0' | 'next1' | 'next2';
+
 export interface LaneFeature extends FeatureBase {
   type: 'lane';
   /** Template evaluated once per lane; $-patterns resolve against each Lane object. */
@@ -82,6 +84,8 @@ export interface LaneFeature extends FeatureBase {
   outlineWidth: number;
   /** Hide lane data this many seconds after its timestamp. Null = always show. */
   displayDuration: number | null;
+  /** Which heat's lanes to display. Defaults to 'current'. */
+  heatSource: HeatSource;
 }
 
 export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature;

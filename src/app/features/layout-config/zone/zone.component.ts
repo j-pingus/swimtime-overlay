@@ -2,7 +2,8 @@ import {
   Component, inject, input, output, computed, signal,
   viewChild, ElementRef, HostListener, DestroyRef,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, PolygonPoint, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, GroupFeature, HeatSource, ImageFeature, LaneFeature, PolygonFeature, PolygonPoint, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { Competition, Lane } from '../../../core/models/domain.models';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { resolveTemplate } from '../../../core/utils/template.util';
 
@@ -203,7 +204,7 @@ export class ZoneComponent {
   }
 
   protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
-    const lanes = this.competitionStore.competition().currentHeat?.lanes ?? [];
+    const lanes = resolveLanes(this.competitionStore.competition(), f.heatSource);
     const now = this.now();
     const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
     return lanes.map((lane, i) => {
@@ -368,6 +369,15 @@ function clamp(v: number, min: number, max: number): number {
 
 function round(v: number): number {
   return Math.round(v);
+}
+
+function resolveLanes(competition: Competition, heatSource: HeatSource): Lane[] {
+  const nextIndex = heatSource === 'next0' ? 0 : heatSource === 'next1' ? 1 : heatSource === 'next2' ? 2 : -1;
+  if (nextIndex >= 0) {
+    const next = competition.nextHeats[nextIndex];
+    if (next?.lanes?.length) return next.lanes;
+  }
+  return competition.currentHeat?.lanes ?? [];
 }
 
 function polygonBBox(points: PolygonPoint[]): { x: number; y: number; width: number; height: number } {

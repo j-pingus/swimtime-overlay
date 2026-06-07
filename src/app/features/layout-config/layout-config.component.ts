@@ -60,7 +60,7 @@ export class LayoutConfigComponent {
       type === 'image' ? { ...base, type: 'image', src: '' }
       : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, outlineWidth: 2, rotation: 0 }
       : type === 'rect' ? { ...base, type: 'rect', bgColor: '#000000', bgOpacity: 50, border: false, borderColor: '#ffffff', borderWidth: 2, borderRadius: 0, padding: 0 }
-      : type === 'lane' ? { ...base, type: 'lane', template: '${swimmerName}', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, outlineWidth: 2, displayDuration: null }
+      : type === 'lane' ? { ...base, type: 'lane', template: '${swimmerName}', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, outlineWidth: 2, displayDuration: null, heatSource: 'current' as const }
       : type === 'polygon' ? { ...base, type: 'polygon', bgColor: '#000000', bgOpacity: 50, points: [
           { x: base.x,              y: base.y },
           { x: base.x + base.width, y: base.y },
