@@ -62,7 +62,7 @@ function buildDummyPool(laneCount: number, firstLane: number): Pool {
 
 function buildDummyCompetition(laneCount: number, firstLane: number): Competition {
   return {
-    currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', heats: [{ number: '1' }, { number: '2' }, { number: '3' }], countHeats: 3 },
+    currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', countHeats: 3 },
     currentHeat:  { number: '2', splashHeatId: 42 },
     pool: buildDummyPool(laneCount, firstLane),
     nextHeats: [

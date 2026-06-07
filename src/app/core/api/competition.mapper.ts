@@ -8,7 +8,6 @@ export function mapEventAndHeat(dto: EventAndHeatDto): Competition {
         stroke: dto.stroke ?? '',
         category: dto.category ?? '',
         distance: dto.distance ?? '',
-        heats: [],
         countHeats: dto.countHeats,
       }
     : null;

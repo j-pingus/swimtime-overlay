@@ -27,7 +27,6 @@ export interface SwimEvent {
   stroke: string;
   category: string;
   distance: string;
-  heats: Heat[];
   countHeats?: number;
 }
 
