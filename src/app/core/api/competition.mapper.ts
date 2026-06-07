@@ -9,10 +9,13 @@ export function mapEventAndHeat(dto: EventAndHeatDto): Competition {
         category: dto.category ?? '',
         distance: dto.distance ?? '',
         heats: [],
+        countHeats: dto.countHeats,
       }
     : null;
 
-  const currentHeat: Heat | null = dto.heat ? { number: dto.heat } : null;
+  const currentHeat: Heat | null = dto.heat
+    ? { number: dto.heat, splashHeatId: dto.splashHeatId }
+    : null;
 
   const pool: Pool = {
     lanes: (dto.lanes ?? []).map((l, i) => mapLane(l, i)),

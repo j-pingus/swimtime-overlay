@@ -96,7 +96,9 @@ export type SwimTimeMessageType =
 export interface EventAndHeatDto {
   swimTimeMessageType?: SwimTimeMessageType;
   event?: string;
+  countHeats?: number;
   heat?: string;
+  splashHeatId?: number;
   isFinished?: boolean;
   stroke?: string;
   category?: string;

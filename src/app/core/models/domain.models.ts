@@ -19,6 +19,7 @@ export interface Pool {
 
 export interface Heat {
   number: string;
+  splashHeatId?: number;
 }
 
 export interface SwimEvent {
@@ -27,6 +28,7 @@ export interface SwimEvent {
   category: string;
   distance: string;
   heats: Heat[];
+  countHeats?: number;
 }
 
 export interface Competition {
