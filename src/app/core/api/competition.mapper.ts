@@ -28,6 +28,7 @@ export function mapNextHeat(dto: EventAndHeatDto): NextHeat {
     category: dto.category ?? '',
     distance: dto.distance ?? '',
     splashHeatId: dto.splashHeatId,
+    lanes: (dto.lanes ?? []).map((l, i) => mapLane(l, i)),
   };
 }
 

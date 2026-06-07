@@ -34,6 +34,7 @@ export interface NextHeat {
   category: string;
   distance: string;
   splashHeatId?: number;
+  lanes: Lane[];
 }
 
 export interface Competition {
