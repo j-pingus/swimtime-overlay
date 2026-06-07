@@ -31,8 +31,18 @@ export interface SwimEvent {
   countHeats?: number;
 }
 
+export interface NextHeat {
+  event: string;
+  heat: string;
+  stroke: string;
+  category: string;
+  distance: string;
+  splashHeatId?: number;
+}
+
 export interface Competition {
   currentEvent: SwimEvent | null;
   currentHeat: Heat | null;
   pool: Pool;
+  nextHeats: NextHeat[];
 }

@@ -68,6 +68,10 @@ export class ApiService {
     return this.http.get<EventAndHeatDto>(`${this.base}/sse/eventAndHeat/current`);
   }
 
+  getNextHeats(splashHeatId: number, n = 3): Observable<EventAndHeatDto[]> {
+    return this.http.get<EventAndHeatDto[]>(`${this.base}/planning/next/${splashHeatId}`, { params: { n } });
+  }
+
   // --- Events ---
 
   getEvent(eventNumber: string): Observable<EventResponseDto> {

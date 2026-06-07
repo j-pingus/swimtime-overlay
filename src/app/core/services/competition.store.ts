@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Competition, Lane, Pool } from '../models/domain.models';
+import { Competition, Lane, NextHeat, Pool } from '../models/domain.models';
 
 export type CompetitionMode = 'live' | 'config';
 
@@ -65,6 +65,11 @@ function buildDummyCompetition(laneCount: number, firstLane: number): Competitio
     currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', heats: [{ number: '1' }, { number: '2' }, { number: '3' }], countHeats: 3 },
     currentHeat:  { number: '2', splashHeatId: 42 },
     pool: buildDummyPool(laneCount, firstLane),
+    nextHeats: [
+      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100', splashHeatId: 43 },
+      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 44 },
+      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 45 },
+    ],
   };
 }
 
@@ -72,6 +77,7 @@ const EMPTY_COMPETITION: Competition = {
   currentEvent: null,
   currentHeat:  null,
   pool:         { lanes: [] },
+  nextHeats:    [],
 };
 
 @Injectable({ providedIn: 'root' })
@@ -86,6 +92,7 @@ export class CompetitionStore {
   readonly pool         = computed(() => this._state().competition.pool);
   readonly currentEvent = computed(() => this._state().competition.currentEvent);
   readonly currentHeat  = computed(() => this._state().competition.currentHeat);
+  readonly nextHeats    = computed(() => this._state().competition.nextHeats);
 
   // --- Mode ---
 
@@ -138,8 +145,12 @@ export class CompetitionStore {
         });
       }
 
-      return { ...s, competition: { ...competition, pool: { lanes } } };
+      return { ...s, competition: { ...competition, pool: { lanes }, nextHeats: s.competition.nextHeats } };
     });
+  }
+
+  setNextHeats(heats: NextHeat[]): void {
+    this.update((s) => ({ ...s, competition: { ...s.competition, nextHeats: heats } }));
   }
 
   updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {

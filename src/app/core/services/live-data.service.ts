@@ -2,7 +2,7 @@ import { Injectable, inject, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { SseService } from '../api/sse.service';
-import { mapEventAndHeat } from '../api/competition.mapper';
+import { mapEventAndHeat, mapNextHeat } from '../api/competition.mapper';
 import { CompetitionStore } from './competition.store';
 import { LayoutStore } from './layout.store';
 
@@ -29,6 +29,12 @@ export class LiveDataService implements OnDestroy {
       this.sse.eventAndHeat$().subscribe({
         next: (dto) => {
           this.competitionStore.setCompetition(mapEventAndHeat(dto));
+          if (dto.swimTimeMessageType === 'START_LIST' && dto.splashHeatId != null) {
+            this.api.getNextHeats(dto.splashHeatId).subscribe({
+              next: (dtos) => this.competitionStore.setNextHeats(dtos.map(mapNextHeat)),
+              error: (err) => console.warn('Failed to load next heats', err),
+            });
+          }
           if (dto.swimTimeMessageType) {
             this.applyRule(dto.swimTimeMessageType);
           }
