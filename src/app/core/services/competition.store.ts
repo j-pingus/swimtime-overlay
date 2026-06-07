@@ -42,19 +42,16 @@ function normalizeLanes(lanes: Lane[], laneCount: number, firstLane: number): La
   });
 }
 
-function buildDummyLanes(laneCount: number, firstLane: number): Lane[] {
+function buildDummyLanes(laneCount: number, firstLane: number, rosterOffset = 0, nextHeat = false): Lane[] {
   return Array.from({ length: laneCount }, (_, i) => {
     const n = firstLane + i;
-    const base = DUMMY_ROSTER[i] ?? {
-      swimmerName: `Swimmer ${n}`,
-      club: '',
-      nat: '',
-      entryTime: null,
-      officialTime: null,
-      time: null,
-      rank: null,
-      timestamp: null,
+    const entry = DUMMY_ROSTER[(i + rosterOffset) % DUMMY_ROSTER.length] ?? {
+      swimmerName: `Swimmer ${n}`, club: '', nat: '', entryTime: null,
+      officialTime: null, time: null, rank: null, timestamp: null,
     };
+    const base = nextHeat
+      ? { ...entry, officialTime: null, time: null, rank: null, timestamp: null }
+      : entry;
     return { number: n, ...base };
   });
 }
@@ -64,9 +61,9 @@ function buildDummyCompetition(laneCount: number, firstLane: number): Competitio
     currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', countHeats: 3 },
     currentHeat:  { number: '2', splashHeatId: 42, lanes: buildDummyLanes(laneCount, firstLane) },
     nextHeats: [
-      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100', splashHeatId: 43, lanes: [] },
-      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 44, lanes: [] },
-      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 45, lanes: [] },
+      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100', splashHeatId: 43, lanes: buildDummyLanes(laneCount, firstLane, 2, true) },
+      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 44, lanes: buildDummyLanes(laneCount, firstLane, 4, true) },
+      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 45, lanes: buildDummyLanes(laneCount, firstLane, 6, true) },
     ],
   };
 }
