@@ -147,7 +147,10 @@ export class CompetitionStore {
   }
 
   setNextHeats(heats: NextHeat[]): void {
-    this.update((s) => ({ ...s, competition: { ...s.competition, nextHeats: heats } }));
+    this.update((s) => {
+      const nextHeats = heats.map((h) => ({ ...h, lanes: normalizeLanes(h.lanes, s.laneCount, s.firstLane) }));
+      return { ...s, competition: { ...s.competition, nextHeats } };
+    });
   }
 
   updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {
