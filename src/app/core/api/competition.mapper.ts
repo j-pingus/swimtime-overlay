@@ -1,5 +1,5 @@
 import { EventAndHeatDto, LaneDto } from './api.models';
-import { Competition, Heat, Lane, Pool, SwimEvent } from '../models/domain.models';
+import { Competition, Heat, Lane, NextHeat, SwimEvent } from '../models/domain.models';
 
 export function mapEventAndHeat(dto: EventAndHeatDto): Competition {
   const currentEvent: SwimEvent | null = dto.event
@@ -8,17 +8,28 @@ export function mapEventAndHeat(dto: EventAndHeatDto): Competition {
         stroke: dto.stroke ?? '',
         category: dto.category ?? '',
         distance: dto.distance ?? '',
-        heats: [],
+        countHeats: dto.countHeats,
       }
     : null;
 
-  const currentHeat: Heat | null = dto.heat ? { number: dto.heat } : null;
+  const lanes = (dto.lanes ?? []).map((l, i) => mapLane(l, i));
+  const currentHeat: Heat | null = dto.heat
+    ? { number: dto.heat, splashHeatId: dto.splashHeatId, lanes }
+    : null;
 
-  const pool: Pool = {
+  return { currentEvent, currentHeat, nextHeats: [] };
+}
+
+export function mapNextHeat(dto: EventAndHeatDto): NextHeat {
+  return {
+    event: dto.event ?? '',
+    heat: dto.heat ?? '',
+    stroke: dto.stroke ?? '',
+    category: dto.category ?? '',
+    distance: dto.distance ?? '',
+    splashHeatId: dto.splashHeatId,
     lanes: (dto.lanes ?? []).map((l, i) => mapLane(l, i)),
   };
-
-  return { currentEvent, currentHeat, pool };
 }
 
 function mapLane(dto: LaneDto, index: number): Lane {

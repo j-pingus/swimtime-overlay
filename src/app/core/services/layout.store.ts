@@ -311,6 +311,9 @@ export class LayoutStore {
           if ((f.type === 'text' || f.type === 'lane') && !('outlineColor' in f)) {
             patched = Object.assign({}, patched, { outlineColor: null }) as AnyFeature;
           }
+          if (f.type === 'lane' && !('heatSource' in f)) {
+            patched = Object.assign({}, patched, { heatSource: 'current' }) as AnyFeature;
+          }
           return patched;
         }),
       })),
