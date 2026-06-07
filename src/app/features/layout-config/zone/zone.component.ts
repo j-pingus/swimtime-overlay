@@ -203,7 +203,7 @@ export class ZoneComponent {
   }
 
   protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
-    const lanes = this.competitionStore.competition().pool.lanes;
+    const lanes = this.competitionStore.competition().currentHeat?.lanes ?? [];
     const now = this.now();
     const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
     return lanes.map((lane, i) => {

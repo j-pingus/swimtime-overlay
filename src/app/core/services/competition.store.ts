@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Competition, Lane, NextHeat, Pool } from '../models/domain.models';
+import { Competition, Lane, NextHeat } from '../models/domain.models';
 
 export type CompetitionMode = 'live' | 'config';
 
@@ -42,8 +42,8 @@ function normalizeLanes(lanes: Lane[], laneCount: number, firstLane: number): La
   });
 }
 
-function buildDummyPool(laneCount: number, firstLane: number): Pool {
-  const lanes: Lane[] = Array.from({ length: laneCount }, (_, i) => {
+function buildDummyLanes(laneCount: number, firstLane: number): Lane[] {
+  return Array.from({ length: laneCount }, (_, i) => {
     const n = firstLane + i;
     const base = DUMMY_ROSTER[i] ?? {
       swimmerName: `Swimmer ${n}`,
@@ -57,14 +57,12 @@ function buildDummyPool(laneCount: number, firstLane: number): Pool {
     };
     return { number: n, ...base };
   });
-  return { lanes };
 }
 
 function buildDummyCompetition(laneCount: number, firstLane: number): Competition {
   return {
     currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', countHeats: 3 },
-    currentHeat:  { number: '2', splashHeatId: 42 },
-    pool: buildDummyPool(laneCount, firstLane),
+    currentHeat:  { number: '2', splashHeatId: 42, lanes: buildDummyLanes(laneCount, firstLane) },
     nextHeats: [
       { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100', splashHeatId: 43 },
       { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 44 },
@@ -76,7 +74,6 @@ function buildDummyCompetition(laneCount: number, firstLane: number): Competitio
 const EMPTY_COMPETITION: Competition = {
   currentEvent: null,
   currentHeat:  null,
-  pool:         { lanes: [] },
   nextHeats:    [],
 };
 
@@ -89,7 +86,6 @@ export class CompetitionStore {
   readonly laneCount    = computed(() => this._state().laneCount);
   readonly firstLane    = computed(() => this._state().firstLane);
   readonly competition  = computed(() => this._state().competition);
-  readonly pool         = computed(() => this._state().competition.pool);
   readonly currentEvent = computed(() => this._state().competition.currentEvent);
   readonly currentHeat  = computed(() => this._state().competition.currentHeat);
   readonly nextHeats    = computed(() => this._state().competition.nextHeats);
@@ -110,8 +106,8 @@ export class CompetitionStore {
     this.update((s) => ({
       ...s,
       laneCount: count,
-      competition: s.mode === 'config'
-        ? { ...s.competition, pool: buildDummyPool(count, s.firstLane) }
+      competition: s.mode === 'config' && s.competition.currentHeat
+        ? { ...s.competition, currentHeat: { ...s.competition.currentHeat, lanes: buildDummyLanes(count, s.firstLane) } }
         : s.competition,
     }));
   }
@@ -120,8 +116,8 @@ export class CompetitionStore {
     this.update((s) => ({
       ...s,
       firstLane: first,
-      competition: s.mode === 'config'
-        ? { ...s.competition, pool: buildDummyPool(s.laneCount, first) }
+      competition: s.mode === 'config' && s.competition.currentHeat
+        ? { ...s.competition, currentHeat: { ...s.competition.currentHeat, lanes: buildDummyLanes(s.laneCount, first) } }
         : s.competition,
     }));
   }
@@ -134,10 +130,10 @@ export class CompetitionStore {
         s.competition.currentEvent?.number === competition.currentEvent?.number &&
         s.competition.currentHeat?.number === competition.currentHeat?.number;
 
-      let lanes = normalizeLanes(competition.pool.lanes, s.laneCount, s.firstLane);
+      let lanes = normalizeLanes(competition.currentHeat?.lanes ?? [], s.laneCount, s.firstLane);
 
       if (sameHeat) {
-        const currentByNumber = new Map(s.competition.pool.lanes.map((l) => [l.number, l]));
+        const currentByNumber = new Map((s.competition.currentHeat?.lanes ?? []).map((l) => [l.number, l]));
         lanes = lanes.map((lane) => {
           const existing = currentByNumber.get(lane.number);
           if (!existing) return lane;
@@ -145,7 +141,8 @@ export class CompetitionStore {
         });
       }
 
-      return { ...s, competition: { ...competition, pool: { lanes }, nextHeats: s.competition.nextHeats } };
+      const currentHeat = competition.currentHeat ? { ...competition.currentHeat, lanes } : null;
+      return { ...s, competition: { ...competition, currentHeat, nextHeats: s.competition.nextHeats } };
     });
   }
 
@@ -155,10 +152,11 @@ export class CompetitionStore {
 
   updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {
     this.update((s) => {
-      const lanes = s.competition.pool.lanes.map((lane) =>
+      if (!s.competition.currentHeat) return s;
+      const lanes = s.competition.currentHeat.lanes.map((lane) =>
         lane.number === laneNumber ? { ...lane, time, rank: rank ?? lane.rank, timestamp: Date.now() } : lane,
       );
-      return { ...s, competition: { ...s.competition, pool: { lanes } } };
+      return { ...s, competition: { ...s.competition, currentHeat: { ...s.competition.currentHeat, lanes } } };
     });
   }
 

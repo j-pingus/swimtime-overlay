@@ -13,13 +13,10 @@ export interface Lane {
   timestamp: number | null;
 }
 
-export interface Pool {
-  lanes: Lane[];
-}
-
 export interface Heat {
   number: string;
   splashHeatId?: number;
+  lanes: Lane[];
 }
 
 export interface SwimEvent {
@@ -42,6 +39,5 @@ export interface NextHeat {
 export interface Competition {
   currentEvent: SwimEvent | null;
   currentHeat: Heat | null;
-  pool: Pool;
   nextHeats: NextHeat[];
 }
