@@ -1,7 +1,8 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AnyFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { FeatureClipboardService } from '../../../core/services/feature-clipboard.service';
 
 interface ListEntry {
   feature: AnyFeature;
@@ -16,6 +17,8 @@ interface ListEntry {
   styleUrl: './feature-panel.component.scss',
 })
 export class FeaturePanelComponent {
+  private readonly clipboard = inject(FeatureClipboardService);
+
   readonly feature = input<AnyFeature | null>(null);
   readonly features = input<AnyFeature[]>([]);
   readonly selectedFeatureId = input<string | null>(null);
@@ -25,8 +28,11 @@ export class FeaturePanelComponent {
   readonly featureRemove = output<string>();
   readonly featureSelect = output<string>();
   readonly featuresReorder = output<AnyFeature[]>();
+  readonly featurePaste = output<AnyFeature[]>();
   readonly groupCreate = output<string[]>();
   readonly ungroupFeature = output<string>();
+
+  protected readonly hasClipboard = this.clipboard.hasContent;
 
   /** Ids of features checked for grouping — cleared on group creation. */
   private readonly checkedIds = signal<Set<string>>(new Set());
@@ -175,6 +181,22 @@ export class FeaturePanelComponent {
     const f = this.feature();
     if (f?.type !== 'image') return;
     this.featureChange.emit({ ...f, src } satisfies ImageFeature);
+  }
+
+  copy(): void {
+    const f = this.feature();
+    if (!f) return;
+    if (f.type === 'group') {
+      const children = this.features().filter((c) => c.groupId === f.id);
+      this.clipboard.copy([f, ...children]);
+    } else {
+      this.clipboard.copy([{ ...f, groupId: undefined }]);
+    }
+  }
+
+  paste(): void {
+    const pasted = this.clipboard.paste();
+    if (pasted) this.featurePaste.emit(pasted);
   }
 
   clone(): void {

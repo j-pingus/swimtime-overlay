@@ -123,4 +123,13 @@ export class LayoutConfigComponent {
       this.selectedId.set(null);
     }
   }
+
+  onFeaturePaste(features: AnyFeature[]): void {
+    const layoutId = this.id();
+    if (!layoutId || features.length === 0) return;
+    this.store.addFeatures(layoutId, features);
+    // Select the group if pasted, otherwise the single feature.
+    const toSelect = features.find((f) => f.type === 'group') ?? features[0];
+    this.selectedId.set(toSelect.id);
+  }
 }

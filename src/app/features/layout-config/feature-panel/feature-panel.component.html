@@ -63,7 +63,6 @@
 
       <div class="actions">
         <button class="btn-ungroup" (click)="ungroup(g.id)">Ungroup</button>
-        <button class="btn-remove" (click)="remove()">Delete group</button>
       </div>
     }
 
@@ -359,12 +358,18 @@
       </div>
     }
 
-    @if (f.type !== 'group') {
-      <div class="actions">
+    <div class="actions">
+      @if (f.type !== 'group') {
         <button class="btn-clone" (click)="clone()">Clone</button>
+      }
+      <button class="btn-copy" (click)="copy()">Copy</button>
+      @if (f.type !== 'group') {
         <button class="btn-remove" (click)="remove()">Delete</button>
-      </div>
-    }
+      }
+      @if (f.type === 'group') {
+        <button class="btn-remove" (click)="remove()">Delete group</button>
+      }
+    </div>
   </div>
 } @else {
   <div class="feature-list-panel">
@@ -372,6 +377,9 @@
       <h2>Features</h2>
       @if (canGroup()) {
         <button class="btn-group" (click)="createGroup()">Group selected</button>
+      }
+      @if (hasClipboard()) {
+        <button class="btn-paste" (click)="paste()">Paste</button>
       }
     </div>
 
