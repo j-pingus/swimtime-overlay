@@ -131,6 +131,7 @@
                 <text
                   [attr.x]="textX(tl)"
                   [attr.y]="row.y"
+                  dominant-baseline="central"
                   [attr.font-size]="tl.fontSize"
                   [attr.fill]="tl.color"
                   [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
@@ -146,7 +147,8 @@
             } @else {
               <text
                 [attr.x]="textX(tl)"
-                [attr.y]="f.y + tl.fontSize"
+                [attr.y]="f.y + f.height / 2"
+                dominant-baseline="central"
                 [attr.font-size]="tl.fontSize"
                 [attr.fill]="tl.color"
                 [attr.font-weight]="tl.bold ? 'bold' : 'normal'"

@@ -213,7 +213,7 @@ export class ZoneComponent {
         lane.timestamp != null &&
         now - lane.timestamp > f.displayDuration * 1000;
       return {
-        y: f.y + i * rowH + f.fontSize,
+        y: f.y + (i + 0.5) * rowH,
         text: expired ? '' : resolveTemplate(f.template, lane),
       };
     });
