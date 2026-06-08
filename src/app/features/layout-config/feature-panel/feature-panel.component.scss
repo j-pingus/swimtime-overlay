@@ -294,6 +294,13 @@ h3 {
     font-family: sans-serif;
     padding: 0.2rem 0;
   }
+
+  li.group-member-item {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+    &:hover { background: #f0f0f0; color: #111; }
+  }
 }
 
 // ── Feature editor ─────────────────────────────────────────────────────────
