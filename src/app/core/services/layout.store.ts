@@ -170,6 +170,15 @@ export class LayoutStore {
     }));
   }
 
+  addFeatures(layoutId: string, features: AnyFeature[]): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) =>
+        l.id === layoutId ? { ...l, features: [...l.features, ...features] } : l,
+      ),
+    }));
+  }
+
   updateFeature(layoutId: string, feature: BaseFeature): void {
     this.update((s) => ({
       ...s,
