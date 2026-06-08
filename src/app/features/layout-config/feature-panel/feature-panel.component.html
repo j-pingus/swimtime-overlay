@@ -52,7 +52,7 @@
         <ul class="group-members-list">
           @for (entry of displayList(); track entry.feature.id) {
             @if (entry.feature.groupId === g.id) {
-              <li>
+              <li class="group-member-item" (click)="featureSelect.emit(entry.feature.id)">
                 <span class="type-badge type-badge--{{ entry.feature.type }}">{{ typeLabel(entry.feature) }}</span>
                 {{ entry.feature.label }}
               </li>
