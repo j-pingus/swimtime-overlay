@@ -174,6 +174,14 @@ export class CompetitionStore {
     }));
   }
 
+  /** Adjust chronoStartTime so elapsed time matches elapsedMs. No-op when chrono is frozen. */
+  syncChrono(elapsedMs: number): void {
+    this.update((s) => {
+      if (s.competition.chronoStopTime != null) return s;
+      return { ...s, competition: { ...s.competition, chronoStartTime: Date.now() - elapsedMs } };
+    });
+  }
+
   updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {
     this.update((s) => {
       if (!s.competition.currentHeat) return s;

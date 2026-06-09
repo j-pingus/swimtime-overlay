@@ -55,6 +55,10 @@ export class LiveDataService implements OnDestroy {
           if (dto.lane != null && dto.time != null && dto.rank !== '0') {
             this.competitionStore.updateLaneTimes(dto.lane, dto.time, dto.rank ?? null);
           }
+          if (dto.time != null) {
+            const elapsedMs = parseTimeToMs(dto.time);
+            if (elapsedMs != null) this.competitionStore.syncChrono(elapsedMs);
+          }
         },
         error: (err) => console.warn('SSE lapTime error', err),
       }),
@@ -98,4 +102,14 @@ export class LiveDataService implements OnDestroy {
       this.ruleTimer = null;
     }
   }
+}
+
+/** Parse "m:ss.f..." lap time string to milliseconds. Returns null on unrecognised format. */
+function parseTimeToMs(time: string): number | null {
+  const match = time.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
+  if (!match) return null;
+  const minutes = parseInt(match[1], 10);
+  const seconds = parseInt(match[2], 10);
+  const fracStr = (match[3] ?? '').padEnd(3, '0').slice(0, 3);
+  return (minutes * 60 + seconds) * 1000 + parseInt(fracStr, 10);
 }
