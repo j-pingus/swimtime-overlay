@@ -394,12 +394,12 @@ function resolveLanes(competition: Competition, heatSource: HeatSource): Lane[] 
 }
 
 function formatChrono(ms: number): string {
-  const totalCs = Math.floor(ms / 10);
-  const cs = totalCs % 100;
-  const totalS = Math.floor(totalCs / 100);
+  const totalDs = Math.floor(ms / 100);
+  const ds = totalDs % 10;
+  const totalS = Math.floor(totalDs / 10);
   const s = totalS % 60;
   const m = Math.floor(totalS / 60);
-  return `${m}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+  return `${m}:${String(s).padStart(2, '0')}.${ds}`;
 }
 
 function polygonBBox(points: PolygonPoint[]): { x: number; y: number; width: number; height: number } {
