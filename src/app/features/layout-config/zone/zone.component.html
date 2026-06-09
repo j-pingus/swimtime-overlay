@@ -113,7 +113,7 @@
           <g [attr.transform]="textTransform(tl)">
             <defs>
               <clipPath [id]="'tc-' + f.id">
-                <rect [attr.x]="f.x" [attr.y]="f.y" [attr.width]="f.width" [attr.height]="f.height" />
+                <rect [attr.x]="f.x - 8" [attr.y]="f.y - 4" [attr.width]="f.width + 16" [attr.height]="f.height + 8" />
               </clipPath>
             </defs>
 
