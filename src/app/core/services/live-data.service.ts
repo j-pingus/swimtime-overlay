@@ -57,6 +57,7 @@ export class LiveDataService implements OnDestroy {
           }
           if (dto.time != null) {
             const elapsedMs = parseTimeToMs(dto.time);
+            console.log("Received laptime",dto.time, elapsedMs);
             if (elapsedMs != null) this.competitionStore.syncChrono(elapsedMs);
           }
         },
@@ -104,12 +105,20 @@ export class LiveDataService implements OnDestroy {
   }
 }
 
-/** Parse "m:ss.f..." lap time string to milliseconds. Returns null on unrecognised format. */
+/** Parse lap time string to milliseconds. Handles "ss.hh", "m:ss.hh", "m:ss", "ss". */
 function parseTimeToMs(time: string): number | null {
-  const match = time.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
-  if (!match) return null;
-  const minutes = parseInt(match[1], 10);
-  const seconds = parseInt(match[2], 10);
-  const fracStr = (match[3] ?? '').padEnd(3, '0').slice(0, 3);
-  return (minutes * 60 + seconds) * 1000 + parseInt(fracStr, 10);
+  const withMinutes = time.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
+  if (withMinutes) {
+    const minutes = parseInt(withMinutes[1], 10);
+    const seconds = parseInt(withMinutes[2], 10);
+    const fracStr = (withMinutes[3] ?? '').padEnd(3, '0').slice(0, 3);
+    return (minutes * 60 + seconds) * 1000 + parseInt(fracStr, 10);
+  }
+  const secondsOnly = time.match(/^(\d+)(?:\.(\d+))?$/);
+  if (secondsOnly) {
+    const seconds = parseInt(secondsOnly[1], 10);
+    const fracStr = (secondsOnly[2] ?? '').padEnd(3, '0').slice(0, 3);
+    return seconds * 1000 + parseInt(fracStr, 10);
+  }
+  return null;
 }
