@@ -1,4 +1,4 @@
-export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group' | 'polygon';
+export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group' | 'polygon' | 'chrono';
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -88,7 +88,18 @@ export interface LaneFeature extends FeatureBase {
   heatSource: HeatSource;
 }
 
-export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature;
+export interface ChronoFeature extends FeatureBase {
+  type: 'chrono';
+  fontSize: number;
+  color: string;
+  bold: boolean;
+  italic: boolean;
+  align: TextAlign;
+  outlineColor: string | null;
+  outlineWidth: number;
+}
+
+export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature | ChronoFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;

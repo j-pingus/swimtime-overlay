@@ -6,6 +6,7 @@
       : f.type === 'text'  ? 'Text'
       : f.type === 'rect'  ? 'Rectangle'
       : f.type === 'lane'  ? 'Lane text'
+      : f.type === 'chrono' ? 'Chrono'
       : 'Feature'
     }}</h2>
 
@@ -311,6 +312,55 @@
           <li><code>${{ '{' }}nextHeats.0.distance{{ '}' }}</code></li>
         </ul>
       </details>
+    }
+
+    @if (chronoFeature(); as ch) {
+      <h3>Text</h3>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Font size</label>
+          <input type="number" [value]="ch.fontSize" min="1"
+            (change)="patchChrono({ fontSize: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="ch.color"
+            (input)="patchChrono({ color: $any($event.target).value })" />
+        </div>
+        <div class="field field--outline">
+          <label class="toggle-label">
+            <input type="checkbox" [checked]="ch.outlineColor !== null"
+              (change)="patchChrono({ outlineColor: $any($event.target).checked ? '#000000' : null })" />
+            Outline
+          </label>
+          @if (ch.outlineColor !== null) {
+            <div class="outline-controls">
+              <input type="color" [value]="ch.outlineColor"
+                (input)="patchChrono({ outlineColor: $any($event.target).value })" />
+              <input type="number" [value]="ch.outlineWidth" min="1" max="20"
+                (change)="patchChrono({ outlineWidth: asNumber($any($event.target).value) })" />
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="style-row">
+        <button class="btn-style" [class.active]="ch.bold"
+          (click)="patchChrono({ bold: !ch.bold })"><b>B</b></button>
+        <button class="btn-style" [class.active]="ch.italic"
+          (click)="patchChrono({ italic: !ch.italic })"><i>I</i></button>
+      </div>
+
+      <h3>Alignment</h3>
+      <div class="align-row">
+        <button class="btn-align" [class.active]="ch.align === 'left'"
+          (click)="patchChrono({ align: 'left' })">Left</button>
+        <button class="btn-align" [class.active]="ch.align === 'center'"
+          (click)="patchChrono({ align: 'center' })">Center</button>
+        <button class="btn-align" [class.active]="ch.align === 'right'"
+          (click)="patchChrono({ align: 'right' })">Right</button>
+      </div>
     }
 
     @if (polygonFeature(); as poly) {

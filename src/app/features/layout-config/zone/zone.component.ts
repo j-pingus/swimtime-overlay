@@ -2,7 +2,7 @@ import {
   Component, inject, input, output, computed, signal,
   viewChild, ElementRef, HostListener, DestroyRef,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, GroupFeature, HeatSource, ImageFeature, LaneFeature, PolygonFeature, PolygonPoint, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
+import { AnyFeature, BaseFeature, ChronoFeature, GroupFeature, HeatSource, ImageFeature, LaneFeature, PolygonFeature, PolygonPoint, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
 import { Competition, Lane } from '../../../core/models/domain.models';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { resolveTemplate } from '../../../core/utils/template.util';
@@ -58,7 +58,7 @@ export class ZoneComponent {
   private readonly now = signal(Date.now());
 
   constructor() {
-    const id = setInterval(() => this.now.set(Date.now()), 1000);
+    const id = setInterval(() => this.now.set(Date.now()), 100);
     inject(DestroyRef).onDestroy(() => clearInterval(id));
   }
 
@@ -169,6 +169,10 @@ export class ZoneComponent {
     return f.type === 'polygon' ? f : null;
   }
 
+  protected aschrono(f: AnyFeature): ChronoFeature | null {
+    return f.type === 'chrono' ? f : null;
+  }
+
   protected polygonPointsAttr(f: PolygonFeature): string {
     return f.points.map(pt => `${pt.x},${pt.y}`).join(' ');
   }
@@ -219,15 +223,24 @@ export class ZoneComponent {
     });
   }
 
-  protected textX(f: TextFeature | LaneFeature): number {
+  protected textX(f: TextFeature | LaneFeature | ChronoFeature): number {
     if (f.align === 'center') return f.x + f.width / 2;
     if (f.align === 'right') return f.x + f.width;
     return f.x;
   }
 
-  protected textAnchor(f: TextFeature | LaneFeature): string {
+  protected textAnchor(f: TextFeature | LaneFeature | ChronoFeature): string {
     const map: Record<TextAlign, string> = { left: 'start', center: 'middle', right: 'end' };
     return map[f.align];
+  }
+
+  protected chronoText(f: ChronoFeature): string {
+    const c = this.competitionStore.competition();
+    const startTime = c.chronoStartTime;
+    if (startTime == null) return '0:00.00';
+    const stopTime = c.chronoStopTime;
+    const elapsedMs = stopTime != null ? stopTime - startTime : this.now() - startTime;
+    return formatChrono(Math.max(0, elapsedMs));
   }
 
   protected textTransform(f: TextFeature | LaneFeature): string | null {
@@ -378,6 +391,15 @@ function resolveLanes(competition: Competition, heatSource: HeatSource): Lane[] 
     if (next?.lanes?.length) return next.lanes;
   }
   return competition.currentHeat?.lanes ?? [];
+}
+
+function formatChrono(ms: number): string {
+  const totalCs = Math.floor(ms / 10);
+  const cs = totalCs % 100;
+  const totalS = Math.floor(totalCs / 100);
+  const s = totalS % 60;
+  const m = Math.floor(totalS / 60);
+  return `${m}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
 }
 
 function polygonBBox(points: PolygonPoint[]): { x: number; y: number; width: number; height: number } {

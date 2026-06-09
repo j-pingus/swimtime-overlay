@@ -65,6 +65,8 @@ function buildDummyCompetition(laneCount: number, firstLane: number): Competitio
       { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 44, lanes: buildDummyLanes(laneCount, firstLane, 4, true) },
       { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 45, lanes: buildDummyLanes(laneCount, firstLane, 6, true) },
     ],
+    chronoStartTime: Date.now() - 23456,
+    chronoStopTime: null,
   };
 }
 
@@ -72,6 +74,8 @@ const EMPTY_COMPETITION: Competition = {
   currentEvent: null,
   currentHeat:  null,
   nextHeats:    [],
+  chronoStartTime: null,
+  chronoStopTime: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -148,6 +152,20 @@ export class CompetitionStore {
       const nextHeats = heats.map((h) => ({ ...h, lanes: normalizeLanes(h.lanes, s.laneCount, s.firstLane) }));
       return { ...s, competition: { ...s.competition, nextHeats } };
     });
+  }
+
+  setChronoStart(startTime: number): void {
+    this.update((s) => ({
+      ...s,
+      competition: { ...s.competition, chronoStartTime: startTime, chronoStopTime: null },
+    }));
+  }
+
+  setChronoStop(): void {
+    this.update((s) => ({
+      ...s,
+      competition: { ...s.competition, chronoStopTime: Date.now() },
+    }));
   }
 
   updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {

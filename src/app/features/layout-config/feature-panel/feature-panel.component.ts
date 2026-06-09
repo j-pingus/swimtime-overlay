@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AnyFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ChronoFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
 import { FeatureClipboardService } from '../../../core/services/feature-clipboard.service';
 
 interface ListEntry {
@@ -101,6 +101,11 @@ export class FeaturePanelComponent {
     return f?.type === 'polygon' ? f : null;
   });
 
+  protected readonly chronoFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'chrono' ? f : null;
+  });
+
   protected readonly canGroup = computed(() => {
     const ids = this.checkedIds();
     return ids.size >= 2;
@@ -169,6 +174,12 @@ export class FeaturePanelComponent {
       points = points.slice(0, count);
     }
     this.featureChange.emit({ ...f, points });
+  }
+
+  patchChrono(partial: Partial<ChronoFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'chrono') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies ChronoFeature);
   }
 
   patchText(partial: Partial<TextFeature>): void {
@@ -271,7 +282,7 @@ export class FeaturePanelComponent {
 
   typeLabel(f: AnyFeature): string {
     const map: Record<string, string> = {
-      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP', polygon: 'PLY',
+      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP', polygon: 'PLY', chrono: 'CHR',
     };
     return map[f.type] ?? 'GEN';
   }

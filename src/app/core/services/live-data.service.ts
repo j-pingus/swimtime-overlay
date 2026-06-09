@@ -35,6 +35,12 @@ export class LiveDataService implements OnDestroy {
               error: (err) => console.warn('Failed to load next heats', err),
             });
           }
+          if (dto.swimTimeMessageType === 'CHRONO_START') {
+            this.competitionStore.setChronoStart(Date.now());
+          }
+          if (dto.swimTimeMessageType === 'HEAT_ARRIVED') {
+            this.competitionStore.setChronoStop();
+          }
           if (dto.swimTimeMessageType) {
             this.applyRule(dto.swimTimeMessageType);
           }

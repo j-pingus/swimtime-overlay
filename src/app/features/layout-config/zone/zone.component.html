@@ -182,6 +182,35 @@
             }
           }
 
+        } @else if (aschrono(f); as ch) {
+          <defs>
+            <clipPath [id]="'tc-' + f.id">
+              <rect [attr.x]="f.x - 8" [attr.y]="f.y - 4" [attr.width]="f.width + 16" [attr.height]="f.height + 8" />
+            </clipPath>
+          </defs>
+          <rect
+            [attr.x]="f.x" [attr.y]="f.y"
+            [attr.width]="f.width" [attr.height]="f.height"
+            class="text-bg"
+            (mousedown)="interactive() && onFeatureClick($event, f)"
+          />
+          <text
+            [attr.x]="textX(ch)"
+            [attr.y]="f.y + f.height / 2"
+            dominant-baseline="central"
+            [attr.font-size]="ch.fontSize"
+            [attr.fill]="ch.color"
+            [attr.font-weight]="ch.bold ? 'bold' : 'normal'"
+            [attr.font-style]="ch.italic ? 'italic' : 'normal'"
+            [attr.text-anchor]="textAnchor(ch)"
+            [attr.stroke]="ch.outlineColor ?? 'none'"
+            [attr.stroke-width]="ch.outlineColor ? ch.outlineWidth : 0"
+            [attr.clip-path]="'url(#tc-' + f.id + ')'"
+            style="paint-order: stroke fill"
+            class="text-content"
+            (mousedown)="interactive() && onFeatureClick($event, f)"
+          >{{ chronoText(ch) }}</text>
+
         } @else {
           <rect
             [attr.x]="f.x" [attr.y]="f.y"

@@ -67,6 +67,7 @@ export class LayoutConfigComponent {
           { x: base.x + base.width, y: base.y + base.height },
           { x: base.x,              y: base.y + base.height },
         ] }
+      : type === 'chrono' ? { ...base, type: 'chrono', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left' as const, outlineColor: null, outlineWidth: 2 }
       : { ...base, type: 'generic' };
 
     this.store.addFeature(layoutId, feature);

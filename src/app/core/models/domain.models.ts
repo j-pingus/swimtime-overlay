@@ -41,4 +41,8 @@ export interface Competition {
   currentEvent: SwimEvent | null;
   currentHeat: Heat | null;
   nextHeats: NextHeat[];
+  /** Unix ms timestamp when CHRONO_START fired; null before first start or after heat reset. */
+  chronoStartTime: number | null;
+  /** Unix ms timestamp when HEAT_ARRIVED fired (chrono frozen); null while running. */
+  chronoStopTime: number | null;
 }
