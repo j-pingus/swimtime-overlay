@@ -17,7 +17,7 @@ export function mapEventAndHeat(dto: EventAndHeatDto): Competition {
     ? { number: dto.heat, splashHeatId: dto.splashHeatId, lanes }
     : null;
 
-  return { currentEvent, currentHeat, nextHeats: [] };
+  return { currentEvent, currentHeat, nextHeats: [], chronoStartTime: null, chronoStopTime: null };
 }
 
 export function mapNextHeat(dto: EventAndHeatDto): NextHeat {
