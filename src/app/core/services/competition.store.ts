@@ -143,7 +143,13 @@ export class CompetitionStore {
       }
 
       const currentHeat = competition.currentHeat ? { ...competition.currentHeat, lanes } : null;
-      return { ...s, competition: { ...competition, currentHeat, nextHeats: s.competition.nextHeats } };
+      return { ...s, competition: {
+        ...competition,
+        currentHeat,
+        nextHeats: s.competition.nextHeats,
+        chronoStartTime: s.competition.chronoStartTime,
+        chronoStopTime: s.competition.chronoStopTime,
+      } };
     });
   }
 
