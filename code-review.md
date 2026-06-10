@@ -26,7 +26,7 @@ The chrono branch emits a `<defs>/<clipPath>` node directly inside the `@for` fe
 ### `ZoneComponent` mixes display and interaction in one ~400-line component
 `ZoneComponent` handles SVG rendering (both config and render modes), drag-move, drag-resize, point dragging for polygons, group bounds computation, and template resolution. It is gated by the `interactive` input but the logic is all in one class. Splitting into a pure `ZoneSurfaceComponent` (display only, used by render) and an `InteractiveZoneComponent` (adds drag overlay) would make both easier to test and extend.
 
-### `LayoutStore.migrate()` has no version guard
+### ✅ `LayoutStore.migrate()` has no version guard
 Migrations run unconditionally on every load. As fields accumulate, all patches apply to every layout on every startup. When a field is added to an existing type, a patch must be manually added here; there is no mechanism that enforces or checks this. Consider stamping a `schemaVersion` on the persisted state and gate each migration block behind a version comparison.
 
 `migrate()` also uses `Object.assign({}, patched, { field }) as AnyFeature`, which casts away type safety. If a required field is missed, TypeScript will not catch it at compile time.

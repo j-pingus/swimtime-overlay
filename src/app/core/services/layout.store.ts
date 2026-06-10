@@ -1,7 +1,10 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Layout, AnyFeature, BaseFeature, GroupFeature, MessageTypeRule, MessageTypeRules } from '../models/layout.model';
+import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, MessageTypeRule, MessageTypeRules, TextFeature } from '../models/layout.model';
+
+const SCHEMA_VERSION = 1;
 
 export type LayoutStoreState = {
+  schemaVersion?: number;
   layouts: Layout[];
   activeLayoutId: string | null;
   messageTypeRules: MessageTypeRules;
@@ -306,27 +309,38 @@ export class LayoutStore {
     }
   }
 
-  private migrate(state: LayoutStoreState): LayoutStoreState {
-    return {
-      ...state,
-      messageTypeRules: state.messageTypeRules ?? {},
-      layouts: state.layouts.map((l) => ({
-        ...l,
-        features: (l.features ?? []).map((f) => {
-          let patched = f;
-          if (f.type === 'lane' && !('displayDuration' in f)) {
-            patched = Object.assign({}, patched, { displayDuration: null }) as AnyFeature;
-          }
-          if ((f.type === 'text' || f.type === 'lane') && !('outlineColor' in f)) {
-            patched = Object.assign({}, patched, { outlineColor: null }) as AnyFeature;
-          }
-          if (f.type === 'lane' && !('heatSource' in f)) {
-            patched = Object.assign({}, patched, { heatSource: 'current' }) as AnyFeature;
-          }
-          return patched;
-        }),
-      })),
-    };
+  private migrate(raw: LayoutStoreState): LayoutStoreState {
+    let state = { ...raw };
+    const from = state.schemaVersion ?? 0;
+
+    if (from < 1) {
+      state = {
+        ...state,
+        messageTypeRules: state.messageTypeRules ?? {},
+        layouts: state.layouts.map((l) => ({
+          ...l,
+          features: (l.features ?? []).map((f): AnyFeature => {
+            if (f.type === 'lane') {
+              const lane = f as LaneFeature;
+              return {
+                ...lane,
+                displayDuration: 'displayDuration' in lane ? lane.displayDuration : null,
+                outlineColor: 'outlineColor' in lane ? lane.outlineColor : null,
+                heatSource: 'heatSource' in lane ? lane.heatSource : 'current',
+              } satisfies LaneFeature;
+            }
+            if (f.type === 'text' && !('outlineColor' in f)) {
+              return { ...(f as TextFeature), outlineColor: null } satisfies TextFeature;
+            }
+            return f;
+          }),
+        })),
+      };
+    }
+
+    // Future migrations: if (from < 2) { ... }
+
+    return { ...state, schemaVersion: SCHEMA_VERSION };
   }
 }
 
