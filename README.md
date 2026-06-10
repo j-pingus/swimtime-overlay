@@ -1,59 +1,65 @@
-# SwimtimeOverlay
+# Swimtime Overlay
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.
+A browser-based graphics overlay for live swimming competitions, designed to be captured by OBS or similar broadcast software. It connects to a running [Swimtime](https://github.com/your-org/swimtime) Java backend via Server-Sent Events and displays race data — lane lists, live lap times, event info, and a running chronometer — on a 1920×1080 canvas.
 
-## Development server
+## How it works
 
-To start a local development server, run:
+The app runs in **two browser windows simultaneously**:
 
-```bash
-ng serve
-```
+- **Config window** (`/layouts`, `/config/:id`) — drag-and-drop layout editor. Position and style text, images, rectangles, lane grids, polygons, and chrono displays on the canvas. Changes sync instantly to the render window via BroadcastChannel.
+- **Render window** (`/render`) — clean full-screen output with no UI chrome. Point OBS at this window with a Browser Source.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Layouts and settings are persisted locally in IndexedDB. No account or server is needed to build layouts; the dummy data mode lets you style everything without a live backend.
 
-## Code scaffolding
+## Getting started
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 1. Install dependencies
 
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
+### 2. Configure the backend URL
 
-To build the project run:
+Open `proxy.conf.json` and set the `target` values to the address of your running Swimtime Java server:
+
+```json
+{
+  "/api/sse": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "headers": { "Connection": "keep-alive" }
+  },
+  "/api": {
+    "target": "http://localhost:8080",
+    "secure": false
+  }
+}
+```
+
+Replace `http://localhost:8080` with the actual host and port if Swimtime is running on a different machine.
+
+### 3. Start the dev server
 
 ```bash
-ng build
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The app opens at `http://localhost:4200`. Open a second tab to `http://localhost:4200/render` for the output window.
 
-## Running unit tests
+## Commands
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+| Command | Description |
+|---|---|
+| `npm start` | Dev server with live reload |
+| `npm run build` | Production build → `dist/` |
+| `npm test` | Unit tests (Vitest) |
+| `npx tsc --noEmit` | Type-check without building |
 
-```bash
-ng test
-```
+## Live data
 
-## Running end-to-end tests
+Once the dev server is running and the Swimtime backend is reachable, go to the layout list page and click **Go Live**. The app will:
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Subscribe to SSE streams for event/heat updates and lap times
+- Automatically switch layouts based on message type rules you configure (e.g. show a specific layout on `START_LIST`, auto-clear after N seconds)
+- Drive the Chrono feature from `CHRONO_START` / `HEAT_ARRIVED` events, with each incoming lap time keeping the display aligned
