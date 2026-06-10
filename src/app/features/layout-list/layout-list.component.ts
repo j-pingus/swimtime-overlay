@@ -47,7 +47,8 @@ export class LayoutListComponent {
     this.store.cloneLayout(id);
   }
 
-  deleteLayout(id: string): void {
+  deleteLayout(id: string, name: string): void {
+    if (!confirm(`Delete layout "${name}"? This cannot be undone.`)) return;
     this.store.deleteLayout(id);
   }
 

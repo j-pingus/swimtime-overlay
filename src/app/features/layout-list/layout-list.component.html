@@ -116,7 +116,7 @@
               <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
               <button class="btn-clone" (click)="cloneLayout(layout.id)" title="Clone layout">⎘</button>
               <button class="btn-export" (click)="exportLayout(layout)" title="Export layout">↓</button>
-              <button class="btn-delete" (click)="deleteLayout(layout.id)" title="Delete layout">×</button>
+              <button class="btn-delete" (click)="deleteLayout(layout.id, layout.name)" title="Delete layout">×</button>
             </span>
           </li>
         }
