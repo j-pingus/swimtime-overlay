@@ -46,7 +46,7 @@ protected readonly store = inject(LayoutStore);
 ### No deletion confirmation for layouts
 `deleteLayout()` is called directly from the button click. There is no undo. A layout with many hours of configuration can be lost with a misclick.
 
-### `btn-copy` badge styling inconsistency
+### ✅ `btn-copy` badge styling inconsistency
 The "Copy" button in the feature panel uses `btn-copy` class but the SCSS file only defines `.btn-clone`, `.btn-remove`, `.btn-upload`, `.btn-clear`. `btn-copy` has no style — it will render with browser defaults. Presumably it should match `.btn-clone`.
 
 ---
