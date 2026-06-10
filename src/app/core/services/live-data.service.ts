@@ -29,6 +29,9 @@ export class LiveDataService implements OnDestroy {
       this.sse.eventAndHeat$().subscribe({
         next: (dto) => {
           this.competitionStore.setCompetition(mapEventAndHeat(dto));
+          if (dto.swimTimeMessageType === 'START_LIST') {
+            this.competitionStore.resetChrono();
+          }
           if (dto.swimTimeMessageType === 'START_LIST' && dto.splashHeatId != null) {
             this.api.getNextHeats(dto.splashHeatId).subscribe({
               next: (dtos) => this.competitionStore.setNextHeats(dtos.map(mapNextHeat)),

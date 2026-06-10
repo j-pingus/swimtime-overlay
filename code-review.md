@@ -4,7 +4,7 @@
 
 ## Bugs / Behavioral Issues
 
-### Chrono not reset between heats
+### ✅ Chrono not reset between heats
 When a new `START_LIST` event fires, `setCompetition` is called and correctly preserves `chronoStartTime`/`chronoStopTime` (so the previous heat's chrono stays frozen on screen). There is no explicit reset of the chrono when a new heat begins. This means if `CHRONO_START` is late or never fires for the new heat, the overlay keeps showing a frozen time from the previous heat. A `HEAT_LOADED` or `START_LIST` handler should clear both chrono fields.
 
 ### ✅ Missing badge colors for `polygon` and `chrono` types

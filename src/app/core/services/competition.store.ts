@@ -160,6 +160,13 @@ export class CompetitionStore {
     });
   }
 
+  resetChrono(): void {
+    this.update((s) => ({
+      ...s,
+      competition: { ...s.competition, chronoStartTime: null, chronoStopTime: null },
+    }));
+  }
+
   setChronoStart(startTime: number): void {
     this.update((s) => ({
       ...s,
