@@ -25,6 +25,12 @@
       <div class="live-toggle">
         @if (competition.mode() === 'live') {
           <button class="btn-live btn-live--on" (click)="disableLive()">● Live</button>
+          @if (!liveData.sseEventAndHeatOk()) {
+            <span class="sse-error" title="Event/heat stream disconnected — event data may be stale">⚠ Heat data</span>
+          }
+          @if (!liveData.sseLapTimeOk()) {
+            <span class="sse-error" title="Lap time stream disconnected — times may be stale">⚠ Lap times</span>
+          }
         } @else {
           <button class="btn-live btn-live--off" (click)="enableLive()">○ Live</button>
         }

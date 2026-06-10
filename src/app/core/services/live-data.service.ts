@@ -1,4 +1,4 @@
-import { Injectable, inject, OnDestroy } from '@angular/core';
+import { Injectable, inject, OnDestroy, signal, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { SseService } from '../api/sse.service';
@@ -16,8 +16,16 @@ export class LiveDataService implements OnDestroy {
   private sub = new Subscription();
   private ruleTimer: ReturnType<typeof setTimeout> | null = null;
 
+  private readonly _eventAndHeatOk = signal(true);
+  private readonly _lapTimeOk = signal(true);
+
+  readonly sseEventAndHeatOk = computed(() => this._eventAndHeatOk());
+  readonly sseLapTimeOk = computed(() => this._lapTimeOk());
+
   start(): void {
     this.stop();
+    this._eventAndHeatOk.set(true);
+    this._lapTimeOk.set(true);
     this.competitionStore.setMode('live');
 
     this.api.getCurrentEventAndHeat().subscribe({
@@ -48,7 +56,7 @@ export class LiveDataService implements OnDestroy {
             this.applyRule(dto.swimTimeMessageType);
           }
         },
-        error: (err) => console.warn('SSE eventAndHeat error', err),
+        error: (err) => { console.warn('SSE eventAndHeat error', err); this._eventAndHeatOk.set(false); },
       }),
     );
 
@@ -63,7 +71,7 @@ export class LiveDataService implements OnDestroy {
             if (elapsedMs != null) this.competitionStore.syncChrono(elapsedMs);
           }
         },
-        error: (err) => console.warn('SSE lapTime error', err),
+        error: (err) => { console.warn('SSE lapTime error', err); this._lapTimeOk.set(false); },
       }),
     );
   }

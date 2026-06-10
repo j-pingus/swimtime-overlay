@@ -16,7 +16,7 @@ import { Layout } from '../../core/models/layout.model';
 export class LayoutListComponent {
   protected readonly store = inject(LayoutStore);
   protected readonly competition = inject(CompetitionStore);
-  private readonly liveData = inject(LiveDataService);
+  protected readonly liveData = inject(LiveDataService);
 
   protected newLayoutName = signal('');
   protected nameError = signal('');
