@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { AnyFeature } from '../models/layout.model';
 
 function remapIds(features: AnyFeature[]): AnyFeature[] {
@@ -14,7 +14,7 @@ function remapIds(features: AnyFeature[]): AnyFeature[] {
 export class FeatureClipboardService {
   private readonly _clipboard = signal<AnyFeature[] | null>(null);
 
-  readonly hasContent = () => this._clipboard() !== null;
+  readonly hasContent = computed(() => this._clipboard() !== null);
 
   copy(features: AnyFeature[]): void {
     this._clipboard.set(features);
