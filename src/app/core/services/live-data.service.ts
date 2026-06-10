@@ -57,7 +57,6 @@ export class LiveDataService implements OnDestroy {
           }
           if (dto.time != null) {
             const elapsedMs = parseTimeToMs(dto.time);
-            console.log("Received laptime",dto.time, elapsedMs);
             if (elapsedMs != null) this.competitionStore.syncChrono(elapsedMs);
           }
         },
