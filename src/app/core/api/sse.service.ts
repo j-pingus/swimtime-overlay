@@ -31,7 +31,12 @@ export class SseService implements OnDestroy {
         }
       };
 
-      es.onerror = (err) => observer.error(err);
+      es.onerror = () => {
+        if (es.readyState === EventSource.CLOSED) {
+          observer.error(new Error('SSE connection permanently closed'));
+        }
+        // readyState === CONNECTING: browser is already retrying — do nothing.
+      };
 
       return () => {
         es.close();

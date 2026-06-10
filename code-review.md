@@ -53,7 +53,7 @@ The "Copy" button in the feature panel uses `btn-copy` class but the SCSS file o
 
 ## Reliability
 
-### No SSE reconnection
+### ✅ No SSE reconnection
 `SseService.stream()` calls `observer.error(err)` on any `EventSource` error, which terminates the RxJS observable permanently. `LiveDataService` logs a warning but never re-subscribes. A network blip, backend restart, or browser going idle will silently kill the live feed until the user manually toggles "Live" off and on. A retry strategy (e.g. `retryWhen` with exponential backoff, or a `visibilitychange` listener) is needed for production use.
 
 ### SSE error in one stream silently stops both
