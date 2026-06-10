@@ -27,7 +27,12 @@ export class ZoneSurfaceComponent {
   private readonly now = signal(Date.now());
 
   constructor() {
-    const id = setInterval(() => this.now.set(Date.now()), 100);
+    const id = setInterval(() => {
+      // Skip when the chrono is frozen (stopped heat) — nothing time-sensitive to update.
+      if (this.competitionStore.competition().chronoStopTime == null) {
+        this.now.set(Date.now());
+      }
+    }, 100);
     inject(DestroyRef).onDestroy(() => clearInterval(id));
   }
 
