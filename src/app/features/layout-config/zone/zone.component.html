@@ -5,6 +5,17 @@
   [class.is-interactive]="interactive()"
   (mousedown)="interactive() && onBackgroundClick()"
 >
+  <!-- All clip paths hoisted here so <defs> is never inside a repeated element. -->
+  <defs>
+    @for (f of displayFeatures(); track f.id) {
+      @if (f.type === 'text' || f.type === 'lane' || f.type === 'chrono') {
+        <clipPath [id]="'tc-' + f.id">
+          <rect [attr.x]="f.x - 8" [attr.y]="f.y - 4" [attr.width]="f.width + 16" [attr.height]="f.height + 8" />
+        </clipPath>
+      }
+    }
+  </defs>
+
   @if (interactive()) {
     <rect width="1920" height="1080" class="canvas-bg" />
   }
@@ -111,12 +122,6 @@
 
         } @else if (asTextLike(f); as tl) {
           <g [attr.transform]="textTransform(tl)">
-            <defs>
-              <clipPath [id]="'tc-' + f.id">
-                <rect [attr.x]="f.x - 8" [attr.y]="f.y - 4" [attr.width]="f.width + 16" [attr.height]="f.height + 8" />
-              </clipPath>
-            </defs>
-
             <!-- Hit area + selection border (config only, hidden in render mode) -->
             <rect
               [attr.x]="f.x" [attr.y]="f.y"
@@ -183,11 +188,6 @@
           }
 
         } @else if (aschrono(f); as ch) {
-          <defs>
-            <clipPath [id]="'tc-' + f.id">
-              <rect [attr.x]="f.x - 8" [attr.y]="f.y - 4" [attr.width]="f.width + 16" [attr.height]="f.height + 8" />
-            </clipPath>
-          </defs>
           <rect
             [attr.x]="f.x" [attr.y]="f.y"
             [attr.width]="f.width" [attr.height]="f.height"

@@ -16,7 +16,7 @@ readonly hasContent = () => this._clipboard() !== null;
 ```
 This is called from a template expression (`@if (hasClipboard())`), but because it is not a `computed()` signal, Angular cannot track it as a reactive dependency. The Paste button may not appear/disappear reactively when the clipboard changes. Should be `readonly hasContent = computed(() => this._clipboard() !== null)`.
 
-### `<defs>` elements inside a repeated `@for` block (chrono)
+### ✅ `<defs>` elements inside a repeated `@for` block (chrono)
 The chrono branch emits a `<defs>/<clipPath>` node directly inside the `@for` feature loop without a `<g>` wrapper. SVG `<defs>` should live at the document level or at minimum in a top-level group. Some renderers may handle this fine, but it is non-standard and fragile; OBS's browser-source renderer may behave differently. The clip-path `<defs>` for text features have the same pattern — they are inside the outer `<g>` but outside a wrapping element. Consider hoisting all `<defs>` to the top of the SVG.
 
 ---
