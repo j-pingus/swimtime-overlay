@@ -24,7 +24,6 @@ export class FeaturePanelComponent {
   readonly selectedFeatureId = input<string | null>(null);
 
   readonly featureChange = output<AnyFeature>();
-  readonly featureClone = output<AnyFeature>();
   readonly featureRemove = output<string>();
   readonly featureSelect = output<string>();
   readonly featuresReorder = output<AnyFeature[]>();
@@ -208,11 +207,6 @@ export class FeaturePanelComponent {
   paste(): void {
     const pasted = this.clipboard.paste();
     if (pasted) this.featurePaste.emit(pasted);
-  }
-
-  clone(): void {
-    const f = this.feature();
-    if (f && f.type !== 'group') this.featureClone.emit({ ...f, id: crypto.randomUUID(), groupId: undefined });
   }
 
   remove(): void {

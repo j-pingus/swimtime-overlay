@@ -89,14 +89,7 @@ export class LayoutConfigComponent {
     if (layoutId) this.store.batchUpdateFeatures(layoutId, features);
   }
 
-  onFeatureClone(feature: AnyFeature): void {
-    const layoutId = this.id();
-    if (!layoutId) return;
-    this.store.addFeature(layoutId, feature);
-    this.selectedId.set(feature.id);
-  }
-
-  onFeaturesReorder(features: AnyFeature[]): void {
+onFeaturesReorder(features: AnyFeature[]): void {
     const layoutId = this.id();
     if (layoutId) this.store.reorderFeatures(layoutId, features);
   }

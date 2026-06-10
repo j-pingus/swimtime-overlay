@@ -409,9 +409,6 @@
     }
 
     <div class="actions">
-      @if (f.type !== 'group') {
-        <button class="btn-clone" (click)="clone()">Clone</button>
-      }
       <button class="btn-copy" (click)="copy()">Copy</button>
       @if (f.type !== 'group') {
         <button class="btn-remove" (click)="remove()">Delete</button>
