@@ -70,11 +70,14 @@ export class LayoutListComponent {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const layout = JSON.parse(reader.result as string) as Layout;
-        if (!layout.name || !Array.isArray(layout.features)) return;
-        this.store.importLayout(layout);
+        const parsed = JSON.parse(reader.result as string);
+        if (!isValidLayout(parsed)) {
+          alert('Import failed: the file is not a valid layout.');
+        } else {
+          this.store.importLayout(parsed);
+        }
       } catch {
-        // invalid JSON — silently ignore
+        alert('Import failed: the file is not valid JSON.');
       }
       input.value = '';
     };
@@ -131,4 +134,50 @@ export class LayoutListComponent {
     this.newLayoutName.set('');
     this.nameError.set('');
   }
+}
+
+const KNOWN_FEATURE_TYPES = new Set([
+  'generic', 'image', 'text', 'rect', 'lane', 'group', 'polygon', 'chrono',
+]);
+
+function isValidFeature(f: unknown): boolean {
+  if (!f || typeof f !== 'object') return false;
+  const o = f as Record<string, unknown>;
+  if (typeof o['id'] !== 'string' || !o['id']) return false;
+  if (typeof o['type'] !== 'string' || !KNOWN_FEATURE_TYPES.has(o['type'])) return false;
+  if (typeof o['label'] !== 'string') return false;
+  if (typeof o['x'] !== 'number' || typeof o['y'] !== 'number') return false;
+  if (typeof o['width'] !== 'number' || typeof o['height'] !== 'number') return false;
+
+  switch (o['type']) {
+    case 'text':
+    case 'lane':
+      return typeof o['template'] === 'string'
+        && typeof o['fontSize'] === 'number'
+        && typeof o['color'] === 'string'
+        && typeof o['bold'] === 'boolean'
+        && typeof o['italic'] === 'boolean';
+    case 'chrono':
+      return typeof o['fontSize'] === 'number'
+        && typeof o['color'] === 'string'
+        && typeof o['bold'] === 'boolean'
+        && typeof o['italic'] === 'boolean';
+    case 'rect':
+      return typeof o['bgColor'] === 'string'
+        && typeof o['bgOpacity'] === 'number'
+        && typeof o['border'] === 'boolean';
+    case 'image':
+      return typeof o['src'] === 'string';
+    case 'polygon':
+      return Array.isArray(o['points']) && typeof o['bgColor'] === 'string';
+  }
+  return true; // 'generic', 'group'
+}
+
+function isValidLayout(obj: unknown): obj is Layout {
+  if (!obj || typeof obj !== 'object') return false;
+  const o = obj as Record<string, unknown>;
+  if (typeof o['name'] !== 'string' || !o['name']) return false;
+  if (!Array.isArray(o['features'])) return false;
+  return (o['features'] as unknown[]).every(isValidFeature);
 }

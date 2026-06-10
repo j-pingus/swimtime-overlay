@@ -37,7 +37,7 @@ Migrations run unconditionally on every load. As fields accumulate, all patches 
 ### ~~`LayoutListComponent.store` is `protected` instead of `private`~~
 Not a valid finding — Angular's template compiler enforces access modifiers on external `.html` templates and rejects `private` members. `protected` is the correct visibility for injected services used in templates.
 
-### Import validation trusts the JSON structure
+### ✅ Import validation trusts the JSON structure
 `onImportFile` only checks `layout.name && Array.isArray(layout.features)`. A JSON file with an empty features array and any name string passes. There is no check on feature types, required fields, or ID format. Importing a malformed feature (e.g. a `text` feature missing `fontSize`) will produce a runtime error or silent mis-render. A minimal schema check (`typeof f.type === 'string'`, required fields per type) would prevent silent corruption of persisted state.
 
 ### ✅ No deletion confirmation for layouts
