@@ -1,6 +1,6 @@
 # Swimtime Overlay
 
-A browser-based graphics overlay for live swimming competitions, designed to be captured by OBS or similar broadcast software. It connects to a running [Swimtime](https://github.com/your-org/swimtime) Java backend via Server-Sent Events and displays race data — lane lists, live lap times, event info, and a running chronometer — on a 1920×1080 canvas.
+A browser-based graphics overlay for live swimming competitions, designed to be captured by OBS or similar broadcast software. It connects to a running [Swimtime](https://github.com/CrazyFox04/JavaSwimTime) Java backend via Server-Sent Events and displays race data — lane lists, live lap times, event info, and a running chronometer — on a 1920×1080 canvas.
 
 ## How it works
 
