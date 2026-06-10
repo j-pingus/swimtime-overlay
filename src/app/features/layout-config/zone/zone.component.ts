@@ -1,11 +1,11 @@
 import {
-  Component, inject, input, output, computed, signal,
-  viewChild, ElementRef, HostListener, DestroyRef,
+  Component, input, output, computed, signal,
+  viewChild, HostListener,
 } from '@angular/core';
-import { AnyFeature, BaseFeature, ChronoFeature, GroupFeature, HeatSource, ImageFeature, LaneFeature, PolygonFeature, PolygonPoint, RectFeature, TextFeature, TextAlign } from '../../../core/models/layout.model';
-import { Competition, Lane } from '../../../core/models/domain.models';
-import { CompetitionStore } from '../../../core/services/competition.store';
-import { resolveTemplate } from '../../../core/utils/template.util';
+import { AnyFeature, BaseFeature, PolygonFeature, PolygonPoint } from '../../../core/models/layout.model';
+import { ZoneSurfaceComponent, GroupBounds } from './zone-surface.component';
+
+export type { GroupBounds } from './zone-surface.component';
 
 export const CANVAS_W = 1920;
 export const CANVAS_H = 1080;
@@ -23,59 +23,37 @@ interface GroupChild {
 interface DragState {
   featureId: string;
   mode: DragMode;
-  /** SVG coords where the drag started — never mutated. */
   startX: number;
   startY: number;
-  /** Feature (or group bounding box) geometry when the drag started — never mutated. */
   origX: number;
   origY: number;
   origW: number;
   origH: number;
-  /** Current SVG mouse position — updated every mousemove. */
   currentX: number;
   currentY: number;
-  /** Set when dragging a group — original positions of all children. */
   groupChildren?: GroupChild[];
-  /** Set when dragging a polygon point. */
   pointIndex?: number;
   origPoints?: PolygonPoint[];
 }
 
-export interface GroupBounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 @Component({
   selector: 'app-zone',
+  imports: [ZoneSurfaceComponent],
   templateUrl: './zone.component.html',
   styleUrl: './zone.component.scss',
 })
 export class ZoneComponent {
-  private readonly competitionStore = inject(CompetitionStore);
-  private readonly now = signal(Date.now());
-
-  constructor() {
-    const id = setInterval(() => this.now.set(Date.now()), 100);
-    inject(DestroyRef).onDestroy(() => clearInterval(id));
-  }
-
   readonly features = input<BaseFeature[]>([]);
   readonly selectedFeatureId = input<string | null>(null);
-  /** When false the zone is display-only: no anchors, no canvas hint, no interaction. */
   readonly interactive = input<boolean>(true);
 
   readonly featureSelect = output<string | null>();
   readonly featureUpdate = output<BaseFeature>();
-  /** Emitted instead of featureUpdate when a group move affects multiple features. */
   readonly featuresUpdate = output<AnyFeature[]>();
 
-  private readonly svgEl = viewChild.required<ElementRef<SVGSVGElement>>('svgEl');
+  private readonly surface = viewChild.required(ZoneSurfaceComponent);
   private readonly drag = signal<DragState | null>(null);
 
-  /** Merges drag-preview geometry into the feature list for live feedback. */
   protected readonly displayFeatures = computed(() => {
     const d = this.drag();
     if (!d) return this.features();
@@ -84,7 +62,6 @@ export class ZoneComponent {
     const rawDy = d.currentY - d.startY;
 
     if (d.groupChildren) {
-      // Constrain delta by the group's bounding box so no child escapes the canvas.
       const clampedX = clamp(d.origX + rawDx, 0, CANVAS_W - d.origW);
       const clampedY = clamp(d.origY + rawDy, 0, CANVAS_H - d.origH);
       const dx = clampedX - d.origX;
@@ -101,7 +78,7 @@ export class ZoneComponent {
       return this.features().map((f) => {
         if (f.id !== d.featureId || f.type !== 'polygon') return f;
         const newPoints = d.origPoints!.map((pt, i) =>
-          i === d.pointIndex ? { x: pt.x + rawDx, y: pt.y + rawDy } : pt
+          i === d.pointIndex ? { x: pt.x + rawDx, y: pt.y + rawDy } : pt,
         );
         return { ...(f as PolygonFeature), points: newPoints };
       });
@@ -123,7 +100,6 @@ export class ZoneComponent {
     });
   });
 
-  /** Bounding boxes for all groups, derived from their children's current positions. */
   protected readonly groupBoundsMap = computed(() => {
     const map = new Map<string, GroupBounds>();
     for (const f of this.displayFeatures()) {
@@ -142,131 +118,16 @@ export class ZoneComponent {
     return map;
   });
 
-  protected readonly ANCHOR = 16;
-  protected readonly GROUP_PAD = 8;
-
-  protected asGroup(f: AnyFeature): GroupFeature | null {
-    return f.type === 'group' ? f : null;
-  }
-
-  protected asImage(f: AnyFeature): ImageFeature | null {
-    return f.type === 'image' ? f : null;
-  }
-
-  protected asTextLike(f: AnyFeature): TextFeature | LaneFeature | null {
-    return (f.type === 'text' || f.type === 'lane') ? f : null;
-  }
-
-  protected asLane(f: AnyFeature): LaneFeature | null {
-    return f.type === 'lane' ? f : null;
-  }
-
-  protected asRect(f: AnyFeature): RectFeature | null {
-    return f.type === 'rect' ? f : null;
-  }
-
-  protected asPolygon(f: AnyFeature): PolygonFeature | null {
-    return f.type === 'polygon' ? f : null;
-  }
-
-  protected aschrono(f: AnyFeature): ChronoFeature | null {
-    return f.type === 'chrono' ? f : null;
-  }
-
-  protected polygonPointsAttr(f: PolygonFeature): string {
-    return f.points.map(pt => `${pt.x},${pt.y}`).join(' ');
-  }
-
-  protected onPointDragStart(event: MouseEvent, feature: PolygonFeature, pointIndex: number): void {
-    event.stopPropagation();
-    event.preventDefault();
-    const { x, y } = this.toSVG(event);
-    this.drag.set({
-      featureId: feature.id,
-      mode: 'point',
-      startX: x, startY: y,
-      origX: feature.points[pointIndex].x,
-      origY: feature.points[pointIndex].y,
-      origW: 0, origH: 0,
-      currentX: x, currentY: y,
-      pointIndex,
-      origPoints: feature.points.map(p => ({ ...p })),
-    });
-    this.featureSelect.emit(feature.id);
-  }
-
-  protected rectFill(f: RectFeature): string {
-    return f.bgColor;
-  }
-
-  protected rectFillOpacity(f: RectFeature): number {
-    return f.bgOpacity / 100;
-  }
-
-  protected resolvedDisplayText(f: TextFeature | LaneFeature): string {
-    return resolveTemplate(f.template, this.competitionStore.competition());
-  }
-
-  protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
-    const lanes = resolveLanes(this.competitionStore.competition(), f.heatSource);
-    const now = this.now();
-    const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
-    return lanes.map((lane, i) => {
-      const expired =
-        f.displayDuration != null &&
-        lane.timestamp != null &&
-        now - lane.timestamp > f.displayDuration * 1000;
-      return {
-        y: f.y + (i + 0.5) * rowH,
-        text: expired ? '' : resolveTemplate(f.template, lane),
-      };
-    });
-  }
-
-  protected textX(f: TextFeature | LaneFeature | ChronoFeature): number {
-    if (f.align === 'center') return f.x + f.width / 2;
-    if (f.align === 'right') return f.x + f.width;
-    return f.x;
-  }
-
-  protected textAnchor(f: TextFeature | LaneFeature | ChronoFeature): string {
-    const map: Record<TextAlign, string> = { left: 'start', center: 'middle', right: 'end' };
-    return map[f.align];
-  }
-
-  protected chronoText(f: ChronoFeature): string {
-    const c = this.competitionStore.competition();
-    const startTime = c.chronoStartTime;
-    if (startTime == null) return '0:00.00';
-    const stopTime = c.chronoStopTime;
-    const elapsedMs = stopTime != null ? stopTime - startTime : this.now() - startTime;
-    return formatChrono(Math.max(0, elapsedMs));
-  }
-
-  protected textTransform(f: TextFeature | LaneFeature): string | null {
-    const rotation = f.type === 'text' ? (f.rotation ?? 0) : 0;
-    if (!rotation) return null;
-    const cx = f.x + f.width / 2;
-    const cy = f.y + f.height / 2;
-    return `rotate(${rotation}, ${cx}, ${cy})`;
-  }
-
-  // --- Interaction ---
-
-  protected onBackgroundClick(): void {
+  protected onBgClick(): void {
     this.featureSelect.emit(null);
   }
 
-  protected onFeatureClick(event: MouseEvent, feature: BaseFeature): void {
-    event.stopPropagation();
-    // Clicking any member of a group selects the group.
+  protected onFeatureClick({ feature }: { event: MouseEvent; feature: AnyFeature }): void {
     this.featureSelect.emit(feature.groupId ?? feature.id);
   }
 
-  protected onMoveStart(event: MouseEvent, feature: BaseFeature): void {
-    event.stopPropagation();
-    event.preventDefault();
-    const { x, y } = this.toSVG(event);
+  protected onMoveStart({ event, feature }: { event: MouseEvent; feature: AnyFeature }): void {
+    const { x, y } = this.surface().toSVGCoords(event.clientX, event.clientY);
 
     const isGroup = feature.type === 'group';
     const groupId = isGroup ? feature.id : null;
@@ -291,10 +152,8 @@ export class ZoneComponent {
     this.featureSelect.emit(feature.groupId ?? feature.id);
   }
 
-  protected onResizeStart(event: MouseEvent, feature: BaseFeature): void {
-    event.stopPropagation();
-    event.preventDefault();
-    const { x, y } = this.toSVG(event);
+  protected onResizeStart({ event, feature }: { event: MouseEvent; feature: AnyFeature }): void {
+    const { x, y } = this.surface().toSVGCoords(event.clientX, event.clientY);
     this.drag.set({
       featureId: feature.id, mode: 'resize',
       startX: x, startY: y,
@@ -305,10 +164,26 @@ export class ZoneComponent {
     this.featureSelect.emit(feature.groupId ?? feature.id);
   }
 
+  protected onPointDragStart({ event, feature, pointIndex }: { event: MouseEvent; feature: PolygonFeature; pointIndex: number }): void {
+    const { x, y } = this.surface().toSVGCoords(event.clientX, event.clientY);
+    this.drag.set({
+      featureId: feature.id,
+      mode: 'point',
+      startX: x, startY: y,
+      origX: feature.points[pointIndex].x,
+      origY: feature.points[pointIndex].y,
+      origW: 0, origH: 0,
+      currentX: x, currentY: y,
+      pointIndex,
+      origPoints: feature.points.map(p => ({ ...p })),
+    });
+    this.featureSelect.emit(feature.id);
+  }
+
   @HostListener('window:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     if (!this.drag()) return;
-    const { x, y } = this.toSVG(event);
+    const { x, y } = this.surface().toSVGCoords(event.clientX, event.clientY);
     this.drag.update((s) => s && ({ ...s, currentX: x, currentY: y }));
   }
 
@@ -318,7 +193,6 @@ export class ZoneComponent {
     if (!d) return;
 
     if (d.groupChildren) {
-      // Group move: commit updated positions for all children.
       const rawDx = d.currentX - d.startX;
       const rawDy = d.currentY - d.startY;
       const clampedX = clamp(d.origX + rawDx, 0, CANVAS_W - d.origW);
@@ -340,7 +214,7 @@ export class ZoneComponent {
         const dx = round(d.currentX - d.startX);
         const dy = round(d.currentY - d.startY);
         const newPoints = d.origPoints.map((pt, i) =>
-          i === d.pointIndex ? { x: pt.x + dx, y: pt.y + dy } : pt
+          i === d.pointIndex ? { x: pt.x + dx, y: pt.y + dy } : pt,
         );
         this.featureUpdate.emit({ ...poly, points: newPoints, ...polygonBBox(newPoints) });
       }
@@ -367,13 +241,6 @@ export class ZoneComponent {
     }
     this.drag.set(null);
   }
-
-  private toSVG(event: MouseEvent): { x: number; y: number } {
-    const svg = this.svgEl().nativeElement;
-    const pt = new DOMPoint(event.clientX, event.clientY);
-    const p = pt.matrixTransform(svg.getScreenCTM()!.inverse());
-    return { x: p.x, y: p.y };
-  }
 }
 
 function clamp(v: number, min: number, max: number): number {
@@ -382,24 +249,6 @@ function clamp(v: number, min: number, max: number): number {
 
 function round(v: number): number {
   return Math.round(v);
-}
-
-function resolveLanes(competition: Competition, heatSource: HeatSource): Lane[] {
-  const nextIndex = heatSource === 'next0' ? 0 : heatSource === 'next1' ? 1 : heatSource === 'next2' ? 2 : -1;
-  if (nextIndex >= 0) {
-    const next = competition.nextHeats[nextIndex];
-    if (next?.lanes?.length) return next.lanes;
-  }
-  return competition.currentHeat?.lanes ?? [];
-}
-
-function formatChrono(ms: number): string {
-  const totalDs = Math.floor(ms / 100);
-  const ds = totalDs % 10;
-  const totalS = Math.floor(totalDs / 10);
-  const s = totalS % 60;
-  const m = Math.floor(totalS / 60);
-  return `${m}:${String(s).padStart(2, '0')}.${ds}`;
 }
 
 function polygonBBox(points: PolygonPoint[]): { x: number; y: number; width: number; height: number } {

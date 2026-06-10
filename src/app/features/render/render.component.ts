@@ -1,10 +1,10 @@
 import { Component, inject, computed } from '@angular/core';
 import { LayoutStore } from '../../core/services/layout.store';
-import { ZoneComponent } from '../layout-config/zone/zone.component';
+import { ZoneSurfaceComponent } from '../layout-config/zone/zone-surface.component';
 
 @Component({
   selector: 'app-render',
-  imports: [ZoneComponent],
+  imports: [ZoneSurfaceComponent],
   templateUrl: './render.component.html',
   styleUrl: './render.component.scss',
 })

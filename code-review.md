@@ -23,7 +23,7 @@ The chrono branch emits a `<defs>/<clipPath>` node directly inside the `@for` fe
 
 ## Technical Debt
 
-### `ZoneComponent` mixes display and interaction in one ~400-line component
+### ✅ `ZoneComponent` mixes display and interaction in one ~400-line component
 `ZoneComponent` handles SVG rendering (both config and render modes), drag-move, drag-resize, point dragging for polygons, group bounds computation, and template resolution. It is gated by the `interactive` input but the logic is all in one class. Splitting into a pure `ZoneSurfaceComponent` (display only, used by render) and an `InteractiveZoneComponent` (adds drag overlay) would make both easier to test and extend.
 
 ### ✅ `LayoutStore.migrate()` has no version guard
