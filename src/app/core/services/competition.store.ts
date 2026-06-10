@@ -104,6 +104,7 @@ export class CompetitionStore {
   // --- Lane count / first lane (config mode only — rebuilds the dummy pool) ---
 
   setLaneCount(count: number): void {
+    if (count < 1 || count > 10) return;
     this.update((s) => ({
       ...s,
       laneCount: count,

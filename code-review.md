@@ -60,7 +60,7 @@ If `eventAndHeat$` errors, laptime updates continue but event/heat data freezes.
 
 ## Minor
 
-- **Lane count upper bound is split between template (max 10) and no guard in `setLaneCount`** — the `+` button is disabled at 10 in the HTML but `setLaneCount` only validates `>= 1`. Symmetrical validation belongs in the store method.
+- ✅ **Lane count upper bound is split between template (max 10) and no guard in `setLaneCount`** — the `+` button is disabled at 10 in the HTML but `setLaneCount` only validates `>= 1`. Symmetrical validation belongs in the store method.
 - **`ZoneComponent` 100ms tick runs even when chrono is stopped** — minor but the interval fires unconditionally for the lifetime of every zone instance. Could be conditional on `chronoStopTime == null`.
 - **`FeatureClipboardService` clipboard is in-memory only** — closing and reopening the config tab loses the clipboard. `localStorage` or `sessionStorage` would survive tab reloads, consistent with how other state is persisted.
 - **`resolveTemplate` silently returns `''` for any missing path** — useful for render mode, but in config mode a typo in a template variable gives no feedback. A dev-mode warning or a template validator in the panel would help catch mistakes.
