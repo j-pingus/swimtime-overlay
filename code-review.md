@@ -34,11 +34,8 @@ Migrations run unconditionally on every load. As fields accumulate, all patches 
 ### Large `ApiService` with ~25 unused methods
 `ApiService` exposes methods for swimmers, officials, SITB control, Stream Deck, dummy-officials reset, vj-command, medal ceremony, etc. Only `getCurrentEventAndHeat()` and `getNextHeats()` are called anywhere in the app. The unused methods — and their corresponding DTOs (`SwimmersDto`, `OfficialsDto`, `DummyOfficialsDto`, `CurrentHeatDto`, `CurrentEventDto`, `StatusDto`, `StreamDeckInfoDto`, `CompetitionInfoDto`, `PoolSizeDto`, `EventDto`, `EventResponseDto`) — suggest this service was copied from another project or is a shared API client. Dead code should either be removed or moved to a separate `swimtime-api-client` package to keep the overlay's API surface clear.
 
-### `LayoutListComponent.store` is `protected` instead of `private`
-```ts
-protected readonly store = inject(LayoutStore);
-```
-`store` is accessed from the template (`store.layouts()`, `store.activeLayoutId()`, `store.messageTypeRules()`), but Angular templates can access `private` members just fine. Marking it `protected` exposes it unnecessarily to subclasses. Same for `competition`.
+### ~~`LayoutListComponent.store` is `protected` instead of `private`~~
+Not a valid finding — Angular's template compiler enforces access modifiers on external `.html` templates and rejects `private` members. `protected` is the correct visibility for injected services used in templates.
 
 ### Import validation trusts the JSON structure
 `onImportFile` only checks `layout.name && Array.isArray(layout.features)`. A JSON file with an empty features array and any name string passes. There is no check on feature types, required fields, or ID format. Importing a malformed feature (e.g. a `text` feature missing `fontSize`) will produce a runtime error or silent mis-render. A minimal schema check (`typeof f.type === 'string'`, required fields per type) would prevent silent corruption of persisted state.
