@@ -31,7 +31,7 @@ Migrations run unconditionally on every load. As fields accumulate, all patches 
 
 `migrate()` also uses `Object.assign({}, patched, { field }) as AnyFeature`, which casts away type safety. If a required field is missed, TypeScript will not catch it at compile time.
 
-### Large `ApiService` with ~25 unused methods
+### ✅ Large `ApiService` with ~25 unused methods
 `ApiService` exposes methods for swimmers, officials, SITB control, Stream Deck, dummy-officials reset, vj-command, medal ceremony, etc. Only `getCurrentEventAndHeat()` and `getNextHeats()` are called anywhere in the app. The unused methods — and their corresponding DTOs (`SwimmersDto`, `OfficialsDto`, `DummyOfficialsDto`, `CurrentHeatDto`, `CurrentEventDto`, `StatusDto`, `StreamDeckInfoDto`, `CompetitionInfoDto`, `PoolSizeDto`, `EventDto`, `EventResponseDto`) — suggest this service was copied from another project or is a shared API client. Dead code should either be removed or moved to a separate `swimtime-api-client` package to keep the overlay's API surface clear.
 
 ### ~~`LayoutListComponent.store` is `protected` instead of `private`~~
