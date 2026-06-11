@@ -180,6 +180,69 @@ export class ZoneComponent {
     this.featureSelect.emit(feature.id);
   }
 
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    // Don't steal keys from form fields in the panel.
+    const tag = (event.target as HTMLElement).tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    const id = this.selectedFeatureId();
+    if (!id || !this.interactive()) return;
+
+    const dx = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    const dy = event.key === 'ArrowDown'  ? 1 : event.key === 'ArrowUp'   ? -1 : 0;
+    if (dx === 0 && dy === 0) return;
+
+    event.preventDefault();
+
+    const step = event.shiftKey ? 10 : 1;
+    const resize = event.altKey;
+
+    const feature = this.features().find((f) => f.id === id);
+    if (!feature) return;
+
+    if (feature.type === 'group') {
+      // Move all children; groups have no intrinsic position to resize.
+      const children = this.features().filter((f) => f.groupId === id);
+      if (children.length === 0) return;
+      const updated = children.map((f) => ({
+        ...f,
+        x: clamp(f.x + dx * step, 0, CANVAS_W - f.width),
+        y: clamp(f.y + dy * step, 0, CANVAS_H - f.height),
+      }));
+      this.featuresUpdate.emit(updated as AnyFeature[]);
+      return;
+    }
+
+    if (resize) {
+      // Polygons are resized by dragging individual points, not by bounding box.
+      if (feature.type === 'polygon') return;
+      this.featureUpdate.emit({
+        ...feature,
+        width:  clamp(feature.width  + dx * step, 40, CANVAS_W - feature.x),
+        height: clamp(feature.height + dy * step, 20, CANVAS_H - feature.y),
+      });
+    } else {
+      if (feature.type === 'polygon') {
+        const poly = feature as PolygonFeature;
+        const newX = clamp(poly.x + dx * step, 0, CANVAS_W - poly.width);
+        const newY = clamp(poly.y + dy * step, 0, CANVAS_H - poly.height);
+        const shiftX = newX - poly.x;
+        const shiftY = newY - poly.y;
+        this.featureUpdate.emit({
+          ...poly, x: newX, y: newY,
+          points: poly.points.map((pt) => ({ x: pt.x + shiftX, y: pt.y + shiftY })),
+        });
+      } else {
+        this.featureUpdate.emit({
+          ...feature,
+          x: clamp(feature.x + dx * step, 0, CANVAS_W - feature.width),
+          y: clamp(feature.y + dy * step, 0, CANVAS_H - feature.height),
+        });
+      }
+    }
+  }
+
   @HostListener('window:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     if (!this.drag()) return;
