@@ -22,7 +22,7 @@ State is kept in sync between windows via **BroadcastChannel** (see `LayoutSyncS
 
 ### Stores
 
-**`LayoutStore`** — persists to IndexedDB (`swimtime` DB). Holds the list of `Layout` objects (each has an array of `AnyFeature`), the currently active layout ID, and `messageTypeRules` (maps SSE message types to layout IDs + optional auto-clear durations).
+**`LayoutStore`** — persists to IndexedDB (`swimtime` DB). Holds the list of `Layout` objects (each has an array of `AnyFeature`), the currently active layout ID, and `messageTypeRules` (maps SSE message types to layout IDs + optional auto-clear durations). Schema migrations are version-gated via `SCHEMA_VERSION` / `migrate()`.
 
 **`CompetitionStore`** — persists mode/lane settings to localStorage; competition data is transient. In `config` mode it holds a fixed dummy dataset. In `live` mode it is populated by `LiveDataService`. The `chronoStartTime`/`chronoStopTime` fields on `Competition` drive the Chrono feature.
 
@@ -32,16 +32,21 @@ State is kept in sync between windows via **BroadcastChannel** (see `LayoutSyncS
 - `/api/sse/eventAndHeat` → `setCompetition()`, next-heat loads, layout rule triggers, chrono start/stop
 - `/api/sse/laptime` → `updateLaneTimes()`, `syncChrono()` (aligns chrono to the received time)
 
-`CHRONO_START` records `Date.now()` as `chronoStartTime`. `HEAT_ARRIVED` freezes it via `chronoStopTime`. Each lap time SSE event also re-syncs `chronoStartTime` so the display matches the swimmer's received time.
+`CHRONO_START` records `Date.now()` as `chronoStartTime`. `HEAT_ARRIVED` freezes it via `chronoStopTime`. `START_LIST` resets the chrono for the new heat. Each lap time SSE event re-syncs `chronoStartTime` so the display matches the swimmer's received time.
+
+`LiveDataService` exposes `sseEventAndHeatOk` and `sseLapTimeOk` computed signals. The layout list shows an amber warning badge next to the Live button when either stream errors. On page reload, `APP_INITIALIZER` in `app.config.ts` calls `liveData.start()` automatically if the persisted mode is `'live'`.
 
 ### Feature system
 
-Features are defined in `layout.model.ts` (`AnyFeature` union). The shared SVG canvas is `ZoneComponent` — it handles both interactive config (drag/resize anchors, selection) and display-only render mode via the `interactive` input.
+Features are defined in `layout.model.ts` (`AnyFeature` union). The SVG canvas is split into two components:
+
+- **`ZoneSurfaceComponent`** (`zone/zone-surface.component.*`) — pure rendering: owns the `<svg>`, all type guards, rendering helpers, and the 100ms chrono tick. Accepts `features`, `groupBoundsMap`, `selectedFeatureId`, `interactive` as inputs; emits typed events (`bgClick`, `featureClick`, `moveStart`, `resizeStart`, `pointDragStart`). Used directly by `RenderComponent`.
+- **`ZoneComponent`** (`zone/zone.component.*`) — drag-interaction wrapper: owns drag state, computes `displayFeatures` (merging live drag preview) and `groupBoundsMap`, handles `@HostListener` mouse events, calls `ZoneSurfaceComponent.toSVGCoords()` for coordinate conversion. Used by the config editor.
 
 **Adding a new feature type** requires touching:
 1. `layout.model.ts` — new interface + add to `FeatureType` and `AnyFeature`
-2. `zone.component.ts` — type-guard helper + rendering logic
-3. `zone.component.html` — `@else if` branch in the feature loop
+2. `zone-surface.component.ts` — type-guard helper + rendering helpers
+3. `zone-surface.component.html` — `@else if` branch in the feature loop; add `<clipPath>` to the `<defs>` block if the feature clips text
 4. `feature-panel.component.ts` — computed + patch method + `typeLabel()`
 5. `feature-panel.component.html` — config section + header label
 6. `layout-config.component.ts` — `addFeature()` default construction
@@ -50,8 +55,16 @@ Features are defined in `layout.model.ts` (`AnyFeature` union). The shared SVG c
 
 ### Template resolution
 
-`TextFeature` and `LaneFeature` use `${path.to.value}` tokens resolved by `resolveTemplate()` against the `Competition` object (for Text) or individual `Lane` objects (for Lane). The feature panel shows available variable references.
+`TextFeature` and `LaneFeature` use `${path.to.value}` tokens resolved by `resolveTemplate()` in `core/utils/template.util.ts` against the `Competition` object (for Text) or individual `Lane` objects (for Lane). `findUnresolvedTokens()` in the same file identifies missing paths; the feature panel uses it to show inline validation errors when a token doesn't exist in the dummy competition data.
 
 ### Chrono format
 
-`formatChrono(ms)` in `zone.component.ts` outputs `m:ss.t` (tenths of a second). The zone ticks at 100 ms. `parseTimeToMs()` in `live-data.service.ts` parses both `"ss.hh"` and `"m:ss.hh"` formats from the SSE stream.
+`formatChrono(ms)` in `zone-surface.component.ts` outputs `m:ss.t` (tenths of a second). The 100ms tick in `ZoneSurfaceComponent` is skipped when `chronoStopTime` is non-null to avoid unnecessary re-renders after a heat ends. `parseTimeToMs()` in `live-data.service.ts` parses `"ss.hh"`, `"m:ss.hh"`, `"ss"`, and `"m:ss"` formats from the SSE stream.
+
+### API surface
+
+`ApiService` exposes exactly two methods: `getCurrentEventAndHeat()` and `getNextHeats()`. `api.models.ts` defines only the types the app consumes: `EventAndHeatDto`, `LaneDto`, `LaptimeDto`, `SwimTimeMessageType`, `ALL_MESSAGE_TYPES`.
+
+### Feature clipboard
+
+`FeatureClipboardService` backs the clipboard with `sessionStorage` (key `swimtime_clipboard`) so copied features survive a tab reload. The clipboard is scoped to the tab and cleared when the tab closes.
