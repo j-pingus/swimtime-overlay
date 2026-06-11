@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AnyFeature, ChronoFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
 import { FeatureClipboardService } from '../../../core/services/feature-clipboard.service';
+import { CompetitionStore } from '../../../core/services/competition.store';
+import { findUnresolvedTokens } from '../../../core/utils/template.util';
 
 interface ListEntry {
   feature: AnyFeature;
@@ -18,6 +20,7 @@ interface ListEntry {
 })
 export class FeaturePanelComponent {
   private readonly clipboard = inject(FeatureClipboardService);
+  private readonly competitionStore = inject(CompetitionStore);
 
   readonly feature = input<AnyFeature | null>(null);
   readonly features = input<AnyFeature[]>([]);
@@ -103,6 +106,20 @@ export class FeaturePanelComponent {
   protected readonly chronoFeature = computed(() => {
     const f = this.feature();
     return f?.type === 'chrono' ? f : null;
+  });
+
+  protected readonly textTemplateErrors = computed(() => {
+    const txt = this.textFeature();
+    if (!txt) return [];
+    return findUnresolvedTokens(txt.template, this.competitionStore.competition());
+  });
+
+  protected readonly laneTemplateErrors = computed(() => {
+    const ln = this.laneFeature();
+    if (!ln) return [];
+    const lane = this.competitionStore.competition().currentHeat?.lanes?.[0];
+    if (!lane) return [];
+    return findUnresolvedTokens(ln.template, lane);
   });
 
   protected readonly canGroup = computed(() => {

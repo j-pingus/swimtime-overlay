@@ -143,6 +143,9 @@
           [value]="ln.template"
           (change)="patchLane({ template: $any($event.target).value })"
         ></textarea>
+        @if (laneTemplateErrors().length > 0) {
+          <p class="template-error">Unknown variable{{ laneTemplateErrors().length > 1 ? 's' : '' }}: {{ laneTemplateErrors().join(', ') }}</p>
+        }
       </div>
 
       <div class="field-row">
@@ -230,6 +233,9 @@
           [value]="txt.template"
           (change)="patchText({ template: $any($event.target).value })"
         ></textarea>
+        @if (textTemplateErrors().length > 0) {
+          <p class="template-error">Unknown variable{{ textTemplateErrors().length > 1 ? 's' : '' }}: {{ textTemplateErrors().join(', ') }}</p>
+        }
       </div>
 
       <div class="field-row">
