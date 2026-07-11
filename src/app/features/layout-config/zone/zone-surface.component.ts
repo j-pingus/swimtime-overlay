@@ -25,15 +25,19 @@ export interface GroupBounds {
 export class ZoneSurfaceComponent {
   private readonly competitionStore = inject(CompetitionStore);
   private readonly now = signal(Date.now());
+  protected readonly clockNow = signal(new Date());
 
   constructor() {
-    const id = setInterval(() => {
+    const chronoId = setInterval(() => {
       // Skip when the chrono is frozen (stopped heat) — nothing time-sensitive to update.
       if (this.competitionStore.competition().chronoStopTime == null) {
         this.now.set(Date.now());
       }
     }, 100);
-    inject(DestroyRef).onDestroy(() => clearInterval(id));
+    // Wall-clock signal for ${HH}/${MM}/${SS} — runs unconditionally every second.
+    const clockId = setInterval(() => this.clockNow.set(new Date()), 1000);
+    const destroyRef = inject(DestroyRef);
+    destroyRef.onDestroy(() => { clearInterval(chronoId); clearInterval(clockId); });
   }
 
   readonly features = input<AnyFeature[]>([]);
@@ -93,7 +97,7 @@ export class ZoneSurfaceComponent {
   }
 
   protected resolvedDisplayText(f: TextFeature | LaneFeature): string {
-    return resolveTemplate(f.template, this.competitionStore.competition());
+    return resolveTemplate(f.template, this.competitionStore.competition(), this.clockNow());
   }
 
   protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
