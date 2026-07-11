@@ -3,7 +3,7 @@ import {
   viewChild, ElementRef, DestroyRef,
 } from '@angular/core';
 import {
-  AnyFeature, ChronoFeature, GroupFeature, ImageFeature,
+  AnyFeature, ChronoFeature, ClockFeature, GroupFeature, ImageFeature,
   LaneFeature, PolygonFeature, RectFeature, TextFeature, TextAlign, HeatSource,
 } from '../../../core/models/layout.model';
 import { Competition, Lane } from '../../../core/models/domain.models';
@@ -82,6 +82,37 @@ export class ZoneSurfaceComponent {
 
   protected aschrono(f: AnyFeature): ChronoFeature | null {
     return f.type === 'chrono' ? f : null;
+  }
+
+  protected asClock(f: AnyFeature): ClockFeature | null {
+    return f.type === 'clock' ? f : null;
+  }
+
+  protected clockHandLines(f: ClockFeature): {
+    hour:   { x1: number; y1: number; x2: number; y2: number };
+    minute: { x1: number; y1: number; x2: number; y2: number };
+    second: { x1: number; y1: number; x2: number; y2: number };
+  } {
+    const now = this.clockNow();
+    const cx = f.x + f.width / 2;
+    const cy = f.y + f.height / 2;
+    const r = Math.min(f.width, f.height) / 2;
+    const h = now.getHours() % 12;
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+    const hourAngle   = (h + m / 60) * (Math.PI / 6);
+    const minuteAngle = (m + s / 60) * (Math.PI / 30);
+    const secondAngle = s             * (Math.PI / 30);
+    const hand = (angle: number, len: number) => ({
+      x1: cx, y1: cy,
+      x2: cx + len * Math.sin(angle),
+      y2: cy - len * Math.cos(angle),
+    });
+    return {
+      hour:   hand(hourAngle,   r * 0.55),
+      minute: hand(minuteAngle, r * 0.80),
+      second: hand(secondAngle, r * 0.90),
+    };
   }
 
   protected polygonPointsAttr(f: PolygonFeature): string {

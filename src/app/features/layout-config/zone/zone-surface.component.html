@@ -187,6 +187,35 @@
             }
           }
 
+        } @else if (asClock(f); as clk) {
+          @let hands = clockHandLines(clk);
+          <line
+            [attr.x1]="hands.hour.x1"   [attr.y1]="hands.hour.y1"
+            [attr.x2]="hands.hour.x2"   [attr.y2]="hands.hour.y2"
+            [attr.stroke]="clk.color" [attr.stroke-width]="clk.hourHandWidth"
+            stroke-linecap="round"
+          />
+          <line
+            [attr.x1]="hands.minute.x1" [attr.y1]="hands.minute.y1"
+            [attr.x2]="hands.minute.x2" [attr.y2]="hands.minute.y2"
+            [attr.stroke]="clk.color" [attr.stroke-width]="clk.minuteHandWidth"
+            stroke-linecap="round"
+          />
+          <line
+            [attr.x1]="hands.second.x1" [attr.y1]="hands.second.y1"
+            [attr.x2]="hands.second.x2" [attr.y2]="hands.second.y2"
+            [attr.stroke]="clk.color" [attr.stroke-width]="clk.secondHandWidth"
+            stroke-linecap="round"
+          />
+          @if (interactive()) {
+            <rect
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              class="feature-overlay"
+              (mousedown)="onFeatClick($event, f)"
+            />
+          }
+
         } @else if (aschrono(f); as ch) {
           <rect
             [attr.x]="f.x" [attr.y]="f.y"
@@ -220,8 +249,8 @@
           />
         }
 
-        <!-- Label shown in config mode only; suppressed for text-like/rect/polygon (their visuals speak for themselves) -->
-        @if (!asTextLike(f) && !asRect(f) && !asPolygon(f)) {
+        <!-- Label shown in config mode only; suppressed for text-like/rect/polygon/clock (their visuals speak for themselves) -->
+        @if (!asTextLike(f) && !asRect(f) && !asPolygon(f) && !asClock(f)) {
           <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
             {{ f.label }}
           </text>

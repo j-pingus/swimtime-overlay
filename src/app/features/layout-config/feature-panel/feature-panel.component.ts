@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AnyFeature, ChronoFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ChronoFeature, ClockFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
 import { FeatureClipboardService } from '../../../core/services/feature-clipboard.service';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { findUnresolvedTokens } from '../../../core/utils/template.util';
@@ -108,6 +108,11 @@ export class FeaturePanelComponent {
     return f?.type === 'chrono' ? f : null;
   });
 
+  protected readonly clockFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'clock' ? f : null;
+  });
+
   protected readonly textTemplateErrors = computed(() => {
     const txt = this.textFeature();
     if (!txt) return [];
@@ -196,6 +201,12 @@ export class FeaturePanelComponent {
     const f = this.feature();
     if (f?.type !== 'chrono') return;
     this.featureChange.emit({ ...f, ...partial } satisfies ChronoFeature);
+  }
+
+  patchClock(partial: Partial<ClockFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'clock') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies ClockFeature);
   }
 
   patchText(partial: Partial<TextFeature>): void {
@@ -293,7 +304,7 @@ export class FeaturePanelComponent {
 
   typeLabel(f: AnyFeature): string {
     const map: Record<string, string> = {
-      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP', polygon: 'PLY', chrono: 'CHR',
+      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP', polygon: 'PLY', chrono: 'CHR', clock: 'CLK',
     };
     return map[f.type] ?? 'GEN';
   }
