@@ -30,6 +30,7 @@ export class FeaturePanelComponent {
   readonly featureRemove = output<string>();
   readonly featureSelect = output<string>();
   readonly featuresReorder = output<AnyFeature[]>();
+  readonly featuresUpdate = output<AnyFeature[]>();
   readonly featurePaste = output<AnyFeature[]>();
   readonly groupCreate = output<string[]>();
   readonly ungroupFeature = output<string>();
@@ -149,6 +150,20 @@ export class FeaturePanelComponent {
     if (ids.length < 2) return;
     this.checkedIds.set(new Set());
     this.groupCreate.emit(ids);
+  }
+
+  protected alignCenterX(): void {
+    const checked = this.features().filter(f => this.checkedIds().has(f.id) && !f.groupId);
+    if (checked.length < 2) return;
+    const avgCx = checked.reduce((sum, f) => sum + f.x + f.width / 2, 0) / checked.length;
+    this.featuresUpdate.emit(checked.map(f => ({ ...f, x: Math.round(avgCx - f.width / 2) })));
+  }
+
+  protected alignCenterY(): void {
+    const checked = this.features().filter(f => this.checkedIds().has(f.id) && !f.groupId);
+    if (checked.length < 2) return;
+    const avgCy = checked.reduce((sum, f) => sum + f.y + f.height / 2, 0) / checked.length;
+    this.featuresUpdate.emit(checked.map(f => ({ ...f, y: Math.round(avgCy - f.height / 2) })));
   }
 
   protected ungroup(groupId: string): void {
