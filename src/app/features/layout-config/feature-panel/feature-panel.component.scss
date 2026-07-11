@@ -244,6 +244,22 @@ h3 {
   &:hover { background: #e6b400; }
 }
 
+.btn-icon-align {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #ccc;
+  cursor: pointer;
+
+  &:hover { border-color: #aaa; color: #fff; }
+}
+
 .btn-ungroup {
   flex: 1;
   padding: 0.5rem;

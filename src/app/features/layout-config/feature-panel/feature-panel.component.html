@@ -467,8 +467,20 @@
       <h2>Features</h2>
       @if (canGroup()) {
         <button class="btn-group" (click)="createGroup()">Group selected</button>
-        <button class="btn-align" title="Align vertical centres" (click)="alignCenterX()">Align V</button>
-        <button class="btn-align" title="Align horizontal centres" (click)="alignCenterY()">Align H</button>
+        <button class="btn-icon-align" title="Align vertical centres (same centre X)" (click)="alignCenterX()">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+            <rect x="2"  y="2" width="12" height="4" rx="0.5" fill="currentColor"/>
+            <rect x="4" y="10" width="8"  height="4" rx="0.5" fill="currentColor"/>
+            <line x1="8" y1="0" x2="8" y2="16" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
+          </svg>
+        </button>
+        <button class="btn-icon-align" title="Align horizontal centres (same centre Y)" (click)="alignCenterY()">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+            <rect x="2"  y="2" width="4" height="12" rx="0.5" fill="currentColor"/>
+            <rect x="10" y="4" width="4" height="8"  rx="0.5" fill="currentColor"/>
+            <line x1="0" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
+          </svg>
+        </button>
       }
       @if (hasClipboard()) {
         <button class="btn-paste" (click)="paste()">Paste</button>
