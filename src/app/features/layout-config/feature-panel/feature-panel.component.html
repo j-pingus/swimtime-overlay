@@ -467,6 +467,8 @@
       <h2>Features</h2>
       @if (canGroup()) {
         <button class="btn-group" (click)="createGroup()">Group selected</button>
+        <button class="btn-align" title="Align vertical centres" (click)="alignCenterX()">Align V</button>
+        <button class="btn-align" title="Align horizontal centres" (click)="alignCenterY()">Align H</button>
       }
       @if (hasClipboard()) {
         <button class="btn-paste" (click)="paste()">Paste</button>
