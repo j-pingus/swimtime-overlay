@@ -7,6 +7,7 @@
       : f.type === 'rect'  ? 'Rectangle'
       : f.type === 'lane'  ? 'Lane text'
       : f.type === 'chrono' ? 'Chrono'
+      : f.type === 'clock'  ? 'Clock'
       : 'Feature'
     }}</h2>
 
@@ -372,6 +373,36 @@
           (click)="patchChrono({ align: 'center' })">Center</button>
         <button class="btn-align" [class.active]="ch.align === 'right'"
           (click)="patchChrono({ align: 'right' })">Right</button>
+      </div>
+    }
+
+    @if (clockFeature(); as clk) {
+      <h3>Hands</h3>
+
+      <div class="field-row">
+        <div class="field field--color">
+          <label>Color</label>
+          <input type="color" [value]="clk.color"
+            (input)="patchClock({ color: $any($event.target).value })" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Hour width</label>
+          <input type="number" [value]="clk.hourHandWidth" min="1" max="50"
+            (change)="patchClock({ hourHandWidth: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field">
+          <label>Min width</label>
+          <input type="number" [value]="clk.minuteHandWidth" min="1" max="50"
+            (change)="patchClock({ minuteHandWidth: asNumber($any($event.target).value) })" />
+        </div>
+        <div class="field">
+          <label>Sec width</label>
+          <input type="number" [value]="clk.secondHandWidth" min="1" max="50"
+            (change)="patchClock({ secondHandWidth: asNumber($any($event.target).value) })" />
+        </div>
       </div>
     }
 

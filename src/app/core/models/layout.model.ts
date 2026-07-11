@@ -1,4 +1,4 @@
-export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group' | 'polygon' | 'chrono';
+export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group' | 'polygon' | 'chrono' | 'clock';
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -99,7 +99,15 @@ export interface ChronoFeature extends FeatureBase {
   outlineWidth: number;
 }
 
-export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature | ChronoFeature;
+export interface ClockFeature extends FeatureBase {
+  type: 'clock';
+  color: string;
+  hourHandWidth: number;
+  minuteHandWidth: number;
+  secondHandWidth: number;
+}
+
+export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature | ChronoFeature | ClockFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;
