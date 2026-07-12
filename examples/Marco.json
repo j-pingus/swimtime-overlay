@@ -1,0 +1,500 @@
+{
+  "id": "9a883f91-b9a9-4a3a-aa42-d4a1cbb8c549",
+  "name": "Marco's",
+  "createdAt": 1780258043774,
+  "features": [
+    {
+      "type": "group",
+      "id": "3fc9eb3e-2a09-47ab-a0ec-5f2b2a0d9c55",
+      "label": "Group 1",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "f1faeb5a-47c3-4b37-80c7-ed9448ecff62",
+      "label": "Feature 22",
+      "x": 340,
+      "y": 76,
+      "width": 1579,
+      "height": 149,
+      "type": "polygon",
+      "bgColor": "#000000",
+      "bgOpacity": 25,
+      "points": [
+        {
+          "x": 340,
+          "y": 76
+        },
+        {
+          "x": 1919,
+          "y": 183
+        },
+        {
+          "x": 1916,
+          "y": 225
+        },
+        {
+          "x": 340,
+          "y": 163
+        }
+      ],
+      "groupId": "3fc9eb3e-2a09-47ab-a0ec-5f2b2a0d9c55"
+    },
+    {
+      "id": "01298dea-8454-486f-9904-d1944bb568dd",
+      "label": "Feature 22",
+      "x": 339,
+      "y": 182,
+      "width": 1594,
+      "height": 124,
+      "type": "polygon",
+      "bgColor": "#000000",
+      "bgOpacity": 25,
+      "points": [
+        {
+          "x": 339,
+          "y": 182
+        },
+        {
+          "x": 1933,
+          "y": 247
+        },
+        {
+          "x": 1924,
+          "y": 306
+        },
+        {
+          "x": 339,
+          "y": 285
+        }
+      ],
+      "groupId": "3fc9eb3e-2a09-47ab-a0ec-5f2b2a0d9c55"
+    },
+    {
+      "id": "cc7e5a64-b304-4bc7-b2e9-5884264bf414",
+      "label": "Feature 22",
+      "x": 342,
+      "y": 310,
+      "width": 1592,
+      "height": 164,
+      "type": "polygon",
+      "bgColor": "#000000",
+      "bgOpacity": 25,
+      "points": [
+        {
+          "x": 342,
+          "y": 310
+        },
+        {
+          "x": 1928,
+          "y": 320
+        },
+        {
+          "x": 1934,
+          "y": 430
+        },
+        {
+          "x": 342,
+          "y": 474
+        }
+      ],
+      "groupId": "3fc9eb3e-2a09-47ab-a0ec-5f2b2a0d9c55"
+    },
+    {
+      "id": "5cff7a68-4dbf-4c85-adf5-e817039847b2",
+      "label": "Feature 22",
+      "x": 345,
+      "y": 461,
+      "width": 1579,
+      "height": 297,
+      "type": "polygon",
+      "bgColor": "#000000",
+      "bgOpacity": 25,
+      "points": [
+        {
+          "x": 345,
+          "y": 501
+        },
+        {
+          "x": 1924,
+          "y": 461
+        },
+        {
+          "x": 1924,
+          "y": 602
+        },
+        {
+          "x": 352,
+          "y": 758
+        }
+      ],
+      "groupId": "3fc9eb3e-2a09-47ab-a0ec-5f2b2a0d9c55"
+    },
+    {
+      "id": "f50fb040-cb00-4551-963e-257e101dce31",
+      "label": "Feature 22",
+      "x": 357,
+      "y": 643,
+      "width": 1570,
+      "height": 438,
+      "type": "polygon",
+      "bgColor": "#000000",
+      "bgOpacity": 25,
+      "points": [
+        {
+          "x": 357,
+          "y": 825
+        },
+        {
+          "x": 1927,
+          "y": 643
+        },
+        {
+          "x": 1927,
+          "y": 906
+        },
+        {
+          "x": 1056,
+          "y": 1079
+        },
+        {
+          "x": 365,
+          "y": 1081
+        }
+      ],
+      "groupId": "3fc9eb3e-2a09-47ab-a0ec-5f2b2a0d9c55"
+    },
+    {
+      "type": "group",
+      "id": "ac7a728f-b0fd-4d2a-a7d5-e41283248538",
+      "label": "Group 1",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "b3305882-7263-4615-93dc-20296904d8c4",
+      "label": "Lane1",
+      "x": 381,
+      "y": 832,
+      "width": 173,
+      "height": 190,
+      "type": "text",
+      "template": "1",
+      "fontSize": 180,
+      "color": "#75e3ff",
+      "bold": true,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 7,
+      "rotation": 352,
+      "groupId": "ac7a728f-b0fd-4d2a-a7d5-e41283248538"
+    },
+    {
+      "id": "703e9036-f4ed-4a2a-bb2a-98664ff1eabc",
+      "label": "Swimmer 1",
+      "x": 511,
+      "y": 754,
+      "width": 1019,
+      "height": 90,
+      "type": "text",
+      "template": "${currentHeat.lanes.0.swimmerName}",
+      "fontSize": 77,
+      "color": "#ffffff",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 352,
+      "groupId": "ac7a728f-b0fd-4d2a-a7d5-e41283248538"
+    },
+    {
+      "id": "48cd1ddf-6326-40d3-84e3-e775d2fb3b99",
+      "label": "Club 1",
+      "x": 524,
+      "y": 853,
+      "width": 1019,
+      "height": 90,
+      "type": "text",
+      "template": "${currentHeat.lanes.0.club}",
+      "fontSize": 61,
+      "color": "#ffef42",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 352,
+      "groupId": "ac7a728f-b0fd-4d2a-a7d5-e41283248538"
+    },
+    {
+      "type": "group",
+      "id": "2e9c0a90-c0fe-40ee-8902-62bc8314e049",
+      "label": "Group 2",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "da266eb4-fe26-4d57-a41c-eaea74ffef95",
+      "label": "Lane 2",
+      "x": 372,
+      "y": 538,
+      "width": 171,
+      "height": 163,
+      "type": "text",
+      "template": "2",
+      "fontSize": 150,
+      "color": "#75e3ff",
+      "bold": true,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 7,
+      "rotation": 357,
+      "groupId": "2e9c0a90-c0fe-40ee-8902-62bc8314e049"
+    },
+    {
+      "id": "63f911fd-5dbb-4c22-9d68-81178b4019b1",
+      "label": "Swimmer 2",
+      "x": 497,
+      "y": 510,
+      "width": 1019,
+      "height": 90,
+      "type": "text",
+      "template": "${currentHeat.lanes.1.swimmerName}",
+      "fontSize": 77,
+      "color": "#ffffff",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 357,
+      "groupId": "2e9c0a90-c0fe-40ee-8902-62bc8314e049"
+    },
+    {
+      "id": "1d803cf0-3968-4efe-97b1-910650fecdab",
+      "label": "Club 2",
+      "x": 500,
+      "y": 610,
+      "width": 1019,
+      "height": 62,
+      "type": "text",
+      "template": "${currentHeat.lanes.1.club}",
+      "fontSize": 56,
+      "color": "#ffef42",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 357,
+      "groupId": "2e9c0a90-c0fe-40ee-8902-62bc8314e049"
+    },
+    {
+      "type": "group",
+      "id": "7135d702-828f-446c-955c-b5a8dfbfaf12",
+      "label": "Group 3",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "49092b3a-1840-4cbc-8720-dc861c2ed940",
+      "label": "Lane 3",
+      "x": 363,
+      "y": 311,
+      "width": 155,
+      "height": 147,
+      "type": "text",
+      "template": "3",
+      "fontSize": 124,
+      "color": "#75e3ff",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 7,
+      "rotation": 359,
+      "groupId": "7135d702-828f-446c-955c-b5a8dfbfaf12"
+    },
+    {
+      "id": "f79cffe9-a92d-436d-833a-bd892a3c5aed",
+      "label": "Swimmer 3",
+      "x": 485,
+      "y": 302,
+      "width": 1019,
+      "height": 90,
+      "type": "text",
+      "template": "${currentHeat.lanes.2.swimmerName}",
+      "fontSize": 70,
+      "color": "#ffffff",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 359,
+      "groupId": "7135d702-828f-446c-955c-b5a8dfbfaf12"
+    },
+    {
+      "id": "84d8ecdf-9a4a-42bb-8935-1d7f6e7fe425",
+      "label": "Club 3",
+      "x": 489,
+      "y": 392,
+      "width": 1019,
+      "height": 56,
+      "type": "text",
+      "template": "${currentHeat.lanes.2.club}",
+      "fontSize": 46,
+      "color": "#ffef42",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 359,
+      "groupId": "7135d702-828f-446c-955c-b5a8dfbfaf12"
+    },
+    {
+      "type": "group",
+      "id": "764f1822-3ee6-4d5a-89f4-ac1b8e169ed4",
+      "label": "Group 4",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "578ce96d-48fd-4c78-bcb8-45bd49100a90",
+      "label": "Lane 4",
+      "x": 370,
+      "y": 175,
+      "width": 142,
+      "height": 126,
+      "type": "text",
+      "template": "4",
+      "fontSize": 101,
+      "color": "#75e3ff",
+      "bold": true,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 2,
+      "groupId": "764f1822-3ee6-4d5a-89f4-ac1b8e169ed4"
+    },
+    {
+      "id": "6ee3c1d3-3291-495b-8bd2-257f1ee065d9",
+      "label": "Swimmer 4",
+      "x": 480,
+      "y": 199,
+      "width": 1019,
+      "height": 63,
+      "type": "text",
+      "template": "${currentHeat.lanes.3.swimmerName}",
+      "fontSize": 53,
+      "color": "#ffffff",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 2,
+      "groupId": "764f1822-3ee6-4d5a-89f4-ac1b8e169ed4"
+    },
+    {
+      "id": "60d7bd69-3209-43e6-9c0d-9508102b84d1",
+      "label": "Club 4",
+      "x": 477,
+      "y": 256,
+      "width": 1019,
+      "height": 46,
+      "type": "text",
+      "template": "${currentHeat.lanes.3.club}",
+      "fontSize": 36,
+      "color": "#ffef42",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 2,
+      "groupId": "764f1822-3ee6-4d5a-89f4-ac1b8e169ed4"
+    },
+    {
+      "type": "group",
+      "id": "09e50b1f-dbbb-48db-b9ed-d64c30775526",
+      "label": "Group 5",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "1b561cf7-13f1-4fa6-9417-27f34dc95372",
+      "label": "Lane 5",
+      "x": 366,
+      "y": 70,
+      "width": 103,
+      "height": 98,
+      "type": "text",
+      "template": "5",
+      "fontSize": 78,
+      "color": "#75e3ff",
+      "bold": true,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 4,
+      "groupId": "09e50b1f-dbbb-48db-b9ed-d64c30775526"
+    },
+    {
+      "id": "668bca6d-4c28-4cf1-a26d-75cd10daf59e",
+      "label": "Swimmer 5",
+      "x": 483,
+      "y": 117,
+      "width": 1019,
+      "height": 55,
+      "type": "text",
+      "template": "${currentHeat.lanes.4.swimmerName}",
+      "fontSize": 45,
+      "color": "#ffffff",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 4,
+      "groupId": "09e50b1f-dbbb-48db-b9ed-d64c30775526"
+    },
+    {
+      "id": "643ea984-0c08-4586-b372-791fb387ffd5",
+      "label": "Club 5",
+      "x": 481,
+      "y": 154,
+      "width": 1011,
+      "height": 45,
+      "type": "text",
+      "template": "${currentHeat.lanes.4.club}",
+      "fontSize": 35,
+      "color": "#ffef42",
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "outlineColor": "#000000",
+      "outlineWidth": 5,
+      "rotation": 4,
+      "groupId": "09e50b1f-dbbb-48db-b9ed-d64c30775526"
+    }
+  ]
+}
