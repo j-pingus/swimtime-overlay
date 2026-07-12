@@ -137,7 +137,7 @@ export class LayoutListComponent {
 }
 
 const KNOWN_FEATURE_TYPES = new Set([
-  'generic', 'image', 'text', 'rect', 'lane', 'group', 'polygon', 'chrono',
+  'generic', 'image', 'text', 'rect', 'lane', 'group', 'polygon', 'chrono', 'clock',
 ]);
 
 function isValidFeature(f: unknown): boolean {
