@@ -58,6 +58,20 @@
     }
   }
 
+  .font-picker {
+    flex-shrink: 0;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-family: sans-serif;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+
+    &:focus { outline: none; border-color: #0070f3; }
+  }
+
   .add-menu-wrapper {
     flex-shrink: 0;
     position: relative;

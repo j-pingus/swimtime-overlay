@@ -38,6 +38,7 @@
           <text
             [attr.x]="bounds.x - GROUP_PAD + 4"
             [attr.y]="bounds.y - GROUP_PAD - 6"
+            [attr.font-family]="fontFamily()"
             class="group-label"
           >{{ g.label }}</text>
           @if (g.id === selectedFeatureId()) {
@@ -137,6 +138,7 @@
                   [attr.x]="textX(tl)"
                   [attr.y]="row.y"
                   dominant-baseline="central"
+                  [attr.font-family]="fontFamily()"
                   [attr.font-size]="tl.fontSize"
                   [attr.fill]="tl.color"
                   [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
@@ -154,6 +156,7 @@
                 [attr.x]="textX(tl)"
                 [attr.y]="f.y + f.height / 2"
                 dominant-baseline="central"
+                [attr.font-family]="fontFamily()"
                 [attr.font-size]="tl.fontSize"
                 [attr.fill]="tl.color"
                 [attr.font-weight]="tl.bold ? 'bold' : 'normal'"
@@ -216,6 +219,26 @@
             />
           }
 
+        } @else if (asFlag(f); as flag) {
+          @for (row of flagRows(flag); track $index) {
+            @if (row.url) {
+              <image
+                [attr.href]="row.url"
+                [attr.x]="f.x" [attr.y]="row.y"
+                [attr.width]="f.width" [attr.height]="row.h"
+                preserveAspectRatio="xMidYMid meet"
+              />
+            }
+          }
+          @if (interactive()) {
+            <rect
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              class="feature-overlay"
+              (mousedown)="onFeatClick($event, f)"
+            />
+          }
+
         } @else if (aschrono(f); as ch) {
           <rect
             [attr.x]="f.x" [attr.y]="f.y"
@@ -227,6 +250,7 @@
             [attr.x]="textX(ch)"
             [attr.y]="f.y + f.height / 2"
             dominant-baseline="central"
+            [attr.font-family]="fontFamily()"
             [attr.font-size]="ch.fontSize"
             [attr.fill]="ch.color"
             [attr.font-weight]="ch.bold ? 'bold' : 'normal'"
@@ -250,8 +274,8 @@
         }
 
         <!-- Label shown in config mode only; suppressed for text-like/rect/polygon/clock (their visuals speak for themselves) -->
-        @if (!asTextLike(f) && !asRect(f) && !asPolygon(f) && !asClock(f)) {
-          <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" class="feature-label">
+        @if (!asTextLike(f) && !asRect(f) && !asPolygon(f) && !asClock(f) && !asFlag(f)) {
+          <text [attr.x]="f.x + 10" [attr.y]="f.y + 36" [attr.font-family]="fontFamily()" class="feature-label">
             {{ f.label }}
           </text>
         }

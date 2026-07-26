@@ -1,4 +1,5 @@
-export type FeatureType = 'generic' | 'image' | 'text' | 'rect' | 'lane' | 'group' | 'polygon' | 'chrono' | 'clock';
+export const ALL_FEATURE_TYPES = ['generic', 'image', 'text', 'rect', 'lane', 'flag', 'group', 'polygon', 'chrono', 'clock'] as const;
+export type FeatureType = typeof ALL_FEATURE_TYPES[number];
 export type TextAlign = 'left' | 'center' | 'right';
 
 interface FeatureBase {
@@ -88,6 +89,14 @@ export interface LaneFeature extends FeatureBase {
   heatSource: HeatSource;
 }
 
+export interface FlagFeature extends FeatureBase {
+  type: 'flag';
+  /** Which heat's lanes to display. Defaults to 'current'. */
+  heatSource: HeatSource;
+  /** Hide flag this many seconds after lane timestamp. Null = always show. */
+  displayDuration: number | null;
+}
+
 export interface ChronoFeature extends FeatureBase {
   type: 'chrono';
   fontSize: number;
@@ -107,7 +116,7 @@ export interface ClockFeature extends FeatureBase {
   secondHandWidth: number;
 }
 
-export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | PolygonFeature | ChronoFeature | ClockFeature;
+export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeature | RectFeature | LaneFeature | FlagFeature | PolygonFeature | ChronoFeature | ClockFeature;
 
 /** Backward-compat alias used throughout the app. */
 export type BaseFeature = AnyFeature;
@@ -121,9 +130,21 @@ export interface MessageTypeRule {
 /** Keyed by SwimTimeMessageType string — loose-typed to avoid importing API models here. */
 export type MessageTypeRules = Record<string, MessageTypeRule>;
 
+export const RENDER_FONTS: { label: string; value: string; googleFont: string | null }[] = [
+  { label: 'System (sans-serif)', value: 'sans-serif',       googleFont: null },
+  { label: 'Inter',               value: 'Inter',            googleFont: 'Inter:wght@400;700' },
+  { label: 'Roboto',              value: 'Roboto',           googleFont: 'Roboto:wght@400;700' },
+  { label: 'Oswald',              value: 'Oswald',           googleFont: 'Oswald:wght@400;700' },
+  { label: 'Barlow Condensed',    value: 'Barlow Condensed', googleFont: 'Barlow+Condensed:wght@400;700' },
+  { label: 'Bebas Neue',          value: 'Bebas Neue',       googleFont: 'Bebas+Neue' },
+  { label: 'Montserrat',          value: 'Montserrat',       googleFont: 'Montserrat:wght@400;700' },
+  { label: 'Rajdhani',            value: 'Rajdhani',         googleFont: 'Rajdhani:wght@400;700' },
+];
+
 export interface Layout {
   id: string;
   name: string;
   createdAt: number;
   features: AnyFeature[];
+  fontFamily: string;
 }

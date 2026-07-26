@@ -7,6 +7,7 @@ import { LayoutSyncService } from './core/services/layout-sync.service';
 import { CompetitionSyncService } from './core/services/competition-sync.service';
 import { CompetitionStore } from './core/services/competition.store';
 import { LiveDataService } from './core/services/live-data.service';
+import { FontLoaderService } from './core/services/font-loader.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
         const liveData = inject(LiveDataService);
         inject(LayoutSyncService);
         inject(CompetitionSyncService);
+        inject(FontLoaderService);
         return async () => {
           await layoutStore.init();
           // Restore live SSE subscriptions if the user had live mode active before the reload.

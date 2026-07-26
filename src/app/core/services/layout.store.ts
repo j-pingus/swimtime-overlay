@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, MessageTypeRule, MessageTypeRules, TextFeature } from '../models/layout.model';
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 export type LayoutStoreState = {
   schemaVersion?: number;
@@ -93,6 +93,7 @@ export class LayoutStore {
       name: name.trim(),
       createdAt: Date.now(),
       features: [],
+      fontFamily: 'sans-serif',
     };
     this.update((s) => ({
       ...s,
@@ -151,6 +152,13 @@ export class LayoutStore {
     this.update((s) => ({
       ...s,
       layouts: s.layouts.map((l) => l.id === id ? { ...l, name } : l),
+    }));
+  }
+
+  updateLayoutFont(id: string, fontFamily: string): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) => l.id === id ? { ...l, fontFamily } : l),
     }));
   }
 
@@ -338,7 +346,15 @@ export class LayoutStore {
       };
     }
 
-    // Future migrations: if (from < 2) { ... }
+    if (from < 2) {
+      state = {
+        ...state,
+        layouts: state.layouts.map((l) => ({
+          ...l,
+          fontFamily: (l as Layout & { fontFamily?: string }).fontFamily ?? 'sans-serif',
+        })),
+      };
+    }
 
     return { ...state, schemaVersion: SCHEMA_VERSION };
   }

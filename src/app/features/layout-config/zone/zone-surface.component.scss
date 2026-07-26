@@ -46,7 +46,6 @@ svg {
 .feature-label {
   fill: #ccc;
   font-size: 28px;
-  font-family: sans-serif;
   pointer-events: none;
 
   .selected & {
@@ -84,7 +83,6 @@ svg {
 
 // Actual SVG text — pointer-events off so clicks fall through to the .text-bg hit area.
 .text-content {
-  font-family: sans-serif;
   pointer-events: none;
 }
 
@@ -133,7 +131,6 @@ svg {
 .group-label {
   fill: rgba(255, 200, 0, 0.7);
   font-size: 22px;
-  font-family: sans-serif;
   pointer-events: none;
 
   svg:not(.is-interactive) & {

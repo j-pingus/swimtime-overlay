@@ -3,12 +3,13 @@ import {
   viewChild, ElementRef, DestroyRef,
 } from '@angular/core';
 import {
-  AnyFeature, ChronoFeature, ClockFeature, GroupFeature, ImageFeature,
+  AnyFeature, ChronoFeature, ClockFeature, FlagFeature, GroupFeature, ImageFeature,
   LaneFeature, PolygonFeature, RectFeature, TextFeature, TextAlign, HeatSource,
 } from '../../../core/models/layout.model';
 import { Competition, Lane } from '../../../core/models/domain.models';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { resolveTemplate } from '../../../core/utils/template.util';
+import { flagUrl } from '../../../core/utils/flag.util';
 
 export interface GroupBounds {
   x: number;
@@ -44,6 +45,7 @@ export class ZoneSurfaceComponent {
   readonly groupBoundsMap = input<Map<string, GroupBounds>>(new Map());
   readonly selectedFeatureId = input<string | null>(null);
   readonly interactive = input<boolean>(true);
+  readonly fontFamily = input<string>('sans-serif');
 
   readonly bgClick = output<void>();
   readonly featureClick = output<{ event: MouseEvent; feature: AnyFeature }>();
@@ -88,6 +90,10 @@ export class ZoneSurfaceComponent {
     return f.type === 'clock' ? f : null;
   }
 
+  protected asFlag(f: AnyFeature): FlagFeature | null {
+    return f.type === 'flag' ? f : null;
+  }
+
   protected clockHandLines(f: ClockFeature): {
     hour:   { x1: number; y1: number; x2: number; y2: number };
     minute: { x1: number; y1: number; x2: number; y2: number };
@@ -129,6 +135,23 @@ export class ZoneSurfaceComponent {
 
   protected resolvedDisplayText(f: TextFeature | LaneFeature): string {
     return resolveTemplate(f.template, this.competitionStore.competition(), this.clockNow());
+  }
+
+  protected flagRows(f: FlagFeature): Array<{ y: number; h: number; url: string | null }> {
+    const lanes = resolveLanes(this.competitionStore.competition(), f.heatSource);
+    const now = this.now();
+    const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
+    return lanes.map((lane, i) => {
+      const expired =
+        f.displayDuration != null &&
+        lane.timestamp != null &&
+        now - lane.timestamp > f.displayDuration * 1000;
+      return {
+        y: f.y + i * rowH,
+        h: rowH,
+        url: expired ? null : flagUrl(lane.nat),
+      };
+    });
   }
 
   protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {

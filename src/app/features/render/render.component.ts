@@ -14,4 +14,8 @@ export class RenderComponent {
   protected readonly features = computed(
     () => this.store.activeLayout()?.features ?? [],
   );
+
+  protected readonly fontFamily = computed(
+    () => this.store.activeLayout()?.fontFamily ?? 'sans-serif',
+  );
 }

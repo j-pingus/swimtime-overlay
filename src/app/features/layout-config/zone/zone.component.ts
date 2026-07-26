@@ -46,6 +46,7 @@ export class ZoneComponent {
   readonly features = input<BaseFeature[]>([]);
   readonly selectedFeatureId = input<string | null>(null);
   readonly interactive = input<boolean>(true);
+  readonly fontFamily = input<string>('sans-serif');
 
   readonly featureSelect = output<string | null>();
   readonly featureUpdate = output<BaseFeature>();

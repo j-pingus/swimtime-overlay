@@ -10,6 +10,11 @@
           [value]="layout.name"
           (change)="renameLayout($any($event.target).value)"
         />
+        <select class="font-picker" (change)="updateFont($any($event.target).value)">
+          @for (font of RENDER_FONTS; track font.value) {
+            <option [value]="font.value" [selected]="fontFamily() === font.value" [style.font-family]="font.value">{{ font.label }}</option>
+          }
+        </select>
         <div class="add-menu-wrapper">
           <button class="btn-add" (click)="showAddMenu.set(!showAddMenu())">+ Add feature</button>
           @if (showAddMenu()) {
@@ -18,6 +23,7 @@
               <button (click)="addFeature('text')">Text</button>
               <button (click)="addFeature('rect')">Rectangle</button>
               <button (click)="addFeature('lane')">Lane text</button>
+              <button (click)="addFeature('flag')">Flag</button>
               <button (click)="addFeature('polygon')">Polygon</button>
               <button (click)="addFeature('chrono')">Chrono</button>
               <button (click)="addFeature('clock')">Clock</button>
@@ -30,6 +36,7 @@
         <app-zone
           [features]="features()"
           [selectedFeatureId]="selectedId()"
+          [fontFamily]="fontFamily()"
           (featureSelect)="onFeatureSelect($event)"
           (featureUpdate)="onFeatureUpdate($event)"
           (featuresUpdate)="onFeaturesUpdate($event)"

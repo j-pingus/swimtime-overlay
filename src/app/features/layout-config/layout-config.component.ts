@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { LayoutStore } from '../../core/services/layout.store';
-import { AnyFeature, FeatureType } from '../../core/models/layout.model';
+import { AnyFeature, FeatureType, RENDER_FONTS } from '../../core/models/layout.model';
 import { ZoneComponent } from './zone/zone.component';
 import { FeaturePanelComponent } from './feature-panel/feature-panel.component';
 
@@ -27,6 +27,8 @@ export class LayoutConfigComponent {
   });
 
   protected readonly features = computed(() => this.layout()?.features ?? []);
+  protected readonly fontFamily = computed(() => this.layout()?.fontFamily ?? 'sans-serif');
+  protected readonly RENDER_FONTS = RENDER_FONTS;
 
   protected readonly selectedId = signal<string | null>(null);
   protected readonly showAddMenu = signal(false);
@@ -46,6 +48,11 @@ export class LayoutConfigComponent {
     if (id && name.trim()) this.store.renameLayout(id, name.trim());
   }
 
+  updateFont(value: string): void {
+    const id = this.id();
+    if (id) this.store.updateLayoutFont(id, value);
+  }
+
   addFeature(type: FeatureType): void {
     const layoutId = this.id();
     if (!layoutId) return;
@@ -61,6 +68,7 @@ export class LayoutConfigComponent {
       : type === 'text' ? { ...base, type: 'text', template: 'Text', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, outlineWidth: 2, rotation: 0 }
       : type === 'rect' ? { ...base, type: 'rect', bgColor: '#000000', bgOpacity: 50, border: false, borderColor: '#ffffff', borderWidth: 2, borderRadius: 0, padding: 0 }
       : type === 'lane' ? { ...base, type: 'lane', template: '${swimmerName}', fontSize: 60, color: '#ffffff', bold: false, italic: false, align: 'left', outlineColor: null, outlineWidth: 2, displayDuration: null, heatSource: 'current' as const }
+      : type === 'flag' ? { ...base, type: 'flag', heatSource: 'current' as const, displayDuration: null }
       : type === 'polygon' ? { ...base, type: 'polygon', bgColor: '#000000', bgOpacity: 50, points: [
           { x: base.x,              y: base.y },
           { x: base.x + base.width, y: base.y },
