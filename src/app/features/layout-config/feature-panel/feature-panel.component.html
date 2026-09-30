@@ -6,6 +6,7 @@
       : f.type === 'text'  ? 'Text'
       : f.type === 'rect'  ? 'Rectangle'
       : f.type === 'lane'  ? 'Lane text'
+      : f.type === 'flag'  ? 'Flag'
       : f.type === 'chrono' ? 'Chrono'
       : f.type === 'clock'  ? 'Clock'
       : 'Feature'
@@ -403,6 +404,36 @@
           <input type="number" [value]="clk.secondHandWidth" min="1" max="50"
             (change)="patchClock({ secondHandWidth: asNumber($any($event.target).value) })" />
         </div>
+      </div>
+    }
+
+    @if (flagFeature(); as flag) {
+      <h3>Heat</h3>
+
+      <div class="field">
+        <label>Source</label>
+        <select [value]="flag.heatSource" (change)="patchFlag({ heatSource: $any($any($event.target).value) })">
+          <option value="current">Current heat</option>
+          <option value="next0">Next heat 1</option>
+          <option value="next1">Next heat 2</option>
+          <option value="next2">Next heat 3</option>
+        </select>
+      </div>
+
+      <h3>Display duration</h3>
+      <div class="field-row field-row--center">
+        <label class="toggle-label">
+          <input type="checkbox" [checked]="flag.displayDuration !== null"
+            (change)="patchFlag({ displayDuration: $any($event.target).checked ? 10 : null })" />
+          Expire after
+        </label>
+        @if (flag.displayDuration !== null) {
+          <div class="field field--inline">
+            <input type="number" [value]="flag.displayDuration" min="1"
+              (change)="patchFlag({ displayDuration: asNumber($any($event.target).value) })" />
+            <label>s</label>
+          </div>
+        }
       </div>
     }
 

@@ -5,7 +5,7 @@ import { LayoutStore } from '../../core/services/layout.store';
 import { CompetitionStore } from '../../core/services/competition.store';
 import { LiveDataService } from '../../core/services/live-data.service';
 import { ALL_MESSAGE_TYPES } from '../../core/api/api.models';
-import { Layout } from '../../core/models/layout.model';
+import { Layout, ALL_FEATURE_TYPES } from '../../core/models/layout.model';
 
 @Component({
   selector: 'app-layout-list',
@@ -136,9 +136,7 @@ export class LayoutListComponent {
   }
 }
 
-const KNOWN_FEATURE_TYPES = new Set([
-  'generic', 'image', 'text', 'rect', 'lane', 'group', 'polygon', 'chrono', 'clock',
-]);
+const KNOWN_FEATURE_TYPES = new Set<string>(ALL_FEATURE_TYPES);
 
 function isValidFeature(f: unknown): boolean {
   if (!f || typeof f !== 'object') return false;

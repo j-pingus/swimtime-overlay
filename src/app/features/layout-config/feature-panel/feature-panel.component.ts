@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AnyFeature, ChronoFeature, ClockFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
+import { AnyFeature, ChronoFeature, ClockFeature, FlagFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
 import { FeatureClipboardService } from '../../../core/services/feature-clipboard.service';
 import { CompetitionStore } from '../../../core/services/competition.store';
 import { findUnresolvedTokens } from '../../../core/utils/template.util';
@@ -114,6 +114,11 @@ export class FeaturePanelComponent {
     return f?.type === 'clock' ? f : null;
   });
 
+  protected readonly flagFeature = computed(() => {
+    const f = this.feature();
+    return f?.type === 'flag' ? f : null;
+  });
+
   protected readonly textTemplateErrors = computed(() => {
     const txt = this.textFeature();
     if (!txt) return [];
@@ -218,6 +223,12 @@ export class FeaturePanelComponent {
     this.featureChange.emit({ ...f, ...partial } satisfies ChronoFeature);
   }
 
+  patchFlag(partial: Partial<FlagFeature>): void {
+    const f = this.feature();
+    if (f?.type !== 'flag') return;
+    this.featureChange.emit({ ...f, ...partial } satisfies FlagFeature);
+  }
+
   patchClock(partial: Partial<ClockFeature>): void {
     const f = this.feature();
     if (f?.type !== 'clock') return;
@@ -319,7 +330,7 @@ export class FeaturePanelComponent {
 
   typeLabel(f: AnyFeature): string {
     const map: Record<string, string> = {
-      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', generic: 'GEN', group: 'GRP', polygon: 'PLY', chrono: 'CHR', clock: 'CLK',
+      image: 'IMG', text: 'TXT', rect: 'RCT', lane: 'LAN', flag: 'FLG', generic: 'GEN', group: 'GRP', polygon: 'PLY', chrono: 'CHR', clock: 'CLK',
     };
     return map[f.type] ?? 'GEN';
   }
