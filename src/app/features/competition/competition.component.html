@@ -1,0 +1,87 @@
+<div class="competition-shell">
+  <header class="page-header">
+    <a routerLink="/layouts" class="back-link">← Layouts</a>
+    @if (competitionInfo(); as info) {
+      <h1>{{ info.name }} <span class="location">{{ info.city }}</span></h1>
+    } @else {
+      <h1>Competition</h1>
+    }
+  </header>
+
+  @if (loading()) {
+    <p class="status-msg">Loading…</p>
+  } @else if (error()) {
+    <p class="status-msg status-msg--error">{{ error() }}</p>
+  } @else if (sessions().length === 0) {
+    <p class="status-msg">No sessions found.</p>
+  } @else {
+    <div class="sessions">
+      @for (session of sessions(); track session.number) {
+        <div class="session">
+          <button class="session-header" (click)="toggleSession(session.number)">
+            <span class="chevron">{{ isCollapsed(session.number) ? '▶' : '▼' }}</span>
+            <span class="session-title">Session {{ session.number }}
+              @if (session.name) { — {{ session.name }} }
+            </span>
+            @if (session.date) {
+              <span class="session-date">{{ session.date }}</span>
+            }
+          </button>
+
+          @if (!isCollapsed(session.number)) {
+            <div class="session-body">
+              @if (session.eventGroups.length === 0) {
+                <p class="empty">No heats in this session.</p>
+              }
+              @for (group of session.eventGroups; track group.eventNumber) {
+                <div class="event-group">
+                  <div class="event-label">
+                    <span class="event-number">Event {{ group.eventNumber }}</span>
+                    @if (group.label) {
+                      <span class="event-desc">{{ group.label }}</span>
+                    }
+                  </div>
+                  <div class="heat-list">
+                    @for (heat of group.heats; track heat.heat) {
+                      <div class="heat-card" [class.heat-card--finished]="heat.isFinished">
+                        <span class="heat-num">H{{ heat.heat }}</span>
+                        @let slRec = actionRecord(group.eventNumber, heat.heat!, 'sl');
+                        <button
+                          class="btn-action btn-action--sl"
+                          [class.btn-action--ok]="slRec?.state === 'ok'"
+                          [class.btn-action--err]="slRec?.state === 'error'"
+                          [disabled]="slRec?.state === 'pending'"
+                          (click)="sendStartList(group.eventNumber, heat.heat!)"
+                          title="Send start list"
+                        >
+                          @if (slRec?.state === 'pending') { … }
+                          @else if (slRec?.state === 'ok') { ✓ {{ slRec?.time }} }
+                          @else if (slRec?.state === 'error') { ✗ {{ slRec?.time }} }
+                          @else { List }
+                        </button>
+                        @let stRec = actionRecord(group.eventNumber, heat.heat!, 'st');
+                        <button
+                          class="btn-action btn-action--st"
+                          [class.btn-action--ok]="stRec?.state === 'ok'"
+                          [class.btn-action--err]="stRec?.state === 'error'"
+                          [disabled]="stRec?.state === 'pending'"
+                          (click)="sendStart(group.eventNumber, heat.heat!)"
+                          title="Send start"
+                        >
+                          @if (stRec?.state === 'pending') { … }
+                          @else if (stRec?.state === 'ok') { ✓ {{ stRec?.time }} }
+                          @else if (stRec?.state === 'error') { ✗ {{ stRec?.time }} }
+                          @else { Start }
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

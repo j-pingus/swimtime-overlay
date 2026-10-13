@@ -61,3 +61,28 @@ export interface EventAndHeatDto {
   startTime?: number;
   lanes?: LaneDto[];
 }
+
+export interface EventDto {
+  number: string;
+  sourceId: number;
+  date: string;
+  distance: string;
+  stroke: string;
+  category: string;
+  gender: string;
+  agegroup: string;
+}
+
+export interface CompetitionSessionDto {
+  number: number;
+  sourceId: number;
+  name: string;
+  date: string;
+}
+
+export interface CompetitionInfoDto {
+  name: string;
+  city: string;
+  nation: string;
+  sessions: CompetitionSessionDto[];
+}
