@@ -99,6 +99,8 @@ export interface FlagFeature extends FeatureBase {
   heatSource: HeatSource;
   /** Hide flag this many seconds after lane timestamp. Null = always show. */
   displayDuration: number | null;
+  /** Row ordering: by lane number or by rank. Defaults to 'lane'. */
+  laneOrder: LaneOrder;
 }
 
 export interface ChronoFeature extends FeatureBase {

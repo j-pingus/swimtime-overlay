@@ -190,6 +190,18 @@ export class CompetitionStore {
     });
   }
 
+  updateOfficialResults(results: Array<{ laneId: number; officialTime: string | null; rank: string | null }>): void {
+    this.update((s) => {
+      if (!s.competition.currentHeat) return s;
+      const map = new Map(results.map((r) => [r.laneId, r]));
+      const lanes = s.competition.currentHeat.lanes.map((lane) => {
+        const r = map.get(lane.number);
+        return r ? { ...lane, officialTime: r.officialTime, rank: r.rank } : lane;
+      });
+      return { ...s, competition: { ...s.competition, currentHeat: { ...s.competition.currentHeat, lanes } } };
+    });
+  }
+
   updateLaneTimes(laneNumber: number, time: string, rank: string | null, distance: string | null): void {
     this.update((s) => {
       if (!s.competition.currentHeat) return s;

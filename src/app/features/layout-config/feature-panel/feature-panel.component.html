@@ -429,6 +429,14 @@
         </select>
       </div>
 
+      <div class="field">
+        <label>Order</label>
+        <select [value]="flag.laneOrder" (change)="patchFlag({ laneOrder: $any($any($event.target).value) })">
+          <option value="lane">Lane number</option>
+          <option value="rank">Rank</option>
+        </select>
+      </div>
+
       <h3>Display duration</h3>
       <div class="field-row field-row--center">
         <label class="toggle-label">

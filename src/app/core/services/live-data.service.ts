@@ -37,7 +37,18 @@ export class LiveDataService implements OnDestroy {
     this.sub.add(
       this.sse.eventAndHeat$().subscribe({
         next: (dto) => {
-          this.competitionStore.setCompetition(mapEventAndHeat(dto));
+          if (dto.swimTimeMessageType !== 'HEAT_ARRIVED' && dto.swimTimeMessageType !== 'HEAT_OFFICIAL') {
+            this.competitionStore.setCompetition(mapEventAndHeat(dto));
+          }
+          if (dto.swimTimeMessageType === 'HEAT_OFFICIAL' && dto.lanes?.length) {
+            this.competitionStore.updateOfficialResults(
+              dto.lanes.map((l, i) => ({
+                laneId: l.laneId ?? i + 1,
+                officialTime: l.officialTime ?? null,
+                rank: l.rank ?? null,
+              })),
+            );
+          }
           if (dto.swimTimeMessageType === 'START_LIST') {
             this.competitionStore.resetChrono();
           }

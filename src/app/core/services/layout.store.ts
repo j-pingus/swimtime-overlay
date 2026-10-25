@@ -1,8 +1,8 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, MessageTypeRule, MessageTypeRules, TextFeature, LaneOrder } from '../models/layout.model';
+import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, FlagFeature, MessageTypeRule, MessageTypeRules, TextFeature, LaneOrder } from '../models/layout.model';
 import { generateUUID } from '../utils/uuid.util';
 
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 export type RenderBackground = 'transparent' | 'green';
 
@@ -388,6 +388,21 @@ export class LayoutStore {
           features: l.features.map((f): AnyFeature => {
             if (f.type === 'lane') {
               return { ...f, laneOrder: (f as LaneFeature & { laneOrder?: LaneOrder }).laneOrder ?? 'lane' };
+            }
+            return f;
+          }),
+        })),
+      };
+    }
+
+    if (from < 6) {
+      state = {
+        ...state,
+        layouts: state.layouts.map((l) => ({
+          ...l,
+          features: l.features.map((f): AnyFeature => {
+            if (f.type === 'flag') {
+              return { ...f, laneOrder: (f as FlagFeature & { laneOrder?: LaneOrder }).laneOrder ?? 'lane' };
             }
             return f;
           }),

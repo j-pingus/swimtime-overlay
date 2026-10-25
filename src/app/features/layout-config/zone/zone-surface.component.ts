@@ -138,7 +138,8 @@ export class ZoneSurfaceComponent {
   }
 
   protected flagRows(f: FlagFeature): Array<{ y: number; h: number; url: string | null }> {
-    const lanes = resolveLanes(this.competitionStore.competition(), f.heatSource);
+    const raw = resolveLanes(this.competitionStore.competition(), f.heatSource);
+    const lanes = f.laneOrder === 'rank' ? sortByRank(raw) : raw;
     const now = this.now();
     const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
     return lanes.map((lane, i) => {

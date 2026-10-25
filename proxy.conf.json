@@ -1,11 +1,11 @@
 {
   "/api/sse": {
-    "target": "http://10.0.1.201:7654",
+    "target": "http://localhost:8080",
     "secure": false,
     "headers": { "Connection": "keep-alive" }
   },
   "/api": {
-    "target": "http://10.0.1.201:7654",
+    "target": "http://localhost:8080",
     "secure": false
   }
 }
