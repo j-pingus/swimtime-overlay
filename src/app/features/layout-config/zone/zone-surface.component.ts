@@ -155,7 +155,8 @@ export class ZoneSurfaceComponent {
   }
 
   protected laneRows(f: LaneFeature): Array<{ y: number; text: string }> {
-    const lanes = resolveLanes(this.competitionStore.competition(), f.heatSource);
+    const raw = resolveLanes(this.competitionStore.competition(), f.heatSource);
+    const lanes = f.laneOrder === 'rank' ? sortByRank(raw) : raw;
     const now = this.now();
     const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
     return lanes.map((lane, i) => {
@@ -235,6 +236,16 @@ export class ZoneSurfaceComponent {
     return { x: p.x, y: p.y };
   }
 }
+
+function isBlank(lane: Lane): boolean {
+  return lane.rank == null || lane.rank === '';
+}
+
+function sortByRank(lanes: Lane[]): Lane[] {
+  const ranked = lanes.filter((l) => !isBlank(l)).sort((a, b) => parseInt(a.rank!, 10) - parseInt(b.rank!, 10));
+  return [...ranked, ...lanes.filter(isBlank)];
+}
+
 
 function resolveLanes(competition: Competition, heatSource: HeatSource): Lane[] {
   const nextIndex = heatSource === 'next0' ? 0 : heatSource === 'next1' ? 1 : heatSource === 'next2' ? 2 : -1;

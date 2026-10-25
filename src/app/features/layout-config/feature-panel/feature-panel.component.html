@@ -137,6 +137,14 @@
         </select>
       </div>
 
+      <div class="field">
+        <label>Order</label>
+        <select [value]="ln.laneOrder" (change)="patchLane({ laneOrder: $any($any($event.target).value) })">
+          <option value="lane">Lane number</option>
+          <option value="rank">Rank</option>
+        </select>
+      </div>
+
       <h3>Text</h3>
 
       <div class="field">

@@ -72,6 +72,8 @@ export interface RectFeature extends FeatureBase {
 
 export type HeatSource = 'current' | 'next0' | 'next1' | 'next2';
 
+export type LaneOrder = 'lane' | 'rank';
+
 export interface LaneFeature extends FeatureBase {
   type: 'lane';
   /** Template evaluated once per lane; $-patterns resolve against each Lane object. */
@@ -87,6 +89,8 @@ export interface LaneFeature extends FeatureBase {
   displayDuration: number | null;
   /** Which heat's lanes to display. Defaults to 'current'. */
   heatSource: HeatSource;
+  /** Row ordering: by lane number or by rank. Defaults to 'lane'. */
+  laneOrder: LaneOrder;
 }
 
 export interface FlagFeature extends FeatureBase {
