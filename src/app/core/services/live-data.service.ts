@@ -65,7 +65,8 @@ export class LiveDataService implements OnDestroy {
       this.sse.lapTime$().subscribe({
         next: (dto) => {
           if (dto.lane != null && dto.time != null && dto.rank !== '0') {
-            this.competitionStore.updateLaneTimes(dto.lane, dto.time, dto.rank ?? null);
+            const distance = dto.distance != null ? String(dto.distance) : null;
+            this.competitionStore.updateLaneTimes(dto.lane, dto.time, dto.rank ?? null, distance);
           }
           if (dto.time != null) {
             const elapsedMs = parseTimeToMs(dto.time);

@@ -11,6 +11,8 @@ export interface Lane {
   rank: string | null;
   /** Unix ms timestamp of the last data update for this lane; null until first update. */
   timestamp: number | null;
+  /** Split distance (as string) from the last SSE lap-time event; null until first update. */
+  distance: string | null;
 }
 
 export interface Heat {

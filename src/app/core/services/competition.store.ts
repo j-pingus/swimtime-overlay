@@ -18,20 +18,20 @@ const DEFAULT_FIRST_LANE = 1;
 
 // Full roster of dummy swimmers — pool is sliced/extended to match laneCount.
 const DUMMY_ROSTER: Omit<Lane, 'number'>[] = [
-  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     nat: 'FRA', entryTime: '1:02.45', officialTime: '1:02.87', time: '1:02.87', rank: '3',  timestamp: null },
-  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          nat: 'GBR', entryTime: '1:01.12', officialTime: '1:01.34', time: '1:01.34', rank: '1',  timestamp: null },
-  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     nat: 'GER', entryTime: '1:01.89', officialTime: '1:01.56', time: '1:01.56', rank: '2',  timestamp: null },
-  { swimmerName: 'Laura García',   club: 'CN Barcelona',     nat: 'ESP', entryTime: '1:03.21', officialTime: '1:03.45', time: '1:03.45', rank: '4',  timestamp: null },
-  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       nat: 'POL', entryTime: '1:03.88', officialTime: '1:02.87', time: '1:02.87', rank: '5',  timestamp: null },
-  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', nat: 'BEL', entryTime: '1:04.12', officialTime: '1:01.34', time: '1:01.34', rank: '6',  timestamp: null },
-  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         nat: 'DEN', entryTime: '1:04.56', officialTime: '1:02.87', time: '1:02.87', rank: '7',  timestamp: null },
-  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    nat: 'SVK', entryTime: '1:05.01', officialTime: '1:01.34', time: '1:01.34', rank: '9',  timestamp: null },
-  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       nat: 'ITA', entryTime: '1:05.34', officialTime: '1:01.56', time: '1:01.56', rank: '8',  timestamp: null },
-  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: '1:03.45', time: '1:03.45', rank: '10', timestamp: null },
+  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     nat: 'FRA', entryTime: '1:02.45', officialTime: '1:02.87', time: '1:02.87', rank: '3',  timestamp: null, distance: '100' },
+  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          nat: 'GBR', entryTime: '1:01.12', officialTime: '1:01.34', time: '1:01.34', rank: '1',  timestamp: null, distance: '100' },
+  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     nat: 'GER', entryTime: '1:01.89', officialTime: '1:01.56', time: '1:01.56', rank: '2',  timestamp: null, distance: '100' },
+  { swimmerName: 'Laura García',   club: 'CN Barcelona',     nat: 'ESP', entryTime: '1:03.21', officialTime: '1:03.45', time: '1:03.45', rank: '4',  timestamp: null, distance: '100' },
+  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       nat: 'POL', entryTime: '1:03.88', officialTime: '1:02.87', time: '1:02.87', rank: '5',  timestamp: null, distance: '100' },
+  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', nat: 'BEL', entryTime: '1:04.12', officialTime: '1:01.34', time: '1:01.34', rank: '6',  timestamp: null, distance: '100' },
+  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         nat: 'DEN', entryTime: '1:04.56', officialTime: '1:02.87', time: '1:02.87', rank: '7',  timestamp: null, distance: '100' },
+  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    nat: 'SVK', entryTime: '1:05.01', officialTime: '1:01.34', time: '1:01.34', rank: '9',  timestamp: null, distance: '100' },
+  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       nat: 'ITA', entryTime: '1:05.34', officialTime: '1:01.56', time: '1:01.56', rank: '8',  timestamp: null, distance: '100' },
+  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: '1:03.45', time: '1:03.45', rank: '10', timestamp: null, distance: '100' },
 ];
 
 function emptyLane(number: number): Lane {
-  return { number, swimmerName: '', club: '', nat: '', entryTime: null, officialTime: null, time: null, rank: null, timestamp: null };
+  return { number, swimmerName: '', club: '', nat: '', entryTime: null, officialTime: null, time: null, rank: null, timestamp: null, distance: null };
 }
 
 function normalizeLanes(lanes: Lane[], laneCount: number, firstLane: number): Lane[] {
@@ -50,7 +50,7 @@ function buildDummyLanes(laneCount: number, firstLane: number, rosterOffset = 0,
       officialTime: null, time: null, rank: null, timestamp: null,
     };
     const base = nextHeat
-      ? { ...entry, officialTime: null, time: null, rank: null, timestamp: null }
+      ? { ...entry, officialTime: null, time: null, rank: null, timestamp: null, distance: null }
       : entry;
     return { number: n, ...base };
   });
@@ -190,11 +190,11 @@ export class CompetitionStore {
     });
   }
 
-  updateLaneTimes(laneNumber: number, time: string, rank: string | null): void {
+  updateLaneTimes(laneNumber: number, time: string, rank: string | null, distance: string | null): void {
     this.update((s) => {
       if (!s.competition.currentHeat) return s;
       const lanes = s.competition.currentHeat.lanes.map((lane) =>
-        lane.number === laneNumber ? { ...lane, time, rank: rank ?? lane.rank, timestamp: Date.now() } : lane,
+        lane.number === laneNumber ? { ...lane, time, rank: rank ?? lane.rank, timestamp: Date.now(), distance } : lane,
       );
       return { ...s, competition: { ...s.competition, currentHeat: { ...s.competition.currentHeat, lanes } } };
     });

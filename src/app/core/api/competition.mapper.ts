@@ -43,5 +43,6 @@ function mapLane(dto: LaneDto, index: number): Lane {
     time: null,
     rank: dto.rank ?? null,
     timestamp: null,
+    distance: null,
   };
 }
