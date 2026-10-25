@@ -2,7 +2,8 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api/api.service';
 import { CompetitionInfoDto, EventAndHeatDto } from '../../core/api/api.models';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 interface HeatGroup {
   eventNumber: string;
@@ -46,7 +47,9 @@ export class CompetitionComponent implements OnInit {
           this.loading.set(false);
           return;
         }
-        const requests = info.sessions.map((s) => this.api.getSessionHeats(s.number));
+        const requests = info.sessions.map((s) =>
+          this.api.getSessionHeats(s.number).pipe(catchError(() => of([] as EventAndHeatDto[]))),
+        );
         forkJoin(requests).subscribe({
           next: (results) => {
             const sessionData: SessionData[] = info.sessions.map((s, i) => ({
