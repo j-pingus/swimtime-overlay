@@ -535,7 +535,21 @@ select {
     list-style: disc;
   }
 
-  li { margin: 0.2rem 0; }
+  li {
+    margin: 0.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    list-style: none;
+
+    &::before {
+      content: '•';
+      color: #999;
+      flex-shrink: 0;
+    }
+  }
+
+  ul { padding-left: 0.5rem; }
 
   p.vars-hint {
     margin: 0.6rem 0 0.2rem;
@@ -548,6 +562,25 @@ select {
     background: #f0f0f0;
     padding: 1px 4px;
     border-radius: 3px;
+  }
+
+  .btn-use-var {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    padding: 1px 5px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    background: #fff;
+    color: #555;
+    cursor: pointer;
+    line-height: 1.4;
+
+    &:hover {
+      background: #e8f0fe;
+      border-color: #4a90e2;
+      color: #1a6bbf;
+    }
   }
 }
 

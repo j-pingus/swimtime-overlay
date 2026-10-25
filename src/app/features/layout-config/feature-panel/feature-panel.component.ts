@@ -241,6 +241,18 @@ export class FeaturePanelComponent {
     this.featureChange.emit({ ...f, ...partial } satisfies TextFeature);
   }
 
+  appendTextToken(token: string): void {
+    const f = this.textFeature();
+    if (!f) return;
+    this.patchText({ template: f.template + '${' + token + '}' });
+  }
+
+  appendLaneToken(token: string): void {
+    const f = this.laneFeature();
+    if (!f) return;
+    this.patchLane({ template: f.template + '${' + token + '}' });
+  }
+
   patchSrc(src: string): void {
     const f = this.feature();
     if (f?.type !== 'image') return;
