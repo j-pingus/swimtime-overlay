@@ -1,13 +1,17 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, MessageTypeRule, MessageTypeRules, TextFeature } from '../models/layout.model';
+import { generateUUID } from '../utils/uuid.util';
 
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 4;
+
+export type RenderBackground = 'transparent' | 'green';
 
 export type LayoutStoreState = {
   schemaVersion?: number;
   layouts: Layout[];
   activeLayoutId: string | null;
   messageTypeRules: MessageTypeRules;
+  renderBackground: RenderBackground;
 };
 
 // ── IndexedDB helpers ──────────────────────────────────────────────────────
@@ -49,7 +53,7 @@ const LS_KEY = 'swimtime_layouts';
 
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
-  private readonly _state = signal<LayoutStoreState>({ layouts: [], activeLayoutId: null, messageTypeRules: {} });
+  private readonly _state = signal<LayoutStoreState>({ layouts: [], activeLayoutId: null, messageTypeRules: {}, renderBackground: 'transparent' });
   private readonly db = openIDB();
   private localUpdateListeners: Array<(s: LayoutStoreState) => void> = [];
 
@@ -60,6 +64,7 @@ export class LayoutStore {
     return this._state().layouts.find((l) => l.id === id) ?? null;
   });
   readonly messageTypeRules = computed(() => this._state().messageTypeRules);
+  readonly renderBackground = computed(() => this._state().renderBackground ?? 'transparent');
 
   /** Called by APP_INITIALIZER — loads persisted state before the app renders. */
   async init(): Promise<void> {
@@ -89,7 +94,7 @@ export class LayoutStore {
 
   createLayout(name: string): Layout {
     const layout: Layout = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       name: name.trim(),
       createdAt: Date.now(),
       features: [],
@@ -123,10 +128,14 @@ export class LayoutStore {
     });
   }
 
+  setRenderBackground(bg: RenderBackground): void {
+    this.update((s) => ({ ...s, renderBackground: bg }));
+  }
+
   importLayout(layout: Layout): void {
     const imported: Layout = {
       ...layout,
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       createdAt: Date.now(),
       features: remapFeatureIds(layout.features),
     };
@@ -139,7 +148,7 @@ export class LayoutStore {
       if (!source) return s;
       const clone: Layout = {
         ...source,
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         name: `${source.name} (copy)`,
         createdAt: Date.now(),
         features: remapFeatureIds(source.features),
@@ -231,7 +240,7 @@ export class LayoutStore {
    *  CDK drag-drop indices stay coherent with the visual list order.
    *  Returns the new group's id. */
   groupFeatures(layoutId: string, featureIds: string[], label: string): string {
-    const groupId = crypto.randomUUID();
+    const groupId = generateUUID();
     const group: GroupFeature = { type: 'group', id: groupId, label, x: 0, y: 0, width: 0, height: 0 };
     const idSet = new Set(featureIds);
     this.update((s) => ({
@@ -356,13 +365,28 @@ export class LayoutStore {
       };
     }
 
+    if (from < 3) {
+      state = { ...state, renderBackground: (state as LayoutStoreState & { renderBackground?: RenderBackground }).renderBackground ?? 'transparent' };
+    }
+
+    if (from < 4) {
+      state = {
+        ...state,
+        messageTypeRules: Object.fromEntries(
+          Object.entries(state.messageTypeRules).map(([k, rule]) => [
+            k, { ...rule, delay: (rule as MessageTypeRule & { delay?: number | null }).delay ?? null },
+          ]),
+        ),
+      };
+    }
+
     return { ...state, schemaVersion: SCHEMA_VERSION };
   }
 }
 
 /** Reassigns all feature IDs (and remaps groupId references) for clone/import. */
 function remapFeatureIds(features: AnyFeature[]): AnyFeature[] {
-  const idMap = new Map(features.map((f) => [f.id, crypto.randomUUID()]));
+  const idMap = new Map(features.map((f) => [f.id, generateUUID()]));
   return features.map((f) => ({
     ...f,
     id: idMap.get(f.id)!,

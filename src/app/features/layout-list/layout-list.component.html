@@ -2,11 +2,11 @@
   <header class="page-header">
     <h1>Swimtime Overlay</h1>
     <a routerLink="/competition" class="nav-link">Competition</a>
-    <a href="/render" target="_blank" class="nav-link">Render ↗</a>
+    <a routerLink="/render" class="nav-link">Render</a>
   </header>
 
   <section class="pool-config">
-    <h2>Pool</h2>
+    <h2>Pool / Render</h2>
     <div class="pool-config-row">
       <div class="lane-count">
         <label>First lane</label>
@@ -38,6 +38,13 @@
         }
       </div>
     </div>
+    <div class="render-bg-row">
+      <span class="render-bg-label">Background</span>
+      <div class="render-bg-toggle">
+        <button class="btn-bg" [class.btn-bg--active]="store.renderBackground() === 'transparent'" (click)="setRenderBackground('transparent')">Transparent</button>
+        <button class="btn-bg" [class.btn-bg--active]="store.renderBackground() === 'green'" (click)="setRenderBackground('green')">Green</button>
+      </div>
+    </div>
   </section>
 
   <section class="associations">
@@ -49,11 +56,14 @@
           <li class="rule-item">
             <span class="rule-type">{{ rule.type }}</span>
             <span class="rule-layout">{{ rule.layoutName }}</span>
-            @if (rule.duration !== null) {
-              <span class="rule-duration">{{ rule.duration }}s</span>
-            } @else {
-              <span class="rule-duration rule-duration--none">∞</span>
-            }
+            <input type="number" class="rule-input" min="0" placeholder="delay s"
+              [value]="rule.delay ?? ''"
+              (change)="updateRuleDelay(rule.type, $event)"
+              title="Entry delay (s)" />
+            <input type="number" class="rule-input" min="1" placeholder="dur s"
+              [value]="rule.duration ?? ''"
+              (change)="updateRuleDuration(rule.type, $event)"
+              title="Duration (s)" />
             <button class="btn-remove-rule" (click)="removeRule(rule.type)" title="Remove">×</button>
           </li>
         }
@@ -74,6 +84,9 @@
             <option [value]="l.id">{{ l.name }}</option>
           }
         </select>
+        <input type="number" min="0" placeholder="Delay (s)"
+          [ngModel]="newRuleDelay()" (ngModelChange)="newRuleDelay.set($event)"
+          name="ruleDelay" />
         <input type="number" min="1" placeholder="Duration (s)"
           [ngModel]="newRuleDuration()" (ngModelChange)="newRuleDuration.set($event)"
           name="ruleDuration" />

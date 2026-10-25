@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LayoutStore } from '../../core/services/layout.store';
+import { LayoutStore, RenderBackground } from '../../core/services/layout.store';
 import { CompetitionStore } from '../../core/services/competition.store';
 import { LiveDataService } from '../../core/services/live-data.service';
 import { ALL_MESSAGE_TYPES } from '../../core/api/api.models';
@@ -23,6 +23,7 @@ export class LayoutListComponent {
 
   protected newRuleType = signal('');
   protected newRuleLayoutId = signal('');
+  protected newRuleDelay = signal('');
   protected newRuleDuration = signal('');
 
   protected readonly ruleEntries = computed(() =>
@@ -30,6 +31,7 @@ export class LayoutListComponent {
       type,
       layoutName: this.store.layouts().find((l) => l.id === rule.layoutId)?.name ?? '(deleted)',
       layoutId: rule.layoutId,
+      delay: rule.delay,
       duration: rule.duration,
     })),
   );
@@ -106,18 +108,39 @@ export class LayoutListComponent {
     const type = this.newRuleType();
     const layoutId = this.newRuleLayoutId();
     if (!type || !layoutId) return;
+    const delay = parseInt(this.newRuleDelay(), 10);
     const dur = parseInt(this.newRuleDuration(), 10);
     this.store.setMessageTypeRule(type, {
       layoutId,
+      delay: delay > 0 ? delay : null,
       duration: dur > 0 ? dur : null,
     });
     this.newRuleType.set('');
     this.newRuleLayoutId.set('');
+    this.newRuleDelay.set('');
     this.newRuleDuration.set('');
+  }
+
+  updateRuleDelay(type: string, event: Event): void {
+    const rule = this.store.messageTypeRules()[type];
+    if (!rule) return;
+    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    this.store.setMessageTypeRule(type, { ...rule, delay: value > 0 ? value : null });
+  }
+
+  updateRuleDuration(type: string, event: Event): void {
+    const rule = this.store.messageTypeRules()[type];
+    if (!rule) return;
+    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    this.store.setMessageTypeRule(type, { ...rule, duration: value > 0 ? value : null });
   }
 
   removeRule(type: string): void {
     this.store.clearMessageTypeRule(type);
+  }
+
+  setRenderBackground(bg: RenderBackground): void {
+    this.store.setRenderBackground(bg);
   }
 
   createLayout(): void {

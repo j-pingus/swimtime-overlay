@@ -143,6 +143,48 @@ h2 {
   }
 }
 
+.render-bg-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.render-bg-label {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.render-bg-toggle {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.btn-bg {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+
+  & + & {
+    border-left: 1px solid #ccc;
+  }
+
+  &--active {
+    background: #0070f3;
+    color: #fff;
+  }
+
+  &:not(&--active):hover {
+    background: #f0f0f0;
+  }
+}
+
 .associations {
   margin-bottom: 2rem;
 }
@@ -177,18 +219,27 @@ h2 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 140px;
+    max-width: 120px;
   }
 
-  .rule-duration {
-    width: 2.5rem;
-    text-align: right;
-    color: #888;
+  .rule-input {
+    width: 4.5rem;
+    padding: 0.2rem 0.35rem;
     font-size: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    color: #555;
+    text-align: center;
     flex-shrink: 0;
 
-    &--none {
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+    }
+
+    &::placeholder {
       color: #bbb;
+      font-size: 0.72rem;
     }
   }
 

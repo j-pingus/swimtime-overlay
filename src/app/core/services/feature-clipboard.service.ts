@@ -1,10 +1,11 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { AnyFeature } from '../models/layout.model';
+import { generateUUID } from '../utils/uuid.util';
 
 const SS_KEY = 'swimtime_clipboard';
 
 function remapIds(features: AnyFeature[]): AnyFeature[] {
-  const idMap = new Map(features.map((f) => [f.id, crypto.randomUUID()]));
+  const idMap = new Map(features.map((f) => [f.id, generateUUID()]));
   return features.map((f) => ({
     ...f,
     id: idMap.get(f.id)!,

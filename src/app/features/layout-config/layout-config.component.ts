@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { LayoutStore } from '../../core/services/layout.store';
 import { AnyFeature, FeatureType, RENDER_FONTS } from '../../core/models/layout.model';
+import { generateUUID } from '../../core/utils/uuid.util';
 import { ZoneComponent } from './zone/zone.component';
 import { FeaturePanelComponent } from './feature-panel/feature-panel.component';
 
@@ -58,7 +59,7 @@ export class LayoutConfigComponent {
     if (!layoutId) return;
 
     const base = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       label: `Feature ${this.features().length + 1}`,
       x: 760, y: 440, width: 400, height: 200,
     };

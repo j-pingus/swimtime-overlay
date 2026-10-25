@@ -1,10 +1,40 @@
 .render-surface {
   position: fixed;
   inset: 0;
-  background: #00b140; // broadcast chroma-key green
+  background: transparent;
+
+  &--green {
+    background: #00b140;
+  }
 }
 
 app-zone {
   width: 100%;
   height: 100%;
+}
+
+.back-btn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 22px;
+  line-height: 1;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+  }
 }

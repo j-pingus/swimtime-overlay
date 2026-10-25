@@ -14,6 +14,7 @@ export class LiveDataService implements OnDestroy {
   private readonly layoutStore = inject(LayoutStore);
 
   private sub = new Subscription();
+  private delayTimer: ReturnType<typeof setTimeout> | null = null;
   private ruleTimer: ReturnType<typeof setTimeout> | null = null;
 
   private readonly _eventAndHeatOk = signal(true);
@@ -77,6 +78,7 @@ export class LiveDataService implements OnDestroy {
   }
 
   stop(): void {
+    this.clearDelayTimer();
     this.clearRuleTimer();
     this.sub.unsubscribe();
     this.sub = new Subscription();
@@ -84,6 +86,7 @@ export class LiveDataService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearDelayTimer();
     this.clearRuleTimer();
     this.sub.unsubscribe();
   }
@@ -92,18 +95,36 @@ export class LiveDataService implements OnDestroy {
     const rule = this.layoutStore.getState().messageTypeRules[messageType];
     if (!rule) return;
 
+    this.clearDelayTimer();
     this.clearRuleTimer();
-    this.layoutStore.setActiveLayout(rule.layoutId);
 
-    if (rule.duration != null) {
-      const activatedId = rule.layoutId;
-      this.ruleTimer = setTimeout(() => {
-        // Only clear if the layout hasn't been changed in the meantime
-        if (this.layoutStore.getState().activeLayoutId === activatedId) {
-          this.layoutStore.setActiveLayout(null);
-        }
-        this.ruleTimer = null;
-      }, rule.duration * 1000);
+    const activate = () => {
+      this.layoutStore.setActiveLayout(rule.layoutId);
+      if (rule.duration != null) {
+        const activatedId = rule.layoutId;
+        this.ruleTimer = setTimeout(() => {
+          if (this.layoutStore.getState().activeLayoutId === activatedId) {
+            this.layoutStore.setActiveLayout(null);
+          }
+          this.ruleTimer = null;
+        }, rule.duration * 1000);
+      }
+    };
+
+    if (rule.delay != null && rule.delay > 0) {
+      this.delayTimer = setTimeout(() => {
+        this.delayTimer = null;
+        activate();
+      }, rule.delay * 1000);
+    } else {
+      activate();
+    }
+  }
+
+  private clearDelayTimer(): void {
+    if (this.delayTimer != null) {
+      clearTimeout(this.delayTimer);
+      this.delayTimer = null;
     }
   }
 

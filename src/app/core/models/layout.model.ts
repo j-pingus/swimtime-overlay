@@ -123,6 +123,8 @@ export type BaseFeature = AnyFeature;
 
 export interface MessageTypeRule {
   layoutId: string;
+  /** Delay in seconds before the layout is activated. Null = activate immediately. */
+  delay: number | null;
   /** Automatically clear the active layout after this many seconds. Null = stay until next rule fires. */
   duration: number | null;
 }

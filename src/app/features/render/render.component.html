@@ -1,3 +1,4 @@
-<div class="render-surface">
+<div class="render-surface" [class.render-surface--green]="renderBackground() === 'green'">
   <app-zone-surface [features]="features()" [fontFamily]="fontFamily()" [interactive]="false" />
 </div>
+<a routerLink="/layouts" class="back-btn" title="Back to layouts">‹</a>
