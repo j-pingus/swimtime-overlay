@@ -22,6 +22,11 @@ export const routes: Routes = [
       import('./features/render/render.component').then((m) => m.RenderComponent),
   },
   {
+    path: 'render/:id',
+    loadComponent: () =>
+      import('./features/render/render.component').then((m) => m.RenderComponent),
+  },
+  {
     path: 'competition',
     loadComponent: () =>
       import('./features/competition/competition.component').then(

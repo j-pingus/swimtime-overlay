@@ -135,6 +135,7 @@
                 <button class="btn-activate" (click)="activate(layout.id)">Use</button>
               }
               <a [routerLink]="['/config', layout.id]" class="btn-configure">Configure</a>
+              <a [routerLink]="['/render', layout.id]" class="btn-render" title="Render this layout directly">▶</a>
               <button class="btn-clone" (click)="cloneLayout(layout.id)" title="Clone layout">⎘</button>
               <button class="btn-export" (click)="exportLayout(layout)" title="Export layout">↓</button>
               <button class="btn-delete" (click)="deleteLayout(layout.id, layout.name)" title="Delete layout">×</button>

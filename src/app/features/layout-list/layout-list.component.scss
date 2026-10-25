@@ -514,6 +514,26 @@ h2 {
         color: #fff;
       }
     }
+
+    .btn-render {
+      font-size: 0.8rem;
+      line-height: 1;
+      width: 1.75rem;
+      height: 1.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      color: #bbb;
+      text-decoration: none;
+      flex-shrink: 0;
+
+      &:hover {
+        border-color: #12b76a;
+        color: #12b76a;
+      }
+    }
   }
 }
 
