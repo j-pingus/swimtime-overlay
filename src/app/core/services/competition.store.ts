@@ -58,12 +58,12 @@ function buildDummyLanes(laneCount: number, firstLane: number, rosterOffset = 0,
 
 function buildDummyCompetition(laneCount: number, firstLane: number): Competition {
   return {
-    currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100', countHeats: 3 },
+    currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100m', countHeats: 3 },
     currentHeat:  { number: '2', splashHeatId: 42, lanes: buildDummyLanes(laneCount, firstLane) },
     nextHeats: [
-      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100', splashHeatId: 43, lanes: buildDummyLanes(laneCount, firstLane, 2, true) },
-      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 44, lanes: buildDummyLanes(laneCount, firstLane, 4, true) },
-      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200', splashHeatId: 45, lanes: buildDummyLanes(laneCount, firstLane, 6, true) },
+      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100m', splashHeatId: 43, lanes: buildDummyLanes(laneCount, firstLane, 2, true) },
+      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200m', splashHeatId: 44, lanes: buildDummyLanes(laneCount, firstLane, 4, true) },
+      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200m', splashHeatId: 45, lanes: buildDummyLanes(laneCount, firstLane, 6, true) },
     ],
     chronoStartTime: Date.now() - 23456,
     chronoStopTime: null,
