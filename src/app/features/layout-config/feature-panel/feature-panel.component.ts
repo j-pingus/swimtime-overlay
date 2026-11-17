@@ -34,6 +34,7 @@ export class FeaturePanelComponent {
   readonly featurePaste = output<AnyFeature[]>();
   readonly groupCreate = output<string[]>();
   readonly ungroupFeature = output<string>();
+  readonly groupRemoveWithChildren = output<string>();
 
   protected readonly hasClipboard = this.clipboard.hasContent;
 
@@ -278,6 +279,11 @@ export class FeaturePanelComponent {
   remove(): void {
     const f = this.feature();
     if (f) this.featureRemove.emit(f.id);
+  }
+
+  removeWithChildren(): void {
+    const f = this.feature();
+    if (f?.type === 'group') this.groupRemoveWithChildren.emit(f.id);
   }
 
   asNumber(value: string): number {

@@ -112,6 +112,14 @@ onFeaturesReorder(features: AnyFeature[]): void {
     }
   }
 
+  onGroupRemoveWithChildren(groupId: string): void {
+    const layoutId = this.id();
+    if (layoutId) {
+      this.store.removeGroupWithChildren(layoutId, groupId);
+      this.selectedId.set(null);
+    }
+  }
+
   onGroupCreate(featureIds: string[]): void {
     const layoutId = this.id();
     if (!layoutId || featureIds.length < 2) return;

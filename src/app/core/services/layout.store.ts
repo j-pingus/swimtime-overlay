@@ -235,6 +235,16 @@ export class LayoutStore {
     }));
   }
 
+  removeGroupWithChildren(layoutId: string, groupId: string): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) => {
+        if (l.id !== layoutId) return l;
+        return { ...l, features: l.features.filter((f) => f.id !== groupId && f.groupId !== groupId) };
+      }),
+    }));
+  }
+
   /** Groups featureIds under a new GroupFeature.
    *  The group header + children are consolidated adjacent in the array so that
    *  CDK drag-drop indices stay coherent with the visual list order.

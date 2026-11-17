@@ -51,6 +51,8 @@ export class ZoneComponent {
   readonly featureSelect = output<string | null>();
   readonly featureUpdate = output<BaseFeature>();
   readonly featuresUpdate = output<AnyFeature[]>();
+  readonly featureRemove = output<string>();
+  readonly featureRemoveWithChildren = output<string>();
 
   private readonly surface = viewChild.required(ZoneSurfaceComponent);
   private readonly drag = signal<DragState | null>(null);
@@ -189,6 +191,17 @@ export class ZoneComponent {
 
     const id = this.selectedFeatureId();
     if (!id || !this.interactive()) return;
+
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      event.preventDefault();
+      this.drag.set(null);
+      if (event.shiftKey) {
+        this.featureRemoveWithChildren.emit(id);
+      } else {
+        this.featureRemove.emit(id);
+      }
+      return;
+    }
 
     const dx = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     const dy = event.key === 'ArrowDown'  ? 1 : event.key === 'ArrowUp'   ? -1 : 0;

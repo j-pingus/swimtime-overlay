@@ -40,6 +40,8 @@
           (featureSelect)="onFeatureSelect($event)"
           (featureUpdate)="onFeatureUpdate($event)"
           (featuresUpdate)="onFeaturesUpdate($event)"
+          (featureRemove)="onFeatureRemove($event)"
+          (featureRemoveWithChildren)="onGroupRemoveWithChildren($event)"
         />
       </div>
     </div>
@@ -57,6 +59,7 @@
         (featurePaste)="onFeaturePaste($event)"
         (groupCreate)="onGroupCreate($event)"
         (ungroupFeature)="onUngroupFeature($event)"
+        (groupRemoveWithChildren)="onGroupRemoveWithChildren($event)"
       />
     </div>
 
