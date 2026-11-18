@@ -1,8 +1,9 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { LayoutStore } from '../../core/services/layout.store';
+import { FontLoaderService } from '../../core/services/font-loader.service';
 import { AnyFeature, FeatureType, RENDER_FONTS } from '../../core/models/layout.model';
 import { generateUUID } from '../../core/utils/uuid.util';
 import { ZoneComponent } from './zone/zone.component';
@@ -17,6 +18,7 @@ import { FeaturePanelComponent } from './feature-panel/feature-panel.component';
 export class LayoutConfigComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly store = inject(LayoutStore);
+  private readonly fontLoader = inject(FontLoaderService);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map((p) => p.get('id'))),
@@ -28,8 +30,11 @@ export class LayoutConfigComponent {
   });
 
   protected readonly features = computed(() => this.layout()?.features ?? []);
-  protected readonly fontFamily = computed(() => this.layout()?.fontFamily ?? 'sans-serif');
   protected readonly RENDER_FONTS = RENDER_FONTS;
+
+  private readonly requestedFont = computed(() => this.layout()?.fontFamily ?? 'sans-serif');
+  private readonly _readyFont = signal('sans-serif');
+  protected readonly fontFamily = this._readyFont.asReadonly();
 
   protected readonly selectedId = signal<string | null>(null);
   protected readonly showAddMenu = signal(false);
@@ -42,7 +47,16 @@ export class LayoutConfigComponent {
   /** Running counter for auto-generated group labels. */
   private groupCount = 0;
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const requested = this.requestedFont();
+      void this.fontLoader.loadFont(requested).then(() => {
+        if (this.requestedFont() === requested) {
+          this._readyFont.set(requested);
+        }
+      });
+    });
+  }
 
   renameLayout(name: string): void {
     const id = this.id();
