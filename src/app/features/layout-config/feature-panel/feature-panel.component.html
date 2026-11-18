@@ -68,6 +68,18 @@
         </ul>
       </div>
 
+      @if (groupAllChildrenRotatable()) {
+        <h3>Rotation</h3>
+        <div class="style-row">
+          <div class="field field--rotation">
+            <label>Angle</label>
+            <input type="number" [value]="g.rotation ?? 0"
+              (change)="applyGroupRotation(asRotation($any($event.target).value))" />
+            <span class="unit">°</span>
+          </div>
+        </div>
+      }
+
       <div class="actions">
         <button class="btn-ungroup" (click)="ungroup(g.id)">Ungroup</button>
         <button class="btn-remove" (click)="removeWithChildren()">Delete with children</button>

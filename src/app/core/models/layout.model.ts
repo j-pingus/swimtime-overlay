@@ -21,12 +21,16 @@ export interface GenericFeature extends FeatureBase {
  *  Its x/y/width/height are ignored; the zone computes them from its children. */
 export interface GroupFeature extends FeatureBase {
   type: 'group';
+  /** Cumulative rotation (degrees) applied to this group's children via applyGroupRotation. */
+  rotation?: number;
 }
 
 export interface ImageFeature extends FeatureBase {
   type: 'image';
   /** base64 data URL or HTTP URL */
   src: string;
+  /** Clockwise rotation in degrees around the feature centre. Defaults to 0. */
+  rotation?: number;
 }
 
 export interface TextFeature extends FeatureBase {
@@ -68,6 +72,8 @@ export interface RectFeature extends FeatureBase {
   borderRadius: number;
   /** Insets the visual rectangle from the bounding-box edges on all sides. */
   padding: number;
+  /** Clockwise rotation in degrees around the feature centre. Defaults to 0. */
+  rotation?: number;
 }
 
 export type HeatSource = 'current' | 'next0' | 'next1' | 'next2';
@@ -112,6 +118,8 @@ export interface ChronoFeature extends FeatureBase {
   align: TextAlign;
   outlineColor: string | null;
   outlineWidth: number;
+  /** Clockwise rotation in degrees around the feature centre. Defaults to 0. */
+  rotation?: number;
 }
 
 export interface ClockFeature extends FeatureBase {

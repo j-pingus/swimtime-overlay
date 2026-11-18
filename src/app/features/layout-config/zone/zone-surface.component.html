@@ -58,16 +58,64 @@
       <g [class.selected]="interactive() && (f.id === selectedFeatureId() || (!!f.groupId && f.groupId === selectedFeatureId()))">
 
         @if (asImage(f); as img) {
-          @if (img.src) {
-            <image
-              [attr.href]="img.src"
-              [attr.x]="f.x" [attr.y]="f.y"
-              [attr.width]="f.width" [attr.height]="f.height"
-              preserveAspectRatio="xMidYMid meet"
+          <g [attr.transform]="featureTransform(img)">
+            @if (img.src) {
+              <image
+                [attr.href]="img.src"
+                [attr.x]="f.x" [attr.y]="f.y"
+                [attr.width]="f.width" [attr.height]="f.height"
+                preserveAspectRatio="xMidYMid meet"
+                (mousedown)="interactive() && onFeatClick($event, f)"
+              />
+              @if (interactive()) {
+                <!-- transparent overlay provides selection border and reliable click target -->
+                <rect
+                  [attr.x]="f.x" [attr.y]="f.y"
+                  [attr.width]="f.width" [attr.height]="f.height"
+                  class="feature-overlay"
+                  (mousedown)="onFeatClick($event, f)"
+                />
+              }
+            } @else {
+              <!-- placeholder shown in config mode until an image is chosen -->
+              <rect
+                [attr.x]="f.x" [attr.y]="f.y"
+                [attr.width]="f.width" [attr.height]="f.height"
+                class="feature-rect feature-placeholder"
+                (mousedown)="interactive() && onFeatClick($event, f)"
+              />
+            }
+          </g>
+
+        } @else if (asRect(f); as r) {
+          <g [attr.transform]="featureTransform(r)">
+            <!-- Fill covers the full bounding box -->
+            <rect
+              [attr.x]="r.x" [attr.y]="r.y"
+              [attr.width]="r.width" [attr.height]="r.height"
+              [attr.fill]="rectFill(r)"
+              [attr.fill-opacity]="rectFillOpacity(r)"
+              stroke="none"
+              [attr.rx]="r.borderRadius"
+              class="rect-visual"
               (mousedown)="interactive() && onFeatClick($event, f)"
             />
+            <!-- Border drawn inset from the fill edges by padding -->
+            @if (r.border) {
+              <rect
+                [attr.x]="r.x + r.padding"
+                [attr.y]="r.y + r.padding"
+                [attr.width]="r.width - 2 * r.padding"
+                [attr.height]="r.height - 2 * r.padding"
+                fill="none"
+                [attr.stroke]="r.borderColor"
+                [attr.stroke-width]="r.borderWidth"
+                [attr.rx]="r.borderRadius"
+                class="rect-visual"
+              />
+            }
             @if (interactive()) {
-              <!-- transparent overlay provides selection border and reliable click target -->
+              <!-- selection + click overlay on the full bounding box so anchors always work -->
               <rect
                 [attr.x]="f.x" [attr.y]="f.y"
                 [attr.width]="f.width" [attr.height]="f.height"
@@ -75,51 +123,7 @@
                 (mousedown)="onFeatClick($event, f)"
               />
             }
-          } @else {
-            <!-- placeholder shown in config mode until an image is chosen -->
-            <rect
-              [attr.x]="f.x" [attr.y]="f.y"
-              [attr.width]="f.width" [attr.height]="f.height"
-              class="feature-rect feature-placeholder"
-              (mousedown)="interactive() && onFeatClick($event, f)"
-            />
-          }
-
-        } @else if (asRect(f); as r) {
-          <!-- Fill covers the full bounding box -->
-          <rect
-            [attr.x]="r.x" [attr.y]="r.y"
-            [attr.width]="r.width" [attr.height]="r.height"
-            [attr.fill]="rectFill(r)"
-            [attr.fill-opacity]="rectFillOpacity(r)"
-            stroke="none"
-            [attr.rx]="r.borderRadius"
-            class="rect-visual"
-            (mousedown)="interactive() && onFeatClick($event, f)"
-          />
-          <!-- Border drawn inset from the fill edges by padding -->
-          @if (r.border) {
-            <rect
-              [attr.x]="r.x + r.padding"
-              [attr.y]="r.y + r.padding"
-              [attr.width]="r.width - 2 * r.padding"
-              [attr.height]="r.height - 2 * r.padding"
-              fill="none"
-              [attr.stroke]="r.borderColor"
-              [attr.stroke-width]="r.borderWidth"
-              [attr.rx]="r.borderRadius"
-              class="rect-visual"
-            />
-          }
-          @if (interactive()) {
-            <!-- selection + click overlay on the full bounding box so anchors always work -->
-            <rect
-              [attr.x]="f.x" [attr.y]="f.y"
-              [attr.width]="f.width" [attr.height]="f.height"
-              class="feature-overlay"
-              (mousedown)="onFeatClick($event, f)"
-            />
-          }
+          </g>
 
         } @else if (asTextLike(f); as tl) {
           <g [attr.transform]="textTransform(tl)">
@@ -240,29 +244,31 @@
           }
 
         } @else if (aschrono(f); as ch) {
-          <rect
-            [attr.x]="f.x" [attr.y]="f.y"
-            [attr.width]="f.width" [attr.height]="f.height"
-            class="text-bg"
-            (mousedown)="interactive() && onFeatClick($event, f)"
-          />
-          <text
-            [attr.x]="textX(ch)"
-            [attr.y]="f.y + f.height / 2"
-            dominant-baseline="central"
-            [attr.font-family]="fontFamily()"
-            [attr.font-size]="ch.fontSize"
-            [attr.fill]="ch.color"
-            [attr.font-weight]="ch.bold ? 'bold' : 'normal'"
-            [attr.font-style]="ch.italic ? 'italic' : 'normal'"
-            [attr.text-anchor]="textAnchor(ch)"
-            [attr.stroke]="ch.outlineColor ?? 'none'"
-            [attr.stroke-width]="ch.outlineColor ? ch.outlineWidth : 0"
-            [attr.clip-path]="'url(#tc-' + f.id + ')'"
-            style="paint-order: stroke fill"
-            class="text-content"
-            (mousedown)="interactive() && onFeatClick($event, f)"
-          >{{ chronoText(ch) }}</text>
+          <g [attr.transform]="featureTransform(ch)">
+            <rect
+              [attr.x]="f.x" [attr.y]="f.y"
+              [attr.width]="f.width" [attr.height]="f.height"
+              class="text-bg"
+              (mousedown)="interactive() && onFeatClick($event, f)"
+            />
+            <text
+              [attr.x]="textX(ch)"
+              [attr.y]="f.y + f.height / 2"
+              dominant-baseline="central"
+              [attr.font-family]="fontFamily()"
+              [attr.font-size]="ch.fontSize"
+              [attr.fill]="ch.color"
+              [attr.font-weight]="ch.bold ? 'bold' : 'normal'"
+              [attr.font-style]="ch.italic ? 'italic' : 'normal'"
+              [attr.text-anchor]="textAnchor(ch)"
+              [attr.stroke]="ch.outlineColor ?? 'none'"
+              [attr.stroke-width]="ch.outlineColor ? ch.outlineWidth : 0"
+              [attr.clip-path]="'url(#tc-' + f.id + ')'"
+              style="paint-order: stroke fill"
+              class="text-content"
+              (mousedown)="interactive() && onFeatClick($event, f)"
+            >{{ chronoText(ch) }}</text>
+          </g>
 
         } @else {
           <rect

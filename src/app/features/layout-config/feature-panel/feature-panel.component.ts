@@ -82,6 +82,13 @@ export class FeaturePanelComponent {
     return f?.type === 'group' ? f : null;
   });
 
+  protected readonly groupAllChildrenRotatable = computed(() => {
+    const g = this.groupFeature();
+    if (!g) return false;
+    const children = this.features().filter(f => f.groupId === g.id);
+    return children.length > 0 && children.every(f => this.supportsRotation(f));
+  });
+
   protected readonly imageFeature = computed(() => {
     const f = this.feature();
     return f?.type === 'image' ? f : null;
@@ -319,6 +326,51 @@ export class FeaturePanelComponent {
 
   asNumber(value: string): number {
     return Math.max(0, Math.round(parseFloat(value)) || 0);
+  }
+
+  asRotation(value: string): number {
+    return Math.round(parseFloat(value)) || 0;
+  }
+
+  private supportsRotation(f: AnyFeature): boolean {
+    return f.type === 'text' || f.type === 'image' || f.type === 'rect' || f.type === 'chrono';
+  }
+
+  applyGroupRotation(newAngle: number): void {
+    const g = this.groupFeature();
+    if (!g) return;
+    const children = this.features().filter(f => f.groupId === g.id);
+    if (children.length === 0) return;
+
+    const delta = newAngle - (g.rotation ?? 0);
+    if (delta === 0) return;
+
+    const deltaRad = (delta * Math.PI) / 180;
+    const cos = Math.cos(deltaRad);
+    const sin = Math.sin(deltaRad);
+
+    const minX = Math.min(...children.map(f => f.x));
+    const minY = Math.min(...children.map(f => f.y));
+    const maxX = Math.max(...children.map(f => f.x + f.width));
+    const maxY = Math.max(...children.map(f => f.y + f.height));
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+
+    const updatedChildren = children.map((f): AnyFeature => {
+      const fcx = f.x + f.width / 2;
+      const fcy = f.y + f.height / 2;
+      const dx = fcx - cx;
+      const dy = fcy - cy;
+      const newFcx = cx + dx * cos - dy * sin;
+      const newFcy = cy + dx * sin + dy * cos;
+      const newX = Math.round(newFcx - f.width / 2);
+      const newY = Math.round(newFcy - f.height / 2);
+      const currentRot = (f as { rotation?: number }).rotation ?? 0;
+      return { ...f, x: newX, y: newY, rotation: Math.round(currentRot + delta) } as AnyFeature;
+    });
+
+    const updatedGroup: AnyFeature = { ...g, rotation: newAngle };
+    this.featuresUpdate.emit([updatedGroup, ...updatedChildren]);
   }
 
   onImageSelected(event: Event): void {

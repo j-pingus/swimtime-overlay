@@ -251,7 +251,7 @@ export class LayoutStore {
    *  Returns the new group's id. */
   groupFeatures(layoutId: string, featureIds: string[], label: string): string {
     const groupId = generateUUID();
-    const group: GroupFeature = { type: 'group', id: groupId, label, x: 0, y: 0, width: 0, height: 0 };
+    const group: GroupFeature = { type: 'group', id: groupId, label, x: 0, y: 0, width: 0, height: 0, rotation: 0 };
     const idSet = new Set(featureIds);
     this.update((s) => ({
       ...s,

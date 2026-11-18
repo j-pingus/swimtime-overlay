@@ -192,6 +192,14 @@ export class ZoneSurfaceComponent {
     return formatChrono(Math.max(0, elapsedMs));
   }
 
+  protected featureTransform(f: { x: number; y: number; width: number; height: number; rotation?: number }): string | null {
+    const rotation = f.rotation ?? 0;
+    if (!rotation) return null;
+    const cx = f.x + f.width / 2;
+    const cy = f.y + f.height / 2;
+    return `rotate(${rotation}, ${cx}, ${cy})`;
+  }
+
   protected textTransform(f: TextFeature | LaneFeature): string | null {
     const rotation = f.type === 'text' ? (f.rotation ?? 0) : 0;
     if (!rotation) return null;
