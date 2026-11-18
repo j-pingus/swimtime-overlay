@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AnyFeature, ChronoFeature, ClockFeature, FlagFeature, GroupFeature, ImageFeature, LaneFeature, PolygonFeature, RectFeature, TextFeature } from '../../../core/models/layout.model';
@@ -37,6 +37,8 @@ export class FeaturePanelComponent {
   readonly groupRemoveWithChildren = output<string>();
 
   protected readonly hasClipboard = this.clipboard.hasContent;
+  protected readonly toast = signal<string>('');
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Ids of features checked for grouping — cleared on group creation. */
   private readonly checkedIds = signal<Set<string>>(new Set());
@@ -260,6 +262,31 @@ export class FeaturePanelComponent {
     this.featureChange.emit({ ...f, src } satisfies ImageFeature);
   }
 
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    const tag = (event.target as HTMLElement).tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (!event.metaKey && !event.ctrlKey) return;
+
+    if (event.key === 'c') {
+      event.preventDefault();
+      this.copy();
+    } else if (event.key === 'v') {
+      event.preventDefault();
+      this.paste();
+    }
+  }
+
+  private showToast(msg: string): void {
+    if (this.toastTimer !== null) clearTimeout(this.toastTimer);
+    this.toast.set('');
+    // Force a new animation cycle by resetting to empty first (microtask gap).
+    queueMicrotask(() => {
+      this.toast.set(msg);
+      this.toastTimer = setTimeout(() => { this.toast.set(''); this.toastTimer = null; }, 2000);
+    });
+  }
+
   copy(): void {
     const f = this.feature();
     if (!f) return;
@@ -269,11 +296,15 @@ export class FeaturePanelComponent {
     } else {
       this.clipboard.copy([{ ...f, groupId: undefined }]);
     }
+    this.showToast('Copied!');
   }
 
   paste(): void {
     const pasted = this.clipboard.paste();
-    if (pasted) this.featurePaste.emit(pasted);
+    if (pasted) {
+      this.featurePaste.emit(pasted);
+      this.showToast('Pasted!');
+    }
   }
 
   remove(): void {

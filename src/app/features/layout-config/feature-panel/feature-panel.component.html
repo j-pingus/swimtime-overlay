@@ -1,3 +1,7 @@
+@if (toast()) {
+  <div class="toast">{{ toast() }}</div>
+}
+
 @if (feature(); as f) {
   <div class="panel">
     <h2>{{
