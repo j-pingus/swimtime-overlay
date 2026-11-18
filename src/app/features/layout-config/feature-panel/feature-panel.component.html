@@ -139,6 +139,15 @@
             (change)="patchRect({ padding: asNumber($any($event.target).value) })" />
         </div>
       </div>
+
+      <div class="style-row">
+        <div class="field field--rotation">
+          <label>Rotation</label>
+          <input type="number" [value]="r.rotation ?? 0" min="-360" max="360"
+            (change)="patchRect({ rotation: asRotation($any($event.target).value) })" />
+          <span class="unit">°</span>
+        </div>
+      </div>
     }
 
     @if (laneFeature(); as ln) {
@@ -390,6 +399,12 @@
           (click)="patchChrono({ bold: !ch.bold })"><b>B</b></button>
         <button class="btn-style" [class.active]="ch.italic"
           (click)="patchChrono({ italic: !ch.italic })"><i>I</i></button>
+        <div class="field field--rotation">
+          <label>Rotation</label>
+          <input type="number" [value]="ch.rotation ?? 0" min="-360" max="360"
+            (change)="patchChrono({ rotation: asRotation($any($event.target).value) })" />
+          <span class="unit">°</span>
+        </div>
       </div>
 
       <h3>Alignment</h3>
@@ -513,6 +528,15 @@
         @if (img.src) {
           <button class="btn-clear" (click)="clearImage()">Clear</button>
         }
+      </div>
+
+      <div class="style-row">
+        <div class="field field--rotation">
+          <label>Rotation</label>
+          <input type="number" [value]="img.rotation ?? 0" min="-360" max="360"
+            (change)="patch({ rotation: asRotation($any($event.target).value) })" />
+          <span class="unit">°</span>
+        </div>
       </div>
     }
 

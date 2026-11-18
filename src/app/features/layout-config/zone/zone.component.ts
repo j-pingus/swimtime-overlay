@@ -210,10 +210,42 @@ export class ZoneComponent {
     event.preventDefault();
 
     const step = event.shiftKey ? 10 : 1;
-    const resize = event.altKey;
+    const rotate = event.altKey && dx !== 0;
+    const resize = event.altKey && !rotate;
 
     const feature = this.features().find((f) => f.id === id);
     if (!feature) return;
+
+    if (rotate) {
+      const delta = dx * step;
+      if (feature.type === 'group') {
+        const children = this.features().filter((f) => f.groupId === id);
+        if (children.length === 0 || !children.every(supportsRotation)) return;
+        const minX = Math.min(...children.map((f) => f.x));
+        const minY = Math.min(...children.map((f) => f.y));
+        const maxX = Math.max(...children.map((f) => f.x + f.width));
+        const maxY = Math.max(...children.map((f) => f.y + f.height));
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const rad = (delta * Math.PI) / 180;
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        const updatedChildren = children.map((f): AnyFeature => {
+          const fcx = f.x + f.width / 2;
+          const fcy = f.y + f.height / 2;
+          const newFcx = cx + (fcx - cx) * cos - (fcy - cy) * sin;
+          const newFcy = cy + (fcx - cx) * sin + (fcy - cy) * cos;
+          const currentRot = (f as { rotation?: number }).rotation ?? 0;
+          return { ...f, x: Math.round(newFcx - f.width / 2), y: Math.round(newFcy - f.height / 2), rotation: Math.round(currentRot + delta) } as AnyFeature;
+        });
+        const updatedGroup: AnyFeature = { ...feature, rotation: Math.round((feature.rotation ?? 0) + delta) };
+        this.featuresUpdate.emit([updatedGroup, ...updatedChildren]);
+      } else if (supportsRotation(feature)) {
+        const currentRot = (feature as { rotation?: number }).rotation ?? 0;
+        this.featureUpdate.emit({ ...feature, rotation: Math.round(currentRot + delta) } as AnyFeature);
+      }
+      return;
+    }
 
     if (feature.type === 'group') {
       // Move all children; groups have no intrinsic position to resize.
@@ -322,6 +354,10 @@ export class ZoneComponent {
 
 function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
+}
+
+function supportsRotation(f: AnyFeature): boolean {
+  return f.type === 'text' || f.type === 'image' || f.type === 'rect' || f.type === 'chrono';
 }
 
 function round(v: number): number {
