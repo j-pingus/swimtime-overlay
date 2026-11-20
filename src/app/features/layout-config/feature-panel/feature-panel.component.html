@@ -184,6 +184,21 @@
         }
       </div>
 
+      <details class="vars-ref">
+        <summary>Available variables</summary>
+        <ul>
+          <li><code>${{ '{' }}swimmerName{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('swimmerName')">Use</button></li>
+          <li><code>${{ '{' }}club{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('club')">Use</button></li>
+          <li><code>${{ '{' }}nat{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('nat')">Use</button></li>
+          <li><code>${{ '{' }}entryTime{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('entryTime')">Use</button></li>
+          <li><code>${{ '{' }}time{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('time')">Use</button></li>
+          <li><code>${{ '{' }}officialTime{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('officialTime')">Use</button></li>
+          <li><code>${{ '{' }}rank{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('rank')">Use</button></li>
+          <li><code>${{ '{' }}distance{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('distance')">Use</button></li>
+          <li><code>${{ '{' }}number{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('number')">Use</button></li>
+        </ul>
+      </details>
+
       <div class="field-row">
         <div class="field">
           <label>Font size</label>
@@ -229,21 +244,6 @@
           (click)="patchLane({ align: 'right' })">Right</button>
       </div>
 
-      <details class="vars-ref">
-        <summary>Available variables</summary>
-        <ul>
-          <li><code>${{ '{' }}swimmerName{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('swimmerName')">Use</button></li>
-          <li><code>${{ '{' }}club{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('club')">Use</button></li>
-          <li><code>${{ '{' }}nat{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('nat')">Use</button></li>
-          <li><code>${{ '{' }}entryTime{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('entryTime')">Use</button></li>
-          <li><code>${{ '{' }}time{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('time')">Use</button></li>
-          <li><code>${{ '{' }}officialTime{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('officialTime')">Use</button></li>
-          <li><code>${{ '{' }}rank{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('rank')">Use</button></li>
-          <li><code>${{ '{' }}distance{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('distance')">Use</button></li>
-          <li><code>${{ '{' }}number{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('number')">Use</button></li>
-        </ul>
-      </details>
-
       <h3>Display duration</h3>
       <div class="field-row field-row--center">
         <label class="toggle-label">
@@ -274,6 +274,42 @@
           <p class="template-error">Unknown variable{{ textTemplateErrors().length > 1 ? 's' : '' }}: {{ textTemplateErrors().join(', ') }}</p>
         }
       </div>
+
+      <details class="vars-ref">
+        <summary>Available variables</summary>
+        <ul>
+          <li><code>${{ '{' }}currentEvent.number{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.number')">Use</button></li>
+          <li><code>${{ '{' }}currentEvent.stroke{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.stroke')">Use</button></li>
+          <li><code>${{ '{' }}currentEvent.category{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.category')">Use</button></li>
+          <li><code>${{ '{' }}currentEvent.distance{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.distance')">Use</button></li>
+          <li><code>${{ '{' }}currentEvent.countHeats{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.countHeats')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.number{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.number')">Use</button></li>
+        </ul>
+        <p class="vars-hint">Lane fields (0-based index):</p>
+        <ul>
+          <li><code>${{ '{' }}currentHeat.lanes.0.swimmerName{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.swimmerName')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.club{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.club')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.nat{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.nat')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.entryTime{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.entryTime')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.time{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.time')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.officialTime{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.officialTime')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.rank{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.rank')">Use</button></li>
+        </ul>
+        <p class="vars-hint">Next heats (indices 0–2):</p>
+        <ul>
+          <li><code>${{ '{' }}nextHeats.0.event{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.event')">Use</button></li>
+          <li><code>${{ '{' }}nextHeats.0.heat{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.heat')">Use</button></li>
+          <li><code>${{ '{' }}nextHeats.0.stroke{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.stroke')">Use</button></li>
+          <li><code>${{ '{' }}nextHeats.0.category{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.category')">Use</button></li>
+          <li><code>${{ '{' }}nextHeats.0.distance{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.distance')">Use</button></li>
+        </ul>
+        <p class="vars-hint">Current time (e.g. <code>${{ '{' }}HH{{ '}' }}:${{ '{' }}MM{{ '}' }}:${{ '{' }}SS{{ '}' }}</code>):</p>
+        <ul>
+          <li><code>${{ '{' }}HH{{ '}' }}</code> — hour (00–23)<button class="btn-use-var" (click)="appendTextToken('HH')">Use</button></li>
+          <li><code>${{ '{' }}MM{{ '}' }}</code> — minute (00–59)<button class="btn-use-var" (click)="appendTextToken('MM')">Use</button></li>
+          <li><code>${{ '{' }}SS{{ '}' }}</code> — second (00–59)<button class="btn-use-var" (click)="appendTextToken('SS')">Use</button></li>
+        </ul>
+      </details>
 
       <div class="field-row">
         <div class="field">
@@ -325,42 +361,6 @@
         <button class="btn-align" [class.active]="txt.align === 'right'"
           (click)="patchText({ align: 'right' })">Right</button>
       </div>
-
-      <details class="vars-ref">
-        <summary>Available variables</summary>
-        <ul>
-          <li><code>${{ '{' }}currentEvent.number{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.number')">Use</button></li>
-          <li><code>${{ '{' }}currentEvent.stroke{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.stroke')">Use</button></li>
-          <li><code>${{ '{' }}currentEvent.category{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.category')">Use</button></li>
-          <li><code>${{ '{' }}currentEvent.distance{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.distance')">Use</button></li>
-          <li><code>${{ '{' }}currentEvent.countHeats{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentEvent.countHeats')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.number{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.number')">Use</button></li>
-        </ul>
-        <p class="vars-hint">Lane fields (0-based index):</p>
-        <ul>
-          <li><code>${{ '{' }}currentHeat.lanes.0.swimmerName{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.swimmerName')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.lanes.0.club{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.club')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.lanes.0.nat{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.nat')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.lanes.0.entryTime{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.entryTime')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.lanes.0.time{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.time')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.lanes.0.officialTime{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.officialTime')">Use</button></li>
-          <li><code>${{ '{' }}currentHeat.lanes.0.rank{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.rank')">Use</button></li>
-        </ul>
-        <p class="vars-hint">Next heats (indices 0–2):</p>
-        <ul>
-          <li><code>${{ '{' }}nextHeats.0.event{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.event')">Use</button></li>
-          <li><code>${{ '{' }}nextHeats.0.heat{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.heat')">Use</button></li>
-          <li><code>${{ '{' }}nextHeats.0.stroke{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.stroke')">Use</button></li>
-          <li><code>${{ '{' }}nextHeats.0.category{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.category')">Use</button></li>
-          <li><code>${{ '{' }}nextHeats.0.distance{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('nextHeats.0.distance')">Use</button></li>
-        </ul>
-        <p class="vars-hint">Current time (e.g. <code>${{ '{' }}HH{{ '}' }}:${{ '{' }}MM{{ '}' }}:${{ '{' }}SS{{ '}' }}</code>):</p>
-        <ul>
-          <li><code>${{ '{' }}HH{{ '}' }}</code> — hour (00–23)<button class="btn-use-var" (click)="appendTextToken('HH')">Use</button></li>
-          <li><code>${{ '{' }}MM{{ '}' }}</code> — minute (00–59)<button class="btn-use-var" (click)="appendTextToken('MM')">Use</button></li>
-          <li><code>${{ '{' }}SS{{ '}' }}</code> — second (00–59)<button class="btn-use-var" (click)="appendTextToken('SS')">Use</button></li>
-        </ul>
-      </details>
     }
 
     @if (chronoFeature(); as ch) {
