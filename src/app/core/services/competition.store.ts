@@ -13,25 +13,25 @@ export interface CompetitionStoreState {
 const MODE_KEY       = 'swimtime_competition_mode';
 const LANE_COUNT_KEY  = 'swimtime_lane_count';
 const FIRST_LANE_KEY  = 'swimtime_first_lane';
-const DEFAULT_LANES   = 8;
+const DEFAULT_LANES   = 10;
 const DEFAULT_FIRST_LANE = 1;
 
 // Full roster of dummy swimmers — pool is sliced/extended to match laneCount.
 const DUMMY_ROSTER: Omit<Lane, 'number'>[] = [
-  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     nat: 'FRA', entryTime: '1:02.45', officialTime: '1:02.87', time: '1:02.87', rank: '3',  timestamp: null, distance: '100' },
-  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          nat: 'GBR', entryTime: '1:01.12', officialTime: '1:01.34', time: '1:01.34', rank: '1',  timestamp: null, distance: '100' },
-  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     nat: 'GER', entryTime: '1:01.89', officialTime: '1:01.56', time: '1:01.56', rank: '2',  timestamp: null, distance: '100' },
-  { swimmerName: 'Laura García',   club: 'CN Barcelona',     nat: 'ESP', entryTime: '1:03.21', officialTime: '1:03.45', time: '1:03.45', rank: '4',  timestamp: null, distance: '100' },
-  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       nat: 'POL', entryTime: '1:03.88', officialTime: '1:02.87', time: '1:02.87', rank: '5',  timestamp: null, distance: '100' },
-  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', nat: 'BEL', entryTime: '1:04.12', officialTime: '1:01.34', time: '1:01.34', rank: '6',  timestamp: null, distance: '100' },
-  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         nat: 'DEN', entryTime: '1:04.56', officialTime: '1:02.87', time: '1:02.87', rank: '7',  timestamp: null, distance: '100' },
-  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    nat: 'SVK', entryTime: '1:05.01', officialTime: '1:01.34', time: '1:01.34', rank: '9',  timestamp: null, distance: '100' },
-  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       nat: 'ITA', entryTime: '1:05.34', officialTime: '1:01.56', time: '1:01.56', rank: '8',  timestamp: null, distance: '100' },
-  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  nat: 'CZE', entryTime: '1:05.67', officialTime: '1:03.45', time: '1:03.45', rank: '10', timestamp: null, distance: '100' },
+  { swimmerName: 'Alice Martin',   club: 'CN Marseille',     clubCode: 'CNM',  clubNat: 'FRA', nat: 'FRA', entryTime: '1:02.45', officialTime: '1:02.87', time: '1:02.87', rank: '3',  timestamp: null, distance: '100' },
+  { swimmerName: 'Emma Johnson',   club: 'Bath SC',          clubCode: 'BATH', clubNat: 'GBR', nat: 'GBR', entryTime: '1:01.12', officialTime: '1:01.34', time: '1:01.34', rank: '1',  timestamp: null, distance: '100' },
+  { swimmerName: 'Sophie Müller',  club: 'SG Frankfurt',     clubCode: 'SGF',  clubNat: 'GER', nat: 'GER', entryTime: '1:01.89', officialTime: '1:01.56', time: '1:01.56', rank: '2',  timestamp: null, distance: '100' },
+  { swimmerName: 'Laura García',   club: 'CN Barcelona',     clubCode: 'CNB',  clubNat: 'ESP', nat: 'ESP', entryTime: '1:03.21', officialTime: '1:03.45', time: '1:03.45', rank: '4',  timestamp: null, distance: '100' },
+  { swimmerName: 'Anna Kowalski',  club: 'KS Wrocław',       clubCode: 'KSW',  clubNat: 'POL', nat: 'POL', entryTime: '1:03.88', officialTime: '1:02.87', time: '1:02.87', rank: '5',  timestamp: null, distance: '100' },
+  { swimmerName: 'Claire Dupont',  club: 'Swimming Antwerp', clubCode: 'SWA',  clubNat: 'BEL', nat: 'FRA', entryTime: '1:04.12', officialTime: '1:01.34', time: '1:01.34', rank: '6',  timestamp: null, distance: '100' },
+  { swimmerName: 'Mia Hansen',     club: 'Virum SK',         clubCode: 'VSK',  clubNat: 'DEN', nat: 'DEN', entryTime: '1:04.56', officialTime: '1:02.87', time: '1:02.87', rank: '7',  timestamp: null, distance: '100' },
+  { swimmerName: 'Lena Novak',     club: 'PK Bratislava',    clubCode: 'PKB',  clubNat: 'SVK', nat: 'CZE', entryTime: '1:05.01', officialTime: '1:01.34', time: '1:01.34', rank: '9',  timestamp: null, distance: '100' },
+  { swimmerName: 'Sara Rossi',     club: 'Fiamme Oro',       clubCode: 'FIO',  clubNat: 'ITA', nat: 'ITA', entryTime: '1:05.34', officialTime: '1:01.56', time: '1:01.56', rank: '8',  timestamp: null, distance: '100' },
+  { swimmerName: 'Petra Novotná',  club: 'SK Slavia Praha',  clubCode: 'SKS',  clubNat: 'CZE', nat: 'CZE', entryTime: '1:05.67', officialTime: '1:03.45', time: '1:03.45', rank: '10', timestamp: null, distance: '100' },
 ];
 
 function emptyLane(number: number): Lane {
-  return { number, swimmerName: '', club: '', nat: '', entryTime: null, officialTime: null, time: null, rank: null, timestamp: null, distance: null };
+  return { number, swimmerName: '', club: '', clubCode: '', clubNat: '', nat: '', entryTime: null, officialTime: null, time: null, rank: null, timestamp: null, distance: null };
 }
 
 function normalizeLanes(lanes: Lane[], laneCount: number, firstLane: number): Lane[] {
@@ -57,13 +57,14 @@ function buildDummyLanes(laneCount: number, firstLane: number, rosterOffset = 0,
 }
 
 function buildDummyCompetition(laneCount: number, firstLane: number): Competition {
+  const dummyCount = Math.max(laneCount, DEFAULT_LANES);
   return {
     currentEvent: { number: '14', stroke: 'Butterfly', category: 'Women', distance: '100m', countHeats: 3 },
-    currentHeat:  { number: '2', splashHeatId: 42, lanes: buildDummyLanes(laneCount, firstLane) },
+    currentHeat:  { number: '2', splashHeatId: 42, lanes: buildDummyLanes(dummyCount, firstLane) },
     nextHeats: [
-      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100m', splashHeatId: 43, lanes: buildDummyLanes(laneCount, firstLane, 2, true) },
-      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200m', splashHeatId: 44, lanes: buildDummyLanes(laneCount, firstLane, 4, true) },
-      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200m', splashHeatId: 45, lanes: buildDummyLanes(laneCount, firstLane, 6, true) },
+      { event: '14', heat: '3', stroke: 'Butterfly',   category: 'Men',   distance: '100m', splashHeatId: 43, lanes: buildDummyLanes(dummyCount, firstLane, 2, true) },
+      { event: '15', heat: '1', stroke: 'Backstroke',  category: 'Women', distance: '200m', splashHeatId: 44, lanes: buildDummyLanes(dummyCount, firstLane, 4, true) },
+      { event: '15', heat: '2', stroke: 'Backstroke',  category: 'Women', distance: '200m', splashHeatId: 45, lanes: buildDummyLanes(dummyCount, firstLane, 6, true) },
     ],
     chronoStartTime: Date.now() - 23456,
     chronoStopTime: null,

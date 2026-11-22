@@ -37,6 +37,8 @@ function mapLane(dto: LaneDto, index: number): Lane {
     number: dto.laneId ?? index + 1,
     swimmerName: dto.displayName ?? '',
     club: dto.club ?? '',
+    clubCode: dto.clubCode ?? '',
+    clubNat: dto.clubNat ?? '',
     nat: dto.nat ?? '',
     entryTime: dto.entryTime ?? null,
     officialTime: dto.officialTime ?? null,

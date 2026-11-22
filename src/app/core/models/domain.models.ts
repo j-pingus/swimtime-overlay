@@ -2,6 +2,8 @@ export interface Lane {
   number: number;
   swimmerName: string;
   club: string;
+  clubCode: string;
+  clubNat: string;
   nat: string;
   entryTime: string | null;
   /** Final official time once the heat is finished. */

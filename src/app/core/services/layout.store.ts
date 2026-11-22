@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, FlagFeature, MessageTypeRule, MessageTypeRules, TextFeature, LaneOrder } from '../models/layout.model';
 import { generateUUID } from '../utils/uuid.util';
 
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 8;
 
 export type RenderBackground = 'transparent' | 'green';
 
@@ -413,6 +413,36 @@ export class LayoutStore {
           features: l.features.map((f): AnyFeature => {
             if (f.type === 'flag') {
               return { ...f, laneOrder: (f as FlagFeature & { laneOrder?: LaneOrder }).laneOrder ?? 'lane' };
+            }
+            return f;
+          }),
+        })),
+      };
+    }
+
+    if (from < 7) {
+      state = {
+        ...state,
+        layouts: state.layouts.map((l) => ({
+          ...l,
+          features: l.features.map((f): AnyFeature => {
+            if (f.type === 'flag') {
+              return { ...f, natSource: (f as FlagFeature & { natSource?: 'swimmer' | 'club' }).natSource ?? 'swimmer' };
+            }
+            return f;
+          }),
+        })),
+      };
+    }
+
+    if (from < 8) {
+      state = {
+        ...state,
+        layouts: state.layouts.map((l) => ({
+          ...l,
+          features: l.features.map((f): AnyFeature => {
+            if (f.type === 'flag') {
+              return { ...f, laneFilter: (f as FlagFeature & { laneFilter?: number | null }).laneFilter ?? null };
             }
             return f;
           }),

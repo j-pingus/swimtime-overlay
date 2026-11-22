@@ -357,7 +357,7 @@ function clamp(v: number, min: number, max: number): number {
 }
 
 function supportsRotation(f: AnyFeature): boolean {
-  return f.type === 'text' || f.type === 'image' || f.type === 'rect' || f.type === 'chrono';
+  return f.type === 'text' || f.type === 'image' || f.type === 'rect' || f.type === 'chrono' || f.type === 'flag';
 }
 
 function round(v: number): number {

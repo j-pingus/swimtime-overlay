@@ -2,6 +2,8 @@ export interface LaneDto {
   laneId?: number;
   displayName?: string;
   club?: string;
+  clubCode?: string;
+  clubNat?: string;
   nat?: string;
   entryTime?: string;
   officialTime?: string;

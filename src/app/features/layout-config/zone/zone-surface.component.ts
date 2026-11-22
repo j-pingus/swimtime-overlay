@@ -139,7 +139,8 @@ export class ZoneSurfaceComponent {
 
   protected flagRows(f: FlagFeature): Array<{ y: number; h: number; url: string | null }> {
     const raw = resolveLanes(this.competitionStore.competition(), f.heatSource);
-    const lanes = f.laneOrder === 'rank' ? sortByRank(raw) : raw;
+    const ordered = f.laneOrder === 'rank' ? sortByRank(raw) : raw;
+    const lanes = f.laneFilter != null ? ordered.filter(l => l.number === f.laneFilter) : ordered;
     const now = this.now();
     const rowH = lanes.length > 0 ? f.height / lanes.length : f.height;
     return lanes.map((lane, i) => {
@@ -150,7 +151,7 @@ export class ZoneSurfaceComponent {
       return {
         y: f.y + i * rowH,
         h: rowH,
-        url: expired ? null : flagUrl(lane.nat),
+        url: expired ? null : flagUrl(f.natSource === 'club' ? lane.clubNat : lane.nat),
       };
     });
   }

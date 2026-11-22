@@ -42,8 +42,11 @@ export function findUnresolvedTokens(template: string, root: object): string[] {
     let val: unknown = root;
     for (const key of keys) {
       if (val == null || typeof val !== 'object') { unresolved.push(match); return ''; }
-      if (!Object.prototype.hasOwnProperty.call(val, key)) { unresolved.push(match); return ''; }
-      val = (val as Record<string, unknown>)[key];
+      // For arrays with a numeric index, use element 0 to validate the sub-path
+      // so templates referencing any lane index (e.g. lanes.5) don't false-positive.
+      const lookupKey = Array.isArray(val) && /^\d+$/.test(key) ? '0' : key;
+      if (!Object.prototype.hasOwnProperty.call(val, lookupKey)) { unresolved.push(match); return ''; }
+      val = (val as Record<string, unknown>)[lookupKey];
     }
     return '';
   });

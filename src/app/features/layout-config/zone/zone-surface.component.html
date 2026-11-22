@@ -224,24 +224,26 @@
           }
 
         } @else if (asFlag(f); as flag) {
-          @for (row of flagRows(flag); track $index) {
-            @if (row.url) {
-              <image
-                [attr.href]="row.url"
-                [attr.x]="f.x" [attr.y]="row.y"
-                [attr.width]="f.width" [attr.height]="row.h"
-                preserveAspectRatio="xMidYMid meet"
+          <g [attr.transform]="featureTransform(flag)">
+            @for (row of flagRows(flag); track $index) {
+              @if (row.url) {
+                <image
+                  [attr.href]="row.url"
+                  [attr.x]="f.x" [attr.y]="row.y"
+                  [attr.width]="f.width" [attr.height]="row.h"
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              }
+            }
+            @if (interactive()) {
+              <rect
+                [attr.x]="f.x" [attr.y]="f.y"
+                [attr.width]="f.width" [attr.height]="f.height"
+                class="feature-overlay"
+                (mousedown)="onFeatClick($event, f)"
               />
             }
-          }
-          @if (interactive()) {
-            <rect
-              [attr.x]="f.x" [attr.y]="f.y"
-              [attr.width]="f.width" [attr.height]="f.height"
-              class="feature-overlay"
-              (mousedown)="onFeatClick($event, f)"
-            />
-          }
+          </g>
 
         } @else if (aschrono(f); as ch) {
           <g [attr.transform]="featureTransform(ch)">

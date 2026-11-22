@@ -107,6 +107,12 @@ export interface FlagFeature extends FeatureBase {
   displayDuration: number | null;
   /** Row ordering: by lane number or by rank. Defaults to 'lane'. */
   laneOrder: LaneOrder;
+  /** Which nation code drives the flag: swimmer's nat or club's clubNat. Defaults to 'swimmer'. */
+  natSource: 'swimmer' | 'club';
+  /** Show only the lane with this lane number. Null = show all lanes. */
+  laneFilter: number | null;
+  /** Clockwise rotation in degrees around the feature centre. Defaults to 0. */
+  rotation?: number;
 }
 
 export interface ChronoFeature extends FeatureBase {

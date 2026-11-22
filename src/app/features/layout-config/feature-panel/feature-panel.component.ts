@@ -129,6 +129,17 @@ export class FeaturePanelComponent {
     return f?.type === 'flag' ? f : null;
   });
 
+  protected readonly flagLaneNumbers = computed((): number[] => {
+    const flag = this.flagFeature();
+    const competition = this.competitionStore.competition();
+    let lanes;
+    if (flag?.heatSource === 'next0') lanes = competition.nextHeats[0]?.lanes;
+    else if (flag?.heatSource === 'next1') lanes = competition.nextHeats[1]?.lanes;
+    else if (flag?.heatSource === 'next2') lanes = competition.nextHeats[2]?.lanes;
+    else lanes = competition.currentHeat?.lanes;
+    return (lanes ?? []).map(l => l.number);
+  });
+
   protected readonly textTemplateErrors = computed(() => {
     const txt = this.textFeature();
     if (!txt) return [];
@@ -333,7 +344,7 @@ export class FeaturePanelComponent {
   }
 
   private supportsRotation(f: AnyFeature): boolean {
-    return f.type === 'text' || f.type === 'image' || f.type === 'rect' || f.type === 'chrono';
+    return f.type === 'text' || f.type === 'image' || f.type === 'rect' || f.type === 'chrono' || f.type === 'flag';
   }
 
   applyGroupRotation(newAngle: number): void {

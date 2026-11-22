@@ -189,6 +189,8 @@
         <ul>
           <li><code>${{ '{' }}swimmerName{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('swimmerName')">Use</button></li>
           <li><code>${{ '{' }}club{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('club')">Use</button></li>
+          <li><code>${{ '{' }}clubCode{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('clubCode')">Use</button></li>
+          <li><code>${{ '{' }}clubNat{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('clubNat')">Use</button></li>
           <li><code>${{ '{' }}nat{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('nat')">Use</button></li>
           <li><code>${{ '{' }}entryTime{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('entryTime')">Use</button></li>
           <li><code>${{ '{' }}time{{ '}' }}</code><button class="btn-use-var" (click)="appendLaneToken('time')">Use</button></li>
@@ -289,6 +291,8 @@
         <ul>
           <li><code>${{ '{' }}currentHeat.lanes.0.swimmerName{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.swimmerName')">Use</button></li>
           <li><code>${{ '{' }}currentHeat.lanes.0.club{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.club')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.clubCode{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.clubCode')">Use</button></li>
+          <li><code>${{ '{' }}currentHeat.lanes.0.clubNat{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.clubNat')">Use</button></li>
           <li><code>${{ '{' }}currentHeat.lanes.0.nat{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.nat')">Use</button></li>
           <li><code>${{ '{' }}currentHeat.lanes.0.entryTime{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.entryTime')">Use</button></li>
           <li><code>${{ '{' }}currentHeat.lanes.0.time{{ '}' }}</code><button class="btn-use-var" (click)="appendTextToken('currentHeat.lanes.0.time')">Use</button></li>
@@ -469,6 +473,24 @@
         </select>
       </div>
 
+      <div class="field">
+        <label>Lane</label>
+        <select [value]="flag.laneFilter ?? 'all'" (change)="patchFlag({ laneFilter: $any($event.target).value === 'all' ? null : asNumber($any($event.target).value) })">
+          <option value="all">All lanes</option>
+          @for (n of flagLaneNumbers(); track n) {
+            <option [value]="n">Lane {{ n }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Nation source</label>
+        <select [value]="flag.natSource" (change)="patchFlag({ natSource: $any($any($event.target).value) })">
+          <option value="swimmer">Swimmer nation</option>
+          <option value="club">Club nation</option>
+        </select>
+      </div>
+
       <h3>Display duration</h3>
       <div class="field-row field-row--center">
         <label class="toggle-label">
@@ -483,6 +505,15 @@
             <label>s</label>
           </div>
         }
+      </div>
+
+      <div class="style-row">
+        <div class="field field--rotation">
+          <label>Rotation</label>
+          <input type="number" [value]="flag.rotation ?? 0" min="-360" max="360"
+            (change)="patchFlag({ rotation: asRotation($any($event.target).value) })" />
+          <span class="unit">°</span>
+        </div>
       </div>
     }
 
