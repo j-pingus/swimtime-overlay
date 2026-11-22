@@ -185,8 +185,10 @@ Replace `0` with the lane index (e.g. `1` for the second lane):
 | Token | Value |
 |-------|-------|
 | `${currentHeat.lanes.0.swimmerName}` | Swimmer's full name |
-| `${currentHeat.lanes.0.club}` | Club name |
-| `${currentHeat.lanes.0.nat}` | Nationality code |
+| `${currentHeat.lanes.0.club}` | Club full name |
+| `${currentHeat.lanes.0.clubCode}` | Club short code (e.g. `CNM`) |
+| `${currentHeat.lanes.0.clubNat}` | Club's nation code (may differ from swimmer's) |
+| `${currentHeat.lanes.0.nat}` | Swimmer's nationality code |
 | `${currentHeat.lanes.0.entryTime}` | Entry time |
 | `${currentHeat.lanes.0.time}` | Live time (updated during the race) |
 | `${currentHeat.lanes.0.officialTime}` | Official final time |
@@ -219,8 +221,10 @@ The template is evaluated **once per lane** and resolved against the individual 
 | Token | Value |
 |-------|-------|
 | `${swimmerName}` | Swimmer's full name |
-| `${club}` | Club name |
-| `${nat}` | Nationality code |
+| `${club}` | Club full name |
+| `${clubCode}` | Club short code (e.g. `CNM`) |
+| `${clubNat}` | Club's nation code (may differ from swimmer's) |
+| `${nat}` | Swimmer's nationality code |
 | `${entryTime}` | Entry time |
 | `${time}` | Live time |
 | `${officialTime}` | Official final time |
@@ -229,6 +233,17 @@ The template is evaluated **once per lane** and resolved against the individual 
 | `${number}` | Lane number |
 
 The panel includes clickable **Use** buttons next to each token to append it to the template without typing.
+
+#### Flag feature options
+
+The Flag feature renders one national flag per lane, sized to fill the feature's height evenly.
+
+| Option | Description |
+|--------|-------------|
+| **Heat source** | Which heat's lanes to use: current heat or one of the next three (`next 1`–`next 3`). |
+| **Order** | Display rows by **Lane number** (default) or by **Rank**. |
+| **Nation source** | Which nation code drives the flag image: **Swimmer nation** (the swimmer's own nationality) or **Club nation** (the nation of the club the swimmer competes for). These differ when a swimmer represents a foreign club. |
+| **Display duration** | Optional: hide a lane's flag this many seconds after the last lap-time update. Leave disabled to always show. |
 
 ### Groups
 
