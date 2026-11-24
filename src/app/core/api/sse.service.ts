@@ -6,24 +6,32 @@ import { EventAndHeatDto, LaptimeDto } from './api.models';
 @Injectable({ providedIn: 'root' })
 export class SseService implements OnDestroy {
   private readonly base = inject(API_BASE_URL);
-  private readonly openSources = new Set<EventSource>();
+  private multiplexedSource: EventSource | null = null;
+  private refCount = 0;
 
   /** Real-time lap time updates pushed by the timing system. */
   lapTime$(): Observable<LaptimeDto> {
-    return this.stream<LaptimeDto>(`${this.base}/sse/laptime`);
+    return this.namedEvent<LaptimeDto>('laptime');
   }
 
   /** Real-time event+heat updates (lane list, stroke, category, etc). */
   eventAndHeat$(): Observable<EventAndHeatDto> {
-    return this.stream<EventAndHeatDto>(`${this.base}/sse/eventAndHeat`);
+    return this.namedEvent<EventAndHeatDto>('eventAndHeat');
   }
 
-  private stream<T>(url: string): Observable<T> {
-    return new Observable<T>((observer) => {
-      const es = new EventSource(url);
-      this.openSources.add(es);
+  private getOrCreateSource(): EventSource {
+    if (!this.multiplexedSource || this.multiplexedSource.readyState === EventSource.CLOSED) {
+      this.multiplexedSource = new EventSource(`${this.base}/sse/stream`);
+    }
+    return this.multiplexedSource;
+  }
 
-      es.onmessage = (event) => {
+  private namedEvent<T>(eventName: string): Observable<T> {
+    return new Observable<T>((observer) => {
+      const es = this.getOrCreateSource();
+      this.refCount++;
+
+      const handler = (event: MessageEvent) => {
         try {
           observer.next(JSON.parse(event.data) as T);
         } catch {
@@ -31,22 +39,32 @@ export class SseService implements OnDestroy {
         }
       };
 
-      es.onerror = () => {
+      const errorHandler = () => {
         if (es.readyState === EventSource.CLOSED) {
           observer.error(new Error('SSE connection permanently closed'));
         }
         // readyState === CONNECTING: browser is already retrying — do nothing.
       };
 
+      es.addEventListener(eventName, handler);
+      es.addEventListener('error', errorHandler);
+
       return () => {
-        es.close();
-        this.openSources.delete(es);
+        es.removeEventListener(eventName, handler);
+        es.removeEventListener('error', errorHandler);
+        this.refCount--;
+        if (this.refCount <= 0) {
+          this.multiplexedSource?.close();
+          this.multiplexedSource = null;
+          this.refCount = 0;
+        }
       };
     });
   }
 
   ngOnDestroy(): void {
-    this.openSources.forEach((es) => es.close());
-    this.openSources.clear();
+    this.multiplexedSource?.close();
+    this.multiplexedSource = null;
+    this.refCount = 0;
   }
 }
