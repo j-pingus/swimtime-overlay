@@ -104,12 +104,23 @@ Click **Add** to save a new rule. Click **×** on an existing rule to remove it.
 |--------|-----|
 | **Create** | Type a name in the "New layout" form and click **Create**. |
 | **Activate** | Click **Use** — the render window immediately switches to this layout. The active layout shows a **● Active** badge. |
+| **Publish / Republish** | Click **↑** to publish the layout to the central server for the first time. Once saved the icon changes to **☁**. Click **☁** again to push your latest local changes back to the server. |
 | **Configure** | Click **Configure** — opens the config editor for that layout. |
 | **Preview render** | Click **▶** — opens the render view for that layout directly (without changing the active layout). |
 | **Clone** | Click **⎘** — duplicates the layout with all its features. |
 | **Export** | Click **↓** — downloads the layout as a `.json` file. |
 | **Import** | Click **Import** — loads a `.json` file exported from another session. |
-| **Delete** | Click **×** — asks for confirmation, then permanently removes the layout. |
+| **Delete** | Click **×** — asks for confirmation, then permanently removes the layout. Deleting a published layout (☁) also removes it from the server. |
+
+### Multi-user layout sync
+
+Layouts can be shared between multiple operator stations through the Swimtime server.
+
+**Publishing a layout** saves it centrally (the ↑ button). Any other station opening the layouts page will automatically receive layouts from the server that are not yet in their local browser — their local edits are never overwritten on page navigation.
+
+**Real-time sync is only active while Live mode is enabled (● Live).** When live, the app subscribes to a server-sent event stream. If another operator publishes or updates a layout on the server, your local copy is automatically replaced with the new version. If a layout is deleted from the server by another operator, your local copy is preserved but its icon reverts to ↑ (unpublished) so you can re-publish or discard it yourself.
+
+> **Summary:** ↑ = local only · ☁ = saved on server · real-time updates only flow while **● Live** is active.
 
 ---
 
