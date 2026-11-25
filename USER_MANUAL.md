@@ -87,16 +87,20 @@ This is the main control panel. It is split into four sections.
 
 ### Message type associations
 
-Rules that automatically switch the active layout when a Swimtime SSE message arrives.
+Rules that automatically switch the active layout when a Swimtime SSE message arrives. **The same message type can have multiple rules** — each fires independently when the message is received.
+
+A common pattern is two rules on the same message type: one that shows a layout immediately for a fixed duration, and a second that shows a different layout after a delay.
 
 | Field | Description |
 |-------|-------------|
-| **Message type** | The Swimtime event that triggers the switch (e.g. `START_LIST`, `HEAT_ARRIVED`, `CHRONO_START`). |
-| **Layout** | The layout to activate when that message fires. |
+| **Message type** | The Swimtime event that triggers the switch (e.g. `START_LIST`, `HEAT_ARRIVED`, `CHRONO_START`). The same type can appear in multiple rows. |
+| **Layout** | The layout to activate. Can be changed at any time using the dropdown on an existing rule. |
 | **Delay (s)** | Optional: wait this many seconds after the message before switching. Leave blank for immediate. |
 | **Duration (s)** | Optional: automatically revert (clear the active layout) after this many seconds. Leave blank to stay until the next rule fires. |
 
-Click **Add** to save a new rule. Click **×** on an existing rule to remove it.
+Click **Add** to save a new rule. Click **×** on an existing rule to remove it. When a message fires, all matching rules are scheduled simultaneously — their delays and durations run independently.
+
+**Syncing associations** — the **↑ / ☁ Sync rules** button (top-right of this section) publishes the entire ruleset to the central server. Other stations load it automatically on page open. Real-time sync via SSE (like layouts) requires **● Live** to be active.
 
 ### Layouts list
 
