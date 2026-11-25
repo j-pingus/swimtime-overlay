@@ -1,7 +1,7 @@
 import { Injectable, inject, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.service';
-import { EventAndHeatDto, LaptimeDto } from './api.models';
+import { EventAndHeatDto, LaptimeDto, ResourceEventDto } from './api.models';
 
 @Injectable({ providedIn: 'root' })
 export class SseService implements OnDestroy {
@@ -17,6 +17,11 @@ export class SseService implements OnDestroy {
   /** Real-time event+heat updates (lane list, stroke, category, etc). */
   eventAndHeat$(): Observable<EventAndHeatDto> {
     return this.namedEvent<EventAndHeatDto>('eventAndHeat');
+  }
+
+  /** Resource change notifications (id, owner, type — no content). */
+  resource$(): Observable<ResourceEventDto> {
+    return this.namedEvent<ResourceEventDto>('resource');
   }
 
   private getOrCreateSource(): EventSource {

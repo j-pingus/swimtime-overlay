@@ -1,10 +1,13 @@
 import { Injectable, inject, OnDestroy, signal, computed } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { ApiService } from '../api/api.service';
+import { EMPTY, Subscription } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ApiService, RESOURCE_OWNER, RESOURCE_TYPE } from '../api/api.service';
 import { SseService } from '../api/sse.service';
 import { mapEventAndHeat, mapNextHeat } from '../api/competition.mapper';
 import { CompetitionStore } from './competition.store';
 import { LayoutStore } from './layout.store';
+import { Layout } from '../models/layout.model';
 
 @Injectable({ providedIn: 'root' })
 export class LiveDataService implements OnDestroy {
@@ -85,6 +88,28 @@ export class LiveDataService implements OnDestroy {
           }
         },
         error: (err) => { console.warn('SSE lapTime error', err); this._lapTimeOk.set(false); },
+      }),
+    );
+
+    this.sub.add(
+      this.sse.resource$().subscribe({
+        next: (evt) => {
+          if (evt.owner !== RESOURCE_OWNER || evt.type !== RESOURCE_TYPE) return;
+          this.api.getLayoutResource(evt.id).pipe(
+            catchError((err: HttpErrorResponse) => {
+              if (err.status === 404) this.layoutStore.markUnpublished(evt.id);
+              return EMPTY;
+            }),
+          ).subscribe((dto) => {
+            try {
+              const layout = JSON.parse(dto.resource) as Layout;
+              this.layoutStore.mergeServerLayouts([layout]);
+            } catch {
+              console.warn('[LiveData] could not parse resource layout', dto.id);
+            }
+          });
+        },
+        error: (err) => console.warn('SSE resource error', err),
       }),
     );
   }

@@ -169,4 +169,6 @@ export interface Layout {
   createdAt: number;
   features: AnyFeature[];
   fontFamily: string;
+  /** True when this layout has been persisted to the server resource API. */
+  serverSaved?: boolean;
 }

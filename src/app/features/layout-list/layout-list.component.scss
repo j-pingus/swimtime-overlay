@@ -500,6 +500,25 @@ h2 {
       }
     }
 
+    .btn-publish {
+      font-size: 1rem;
+      line-height: 1;
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: #bbb;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      &:hover {
+        border-color: #0070f3;
+        color: #0070f3;
+      }
+    }
+
     .btn-configure {
       font-size: 0.85rem;
       padding: 0.3rem 0.75rem;

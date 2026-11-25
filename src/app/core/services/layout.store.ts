@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, FlagFeature, MessageTypeRule, MessageTypeRules, TextFeature, LaneOrder } from '../models/layout.model';
 import { generateUUID } from '../utils/uuid.util';
 
-const SCHEMA_VERSION = 8;
+const SCHEMA_VERSION = 9;
 
 export type RenderBackground = 'transparent' | 'green';
 
@@ -176,6 +176,34 @@ export class LayoutStore {
       ...s,
       layouts: s.layouts.filter((l) => l.id !== id),
       activeLayoutId: s.activeLayoutId === id ? null : s.activeLayoutId,
+    }));
+  }
+
+  /** Merges layouts fetched from the server into local state.
+   *  Server version wins for layouts with matching IDs; new server layouts are appended. */
+  mergeServerLayouts(serverLayouts: Layout[]): void {
+    this.update((s) => {
+      const serverById = new Map(serverLayouts.map((l) => [l.id, { ...l, serverSaved: true }]));
+      const merged = s.layouts.map((local) => serverById.get(local.id) ?? local);
+      const localIds = new Set(s.layouts.map((l) => l.id));
+      for (const [id, layout] of serverById) {
+        if (!localIds.has(id)) merged.push(layout);
+      }
+      return { ...s, layouts: merged };
+    });
+  }
+
+  markPublished(id: string): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) => l.id === id ? { ...l, serverSaved: true } : l),
+    }));
+  }
+
+  markUnpublished(id: string): void {
+    this.update((s) => ({
+      ...s,
+      layouts: s.layouts.map((l) => l.id === id ? { ...l, serverSaved: false } : l),
     }));
   }
 
@@ -446,6 +474,16 @@ export class LayoutStore {
             }
             return f;
           }),
+        })),
+      };
+    }
+
+    if (from < 9) {
+      state = {
+        ...state,
+        layouts: state.layouts.map((l) => ({
+          ...l,
+          serverSaved: (l as Layout & { serverSaved?: boolean }).serverSaved ?? false,
         })),
       };
     }

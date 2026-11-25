@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LayoutStore, RenderBackground } from '../../core/services/layout.store';
@@ -6,6 +6,7 @@ import { CompetitionStore } from '../../core/services/competition.store';
 import { LiveDataService } from '../../core/services/live-data.service';
 import { ALL_MESSAGE_TYPES } from '../../core/api/api.models';
 import { Layout, ALL_FEATURE_TYPES } from '../../core/models/layout.model';
+import { ApiService } from '../../core/api/api.service';
 
 @Component({
   selector: 'app-layout-list',
@@ -13,10 +14,11 @@ import { Layout, ALL_FEATURE_TYPES } from '../../core/models/layout.model';
   templateUrl: './layout-list.component.html',
   styleUrl: './layout-list.component.scss',
 })
-export class LayoutListComponent {
+export class LayoutListComponent implements OnInit {
   protected readonly store = inject(LayoutStore);
   protected readonly competition = inject(CompetitionStore);
   protected readonly liveData = inject(LiveDataService);
+  private readonly api = inject(ApiService);
 
   protected newLayoutName = signal('');
   protected nameError = signal('');
@@ -41,6 +43,25 @@ export class LayoutListComponent {
     return ALL_MESSAGE_TYPES.filter((t) => !configured.has(t));
   });
 
+  ngOnInit(): void {
+    this.api.getLayoutResources().subscribe({
+      next: (dtos) => {
+        const localIds = new Set(this.store.layouts().map((l) => l.id));
+        const newLayouts: Layout[] = [];
+        for (const dto of dtos) {
+          if (localIds.has(dto.id)) continue;
+          try {
+            newLayouts.push(JSON.parse(dto.resource) as Layout);
+          } catch {
+            console.warn('[LayoutList] could not parse server layout', dto.id);
+          }
+        }
+        if (newLayouts.length > 0) this.store.mergeServerLayouts(newLayouts);
+      },
+      error: (err) => console.warn('[LayoutList] could not load server layouts', err),
+    });
+  }
+
   activate(id: string): void {
     this.store.setActiveLayout(id);
   }
@@ -51,7 +72,33 @@ export class LayoutListComponent {
 
   deleteLayout(id: string, name: string): void {
     if (!confirm(`Delete layout "${name}"? This cannot be undone.`)) return;
-    this.store.deleteLayout(id);
+    const layout = this.store.layouts().find((l) => l.id === id);
+    if (layout?.serverSaved) {
+      this.api.deleteLayoutResource(id).subscribe({
+        next: () => this.store.deleteLayout(id),
+        error: (err) => {
+          console.error('[LayoutList] server delete failed', err);
+          if (confirm(`Server delete failed. Remove "${name}" locally only?`)) {
+            this.store.deleteLayout(id);
+          }
+        },
+      });
+    } else {
+      this.store.deleteLayout(id);
+    }
+  }
+
+  publishLayout(layout: Layout): void {
+    if (!layout.serverSaved) {
+      this.api.publishNewLayoutResource(layout).subscribe({
+        next: () => this.store.markPublished(layout.id),
+        error: (err) => console.error('[LayoutList] publish failed', err),
+      });
+    } else {
+      this.api.updateLayoutResource(layout.id, layout).subscribe({
+        error: (err) => console.error('[LayoutList] republish failed', err),
+      });
+    }
   }
 
   exportLayout(layout: Layout): void {

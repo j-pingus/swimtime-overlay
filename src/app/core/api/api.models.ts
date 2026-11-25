@@ -1,3 +1,9 @@
+export interface ResourceEventDto {
+  id: string;
+  owner: string;
+  type: string;
+}
+
 export interface LaneDto {
   laneId?: number;
   displayName?: string;
