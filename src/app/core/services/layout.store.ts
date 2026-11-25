@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Layout, AnyFeature, BaseFeature, GroupFeature, LaneFeature, FlagFeature, MessageTypeRule, MessageTypeRules, TextFeature, LaneOrder } from '../models/layout.model';
 import { generateUUID } from '../utils/uuid.util';
 
-const SCHEMA_VERSION = 9;
+const SCHEMA_VERSION = 11;
 
 export type RenderBackground = 'transparent' | 'green';
 
@@ -12,6 +12,7 @@ export type LayoutStoreState = {
   activeLayoutId: string | null;
   messageTypeRules: MessageTypeRules;
   renderBackground: RenderBackground;
+  associationsSaved?: boolean;
 };
 
 // ── IndexedDB helpers ──────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ const LS_KEY = 'swimtime_layouts';
 
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
-  private readonly _state = signal<LayoutStoreState>({ layouts: [], activeLayoutId: null, messageTypeRules: {}, renderBackground: 'transparent' });
+  private readonly _state = signal<LayoutStoreState>({ layouts: [], activeLayoutId: null, messageTypeRules: [], renderBackground: 'transparent' });
   private readonly db = openIDB();
   private localUpdateListeners: Array<(s: LayoutStoreState) => void> = [];
 
@@ -63,8 +64,12 @@ export class LayoutStore {
     const id = this._state().activeLayoutId;
     return this._state().layouts.find((l) => l.id === id) ?? null;
   });
-  readonly messageTypeRules = computed(() => this._state().messageTypeRules);
+  readonly messageTypeRules = computed(() => {
+    const rules = this._state().messageTypeRules;
+    return Array.isArray(rules) ? rules : [];
+  });
   readonly renderBackground = computed(() => this._state().renderBackground ?? 'transparent');
+  readonly associationsSaved = computed(() => this._state().associationsSaved ?? false);
 
   /** Called by APP_INITIALIZER — loads persisted state before the app renders. */
   async init(): Promise<void> {
@@ -114,18 +119,20 @@ export class LayoutStore {
 
   // --- Message type rules ---
 
-  setMessageTypeRule(messageType: string, rule: MessageTypeRule): void {
+  addMessageTypeRule(rule: Omit<MessageTypeRule, 'id'>): void {
+    const newRule: MessageTypeRule = { ...rule, id: generateUUID() };
+    this.update((s) => ({ ...s, messageTypeRules: [...s.messageTypeRules, newRule] }));
+  }
+
+  updateMessageTypeRule(id: string, patch: Partial<Omit<MessageTypeRule, 'id'>>): void {
     this.update((s) => ({
       ...s,
-      messageTypeRules: { ...s.messageTypeRules, [messageType]: rule },
+      messageTypeRules: s.messageTypeRules.map((r) => r.id === id ? { ...r, ...patch } : r),
     }));
   }
 
-  clearMessageTypeRule(messageType: string): void {
-    this.update((s) => {
-      const { [messageType]: _, ...rest } = s.messageTypeRules;
-      return { ...s, messageTypeRules: rest };
-    });
+  removeMessageTypeRule(id: string): void {
+    this.update((s) => ({ ...s, messageTypeRules: s.messageTypeRules.filter((r) => r.id !== id) }));
   }
 
   setRenderBackground(bg: RenderBackground): void {
@@ -205,6 +212,14 @@ export class LayoutStore {
       ...s,
       layouts: s.layouts.map((l) => l.id === id ? { ...l, serverSaved: false } : l),
     }));
+  }
+
+  applyServerAssociations(rawRules: unknown): void {
+    this.update((s) => ({ ...s, messageTypeRules: normalizeMessageTypeRules(rawRules), associationsSaved: true }));
+  }
+
+  markAssociationsSaved(saved: boolean): void {
+    this.update((s) => ({ ...s, associationsSaved: saved }));
   }
 
   // --- Feature CRUD ---
@@ -408,13 +423,13 @@ export class LayoutStore {
     }
 
     if (from < 4) {
+      type OldRules = Record<string, { layoutId: string; delay?: number | null; duration: number | null }>;
+      const old = state.messageTypeRules as unknown as OldRules;
       state = {
         ...state,
         messageTypeRules: Object.fromEntries(
-          Object.entries(state.messageTypeRules).map(([k, rule]) => [
-            k, { ...rule, delay: (rule as MessageTypeRule & { delay?: number | null }).delay ?? null },
-          ]),
-        ),
+          Object.entries(old).map(([k, rule]) => [k, { ...rule, delay: rule.delay ?? null }]),
+        ) as unknown as MessageTypeRules,
       };
     }
 
@@ -488,8 +503,35 @@ export class LayoutStore {
       };
     }
 
+    if (from < 10) {
+      state = {
+        ...state,
+        associationsSaved: (state as LayoutStoreState & { associationsSaved?: boolean }).associationsSaved ?? false,
+      };
+    }
+
+    if (from < 11) {
+      state = { ...state, messageTypeRules: normalizeMessageTypeRules(state.messageTypeRules) };
+    }
+
     return { ...state, schemaVersion: SCHEMA_VERSION };
   }
+}
+
+/** Converts old Record<string, rule> format or new MessageTypeRule[] to the canonical array form. */
+function normalizeMessageTypeRules(raw: unknown): MessageTypeRule[] {
+  if (Array.isArray(raw)) return raw as MessageTypeRule[];
+  if (raw && typeof raw === 'object') {
+    type OldEntry = { layoutId: string; delay?: number | null; duration?: number | null };
+    return Object.entries(raw as Record<string, OldEntry>).map(([messageType, rule]) => ({
+      id: generateUUID(),
+      messageType,
+      layoutId: rule.layoutId,
+      delay: rule.delay ?? null,
+      duration: rule.duration ?? null,
+    }));
+  }
+  return [];
 }
 
 /** Reassigns all feature IDs (and remaps groupId references) for clone/import. */

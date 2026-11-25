@@ -2,7 +2,7 @@ import { Injectable, inject, OnDestroy, signal, computed } from '@angular/core';
 import { EMPTY, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ApiService, RESOURCE_OWNER, RESOURCE_TYPE } from '../api/api.service';
+import { ApiService, RESOURCE_OWNER, RESOURCE_TYPE, ASSOCIATIONS_TYPE } from '../api/api.service';
 import { SseService } from '../api/sse.service';
 import { mapEventAndHeat, mapNextHeat } from '../api/competition.mapper';
 import { CompetitionStore } from './competition.store';
@@ -17,8 +17,7 @@ export class LiveDataService implements OnDestroy {
   private readonly layoutStore = inject(LayoutStore);
 
   private sub = new Subscription();
-  private delayTimer: ReturnType<typeof setTimeout> | null = null;
-  private ruleTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingTimers: ReturnType<typeof setTimeout>[] = [];
 
   private readonly _eventAndHeatOk = signal(true);
   private readonly _lapTimeOk = signal(true);
@@ -94,20 +93,36 @@ export class LiveDataService implements OnDestroy {
     this.sub.add(
       this.sse.resource$().subscribe({
         next: (evt) => {
-          if (evt.owner !== RESOURCE_OWNER || evt.type !== RESOURCE_TYPE) return;
-          this.api.getLayoutResource(evt.id).pipe(
-            catchError((err: HttpErrorResponse) => {
-              if (err.status === 404) this.layoutStore.markUnpublished(evt.id);
-              return EMPTY;
-            }),
-          ).subscribe((dto) => {
-            try {
-              const layout = JSON.parse(dto.resource) as Layout;
-              this.layoutStore.mergeServerLayouts([layout]);
-            } catch {
-              console.warn('[LiveData] could not parse resource layout', dto.id);
-            }
-          });
+          if (evt.owner !== RESOURCE_OWNER) return;
+
+          if (evt.type === RESOURCE_TYPE) {
+            this.api.getLayoutResource(evt.id).pipe(
+              catchError((err: HttpErrorResponse) => {
+                if (err.status === 404) this.layoutStore.markUnpublished(evt.id);
+                return EMPTY;
+              }),
+            ).subscribe((dto) => {
+              try {
+                const layout = JSON.parse(dto.resource) as Layout;
+                this.layoutStore.mergeServerLayouts([layout]);
+              } catch {
+                console.warn('[LiveData] could not parse resource layout', dto.id);
+              }
+            });
+          } else if (evt.type === ASSOCIATIONS_TYPE) {
+            this.api.getAssociationsResource().pipe(
+              catchError((err: HttpErrorResponse) => {
+                if (err.status === 404) this.layoutStore.markAssociationsSaved(false);
+                return EMPTY;
+              }),
+            ).subscribe((dto) => {
+              try {
+                this.layoutStore.applyServerAssociations(JSON.parse(dto.resource));
+              } catch {
+                console.warn('[LiveData] could not parse associations resource');
+              }
+            });
+          }
         },
         error: (err) => console.warn('SSE resource error', err),
       }),
@@ -115,61 +130,53 @@ export class LiveDataService implements OnDestroy {
   }
 
   stop(): void {
-    this.clearDelayTimer();
-    this.clearRuleTimer();
+    this.clearPendingTimers();
     this.sub.unsubscribe();
     this.sub = new Subscription();
     this.competitionStore.setMode('config');
   }
 
   ngOnDestroy(): void {
-    this.clearDelayTimer();
-    this.clearRuleTimer();
+    this.clearPendingTimers();
     this.sub.unsubscribe();
   }
 
   private applyRule(messageType: string): void {
-    const rule = this.layoutStore.getState().messageTypeRules[messageType];
-    if (!rule) return;
+    const rules = this.layoutStore.getState().messageTypeRules.filter((r) => r.messageType === messageType);
+    if (!rules.length) return;
 
-    this.clearDelayTimer();
-    this.clearRuleTimer();
+    this.clearPendingTimers();
 
-    const activate = () => {
-      this.layoutStore.setActiveLayout(rule.layoutId);
-      if (rule.duration != null) {
-        const activatedId = rule.layoutId;
-        this.ruleTimer = setTimeout(() => {
-          if (this.layoutStore.getState().activeLayoutId === activatedId) {
-            this.layoutStore.setActiveLayout(null);
-          }
-          this.ruleTimer = null;
-        }, rule.duration * 1000);
-      }
-    };
+    for (const rule of rules) {
+      const activate = () => {
+        this.layoutStore.setActiveLayout(rule.layoutId);
+        if (rule.duration != null) {
+          const activatedId = rule.layoutId;
+          const t = setTimeout(() => {
+            if (this.layoutStore.getState().activeLayoutId === activatedId) {
+              this.layoutStore.setActiveLayout(null);
+            }
+            this.pendingTimers = this.pendingTimers.filter((x) => x !== t);
+          }, rule.duration * 1000);
+          this.pendingTimers.push(t);
+        }
+      };
 
-    if (rule.delay != null && rule.delay > 0) {
-      this.delayTimer = setTimeout(() => {
-        this.delayTimer = null;
+      if (rule.delay != null && rule.delay > 0) {
+        const t = setTimeout(() => {
+          this.pendingTimers = this.pendingTimers.filter((x) => x !== t);
+          activate();
+        }, rule.delay * 1000);
+        this.pendingTimers.push(t);
+      } else {
         activate();
-      }, rule.delay * 1000);
-    } else {
-      activate();
+      }
     }
   }
 
-  private clearDelayTimer(): void {
-    if (this.delayTimer != null) {
-      clearTimeout(this.delayTimer);
-      this.delayTimer = null;
-    }
-  }
-
-  private clearRuleTimer(): void {
-    if (this.ruleTimer != null) {
-      clearTimeout(this.ruleTimer);
-      this.ruleTimer = null;
-    }
+  private clearPendingTimers(): void {
+    for (const t of this.pendingTimers) clearTimeout(t);
+    this.pendingTimers = [];
   }
 }
 

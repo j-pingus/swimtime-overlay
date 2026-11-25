@@ -142,6 +142,8 @@ export type AnyFeature = GenericFeature | GroupFeature | ImageFeature | TextFeat
 export type BaseFeature = AnyFeature;
 
 export interface MessageTypeRule {
+  id: string;
+  messageType: string;
   layoutId: string;
   /** Delay in seconds before the layout is activated. Null = activate immediately. */
   delay: number | null;
@@ -149,8 +151,7 @@ export interface MessageTypeRule {
   duration: number | null;
 }
 
-/** Keyed by SwimTimeMessageType string — loose-typed to avoid importing API models here. */
-export type MessageTypeRules = Record<string, MessageTypeRule>;
+export type MessageTypeRules = MessageTypeRule[];
 
 export const RENDER_FONTS: { label: string; value: string; googleFont: string | null }[] = [
   { label: 'System (sans-serif)', value: 'sans-serif',       googleFont: null },

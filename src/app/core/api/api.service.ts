@@ -2,7 +2,7 @@ import { Injectable, inject, InjectionToken } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CompetitionInfoDto, EventAndHeatDto, EventDto } from './api.models';
-import { Layout } from '../models/layout.model';
+import { Layout, MessageTypeRules } from '../models/layout.model';
 
 export interface ResourceDto {
   id: string;
@@ -11,8 +11,10 @@ export interface ResourceDto {
   resource: string;
 }
 
-export const RESOURCE_OWNER = 'swimtime-overlay';
-export const RESOURCE_TYPE  = 'layout';
+export const RESOURCE_OWNER          = 'swimtime-overlay';
+export const RESOURCE_TYPE           = 'layout';
+export const ASSOCIATIONS_TYPE        = 'associations';
+export const ASSOCIATIONS_RESOURCE_ID = 'message-type-association';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL', {
   factory: () => '/api',
@@ -77,5 +79,25 @@ export class ApiService {
 
   deleteLayoutResource(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/resources/id/${id}`);
+  }
+
+  getAssociationsResource(): Observable<ResourceDto> {
+    return this.http.get<ResourceDto>(`${this.base}/resources/id/${ASSOCIATIONS_RESOURCE_ID}`);
+  }
+
+  publishNewAssociationsResource(rules: MessageTypeRules): Observable<ResourceDto> {
+    return this.http.post<ResourceDto>(`${this.base}/resources/id/${ASSOCIATIONS_RESOURCE_ID}`, {
+      owner: RESOURCE_OWNER,
+      type: ASSOCIATIONS_TYPE,
+      resource: JSON.stringify(rules),
+    });
+  }
+
+  updateAssociationsResource(rules: MessageTypeRules): Observable<ResourceDto> {
+    return this.http.put<ResourceDto>(
+      `${this.base}/resources/id/${ASSOCIATIONS_RESOURCE_ID}`,
+      JSON.stringify(rules),
+      { headers: { 'Content-Type': 'application/json' } },
+    );
   }
 }

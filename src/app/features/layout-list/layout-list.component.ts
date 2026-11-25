@@ -7,6 +7,8 @@ import { LiveDataService } from '../../core/services/live-data.service';
 import { ALL_MESSAGE_TYPES } from '../../core/api/api.models';
 import { Layout, ALL_FEATURE_TYPES } from '../../core/models/layout.model';
 import { ApiService } from '../../core/api/api.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchError, EMPTY } from 'rxjs';
 
 @Component({
   selector: 'app-layout-list',
@@ -29,24 +31,27 @@ export class LayoutListComponent implements OnInit {
   protected newRuleDuration = signal('');
 
   protected readonly ruleEntries = computed(() =>
-    Object.entries(this.store.messageTypeRules()).map(([type, rule]) => ({
-      type,
+    this.store.messageTypeRules().map((rule) => ({
+      ...rule,
       layoutName: this.store.layouts().find((l) => l.id === rule.layoutId)?.name ?? '(deleted)',
-      layoutId: rule.layoutId,
-      delay: rule.delay,
-      duration: rule.duration,
     })),
   );
 
-  protected readonly availableMessageTypes = computed(() => {
-    const configured = new Set(Object.keys(this.store.messageTypeRules()));
-    return ALL_MESSAGE_TYPES.filter((t) => !configured.has(t));
-  });
+  protected readonly availableMessageTypes = computed(() => ALL_MESSAGE_TYPES);
 
   ngOnInit(): void {
     this.api.getLayoutResources().subscribe({
       next: (dtos) => {
+        const serverIds = new Set(dtos.map((d) => d.id));
         const localIds = new Set(this.store.layouts().map((l) => l.id));
+
+        // Mark locally-published layouts as unpublished when absent from the server.
+        for (const layout of this.store.layouts()) {
+          if (layout.serverSaved && !serverIds.has(layout.id)) {
+            this.store.markUnpublished(layout.id);
+          }
+        }
+
         const newLayouts: Layout[] = [];
         for (const dto of dtos) {
           if (localIds.has(dto.id)) continue;
@@ -60,6 +65,33 @@ export class LayoutListComponent implements OnInit {
       },
       error: (err) => console.warn('[LayoutList] could not load server layouts', err),
     });
+
+    this.api.getAssociationsResource().pipe(
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 404) this.store.markAssociationsSaved(false);
+        return EMPTY;
+      }),
+    ).subscribe((dto) => {
+      try {
+        this.store.applyServerAssociations(JSON.parse(dto.resource));
+      } catch {
+        console.warn('[LayoutList] could not parse server associations');
+      }
+    });
+  }
+
+  publishAssociations(): void {
+    const rules = this.store.messageTypeRules();
+    if (!this.store.associationsSaved()) {
+      this.api.publishNewAssociationsResource(rules).subscribe({
+        next: () => this.store.markAssociationsSaved(true),
+        error: (err) => console.error('[LayoutList] publish associations failed', err),
+      });
+    } else {
+      this.api.updateAssociationsResource(rules).subscribe({
+        error: (err) => console.error('[LayoutList] republish associations failed', err),
+      });
+    }
   }
 
   activate(id: string): void {
@@ -152,12 +184,13 @@ export class LayoutListComponent implements OnInit {
   }
 
   addRule(): void {
-    const type = this.newRuleType();
+    const messageType = this.newRuleType();
     const layoutId = this.newRuleLayoutId();
-    if (!type || !layoutId) return;
+    if (!messageType || !layoutId) return;
     const delay = parseInt(this.newRuleDelay(), 10);
     const dur = parseInt(this.newRuleDuration(), 10);
-    this.store.setMessageTypeRule(type, {
+    this.store.addMessageTypeRule({
+      messageType,
       layoutId,
       delay: delay > 0 ? delay : null,
       duration: dur > 0 ? dur : null,
@@ -168,22 +201,22 @@ export class LayoutListComponent implements OnInit {
     this.newRuleDuration.set('');
   }
 
-  updateRuleDelay(type: string, event: Event): void {
-    const rule = this.store.messageTypeRules()[type];
-    if (!rule) return;
-    const value = parseInt((event.target as HTMLInputElement).value, 10);
-    this.store.setMessageTypeRule(type, { ...rule, delay: value > 0 ? value : null });
+  updateRuleLayout(id: string, layoutId: string): void {
+    if (layoutId) this.store.updateMessageTypeRule(id, { layoutId });
   }
 
-  updateRuleDuration(type: string, event: Event): void {
-    const rule = this.store.messageTypeRules()[type];
-    if (!rule) return;
+  updateRuleDelay(id: string, event: Event): void {
     const value = parseInt((event.target as HTMLInputElement).value, 10);
-    this.store.setMessageTypeRule(type, { ...rule, duration: value > 0 ? value : null });
+    this.store.updateMessageTypeRule(id, { delay: value > 0 ? value : null });
   }
 
-  removeRule(type: string): void {
-    this.store.clearMessageTypeRule(type);
+  updateRuleDuration(id: string, event: Event): void {
+    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    this.store.updateMessageTypeRule(id, { duration: value > 0 ? value : null });
+  }
+
+  removeRule(id: string): void {
+    this.store.removeMessageTypeRule(id);
   }
 
   setRenderBackground(bg: RenderBackground): void {
